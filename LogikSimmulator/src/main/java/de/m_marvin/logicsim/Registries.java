@@ -14,43 +14,55 @@ public class Registries {
 	/* Folder Registry */
 	
 	public static record ComponentFolder(String name, String icon) {}
-	protected List<ComponentFolder> partFolders = new ArrayList<>();
+	protected static List<ComponentFolder> partFolders = new ArrayList<>();
 
-	public ComponentFolder registerFolder(String name, String icon) {
+	public static ComponentFolder registerFolder(String name, String icon) {
 		ComponentFolder folder = new ComponentFolder(name, icon);
-		this.partFolders.add(folder);
+		partFolders.add(folder);
 		return folder;
 	}
 	
-	public ComponentFolder getFolderEntry(String name) {
-		for (ComponentFolder entry : this.partFolders) {
+	public static ComponentFolder getFolderEntry(String name) {
+		for (ComponentFolder entry : partFolders) {
 			if (entry.name == name) return entry;
 		}
 		throw new IllegalArgumentException("There is no folder registered with name '" + name + "'");
 	}
 	
-	public List<ComponentFolder> getRegisteredFolderList() {
-		return this.partFolders;
+	public static List<ComponentFolder> getRegisteredFolderList() {
+		return partFolders;
 	}
 	
 	/* Component Registry */
 	
 	public static record ComponentEntry(ComponentFolder folder, Class<?> componentClass, BiConsumer<Circuit, Vec2i> placementClickMethod, BiFunction<Circuit, Vec2i, Boolean> placementMoveMethod, Consumer<Circuit> placementAbbortMethod, String name, String icon) {}
-	protected List<ComponentEntry> logicParts = new ArrayList<>();
+	protected static List<ComponentEntry> logicParts = new ArrayList<>();
 	
-	public void registerPart(ComponentFolder folder, Class<?> component, BiConsumer<Circuit, Vec2i> placementClickMethod, BiFunction<Circuit, Vec2i, Boolean> placementMoveMethod, Consumer<Circuit> placementAbbortMethod, String name, String icon) {
-		this.logicParts.add(new ComponentEntry(folder, component, placementClickMethod, placementMoveMethod, placementAbbortMethod, name, icon));
+	public static void registerPart(ComponentFolder folder, Class<?> component, BiConsumer<Circuit, Vec2i> placementClickMethod, BiFunction<Circuit, Vec2i, Boolean> placementMoveMethod, Consumer<Circuit> placementAbbortMethod, String name, String icon) {
+		logicParts.add(new ComponentEntry(folder, component, placementClickMethod, placementMoveMethod, placementAbbortMethod, name, icon));
 	}
 	
-	public ComponentEntry getPartEntry(Class<?> connectorClass) {
-		for (ComponentEntry entry : this.logicParts) {
+	public static ComponentEntry getPartEntry(Class<?> connectorClass) {
+		for (ComponentEntry entry : logicParts) {
 			if (entry.componentClass == connectorClass) return entry;
 		}
 		throw new IllegalArgumentException("There is no net-connector registered with class '" + connectorClass.getName() + "'");
 	}
 	
-	public List<ComponentEntry> getRegisteredPartsList() {
-		return this.logicParts;
+	public static List<ComponentEntry> getRegisteredPartsList() {
+		return logicParts;
+	}
+	
+	/* Language File Registry */
+	
+	protected static List<String> langFolders = new ArrayList<>();
+	
+	public static void registerLangFolder(String langFolder) {
+		langFolders.add(langFolder);
+	}
+	
+	public static List<String> getLangFolders() {
+		return langFolders;
 	}
 	
 }

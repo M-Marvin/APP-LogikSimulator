@@ -5,8 +5,8 @@ import java.util.Optional;
 import de.m_marvin.univec.impl.Vec2i;
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Circuit.NetState;
+import de.m_marvin.logicsim.logic.nodes.PassivNode;
 import de.m_marvin.logicsim.logic.NetConnector;
-import de.m_marvin.logicsim.logic.PassivNode;
 import de.m_marvin.logicsim.ui.EditorArea;
 
 public class ConnectorWire extends NetConnector {

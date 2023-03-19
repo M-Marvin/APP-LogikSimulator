@@ -1,0 +1,13 @@
+{
+"editor.menu.file": "File",
+"editor.menu.file.save": "Save",
+"editor.menu.file.load": "Lode",
+
+"circuit.components.and_gate": "And Gate",
+"circuit.components.or_gate": "Or Gate",
+"circuit.components.nand_gate": "Nand Gate",
+"circuit.components.nor_gate": "Nor Gate",
+"circuit.components.xor_gate": "Xor Gate",
+"circuit.components.button": "Button"
+
+}

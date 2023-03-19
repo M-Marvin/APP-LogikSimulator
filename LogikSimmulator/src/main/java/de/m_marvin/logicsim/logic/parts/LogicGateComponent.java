@@ -5,8 +5,8 @@ import java.util.function.BiFunction;
 import de.m_marvin.univec.impl.Vec2i;
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Component;
-import de.m_marvin.logicsim.logic.InputNode;
-import de.m_marvin.logicsim.logic.OutputNode;
+import de.m_marvin.logicsim.logic.nodes.InputNode;
+import de.m_marvin.logicsim.logic.nodes.OutputNode;
 import de.m_marvin.logicsim.ui.EditorArea;
 
 public class LogicGateComponent extends Component {

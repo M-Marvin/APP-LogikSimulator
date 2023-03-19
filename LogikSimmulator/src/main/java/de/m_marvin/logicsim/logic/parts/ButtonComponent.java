@@ -2,7 +2,7 @@ package de.m_marvin.logicsim.logic.parts;
 
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Component;
-import de.m_marvin.logicsim.logic.OutputNode;
+import de.m_marvin.logicsim.logic.nodes.OutputNode;
 import de.m_marvin.logicsim.ui.EditorArea;
 import de.m_marvin.univec.impl.Vec2i;
 

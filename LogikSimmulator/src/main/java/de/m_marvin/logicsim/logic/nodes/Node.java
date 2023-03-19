@@ -1,7 +1,9 @@
-package de.m_marvin.logicsim.logic;
+package de.m_marvin.logicsim.logic.nodes;
 
 import java.util.Objects;
 
+import de.m_marvin.logicsim.logic.Circuit;
+import de.m_marvin.logicsim.logic.Component;
 import de.m_marvin.univec.impl.Vec2i;
 
 public class Node {

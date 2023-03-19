@@ -12,9 +12,9 @@ import de.m_marvin.logicsim.logic.parts.LogicGateComponent.NandGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.NorGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.OrGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.XorGateComponent;
-import de.m_marvin.logicsim.logic.parts.TestComponent;
 import de.m_marvin.logicsim.logic.wires.ConnectorWire;
 import de.m_marvin.logicsim.ui.Editor;
+import de.m_marvin.logicsim.ui.Translator;
 
 public class LogicSim {
 	
@@ -22,7 +22,6 @@ public class LogicSim {
 	
 	protected boolean shouldTerminate;
 	protected Thread renderThread;
-	protected Registries registries;
 	protected Display display;
 	protected Editor mainWindow;
 	protected Circuit circuit;
@@ -35,9 +34,6 @@ public class LogicSim {
 	
 	public LogicSim() {
 		INSTANCE = this;
-		
-		registries = new Registries();
-		registerIncludedParts();
 	}
 	
 	public static LogicSim getInstance() {
@@ -46,10 +42,6 @@ public class LogicSim {
 
 	public Device getDisplay() {
 		return this.display;
-	}
-	
-	public Registries getRegistries() {
-		return registries;
 	}
 	
 	public boolean shouldTerminate() {
@@ -70,6 +62,10 @@ public class LogicSim {
 	}
 	
 	private void start() {
+
+		registerIncludedParts();
+		
+		Translator.changeLanguage("lang_de");
 		
 		this.display = new Display();
 		
@@ -106,17 +102,19 @@ public class LogicSim {
 	public static final String ICON_WIRE_GROUP = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAGUExURQAAAAAAAKVnuc8AAAACdFJOU/8A5bcwSgAAAAlwSFlzAAAOwwAADsMBx2+oZAAAAFpJREFUOE/djsESgCAIROX/f1qUxchwKGM69C7q7lMpFJApeCpnRvCY70lmN+kCF5cNVvCtgDm3hcFDAc9a+Nx/O0Ch3BEMoRAO+RvhREukUFAoLZFizVuBqALkLQNcVg88CgAAAABJRU5ErkJggg==";
 	
 	public void registerIncludedParts() {
-		ComponentFolder wireFolder = registries.registerFolder("wires", ICON_WIRE_GROUP);
-		ComponentFolder partFolder = registries.registerFolder("parts", ICON_PART_GROUP);
-		registries.registerPart(partFolder, AndGateComponent.class, Component::placeClick, AndGateComponent::coursorMove, Component::abbortPlacement, "And Gate", TestComponent.ICON_B64);
-		registries.registerPart(partFolder, OrGateComponent.class, Component::placeClick, OrGateComponent::coursorMove, Component::abbortPlacement, "Or Gate", TestComponent.ICON_B64);
-		registries.registerPart(partFolder, NandGateComponent.class, Component::placeClick, NandGateComponent::coursorMove, Component::abbortPlacement, "Nand Gate", TestComponent.ICON_B64);
-		registries.registerPart(partFolder, NorGateComponent.class, Component::placeClick, NorGateComponent::coursorMove, Component::abbortPlacement, "Nort Gate", TestComponent.ICON_B64);
-		registries.registerPart(partFolder, XorGateComponent.class, Component::placeClick, XorGateComponent::coursorMove, Component::abbortPlacement, "Xor Gate", TestComponent.ICON_B64);
-		registries.registerPart(partFolder, ButtonComponent.class, Component::placeClick, ButtonComponent::coursorMove, Component::abbortPlacement, "Button", TestComponent.ICON_B64);
+		ComponentFolder wireFolder = Registries.registerFolder("circuit.folders.wires", ICON_WIRE_GROUP);
+		ComponentFolder partFolder = Registries.registerFolder("circuit.folders.basic", ICON_PART_GROUP);
 		
-		registries.registerPart(partFolder, TestComponent.class, Component::placeClick, TestComponent::coursorMove, Component::abbortPlacement, "Test-Part", TestComponent.ICON_B64);
-		registries.registerPart(wireFolder, ConnectorWire.class, ConnectorWire::placeClick, ConnectorWire::coursorMove, ConnectorWire::abbortPlacement, "Wire", ConnectorWire.ICON_B64);
+		Registries.registerPart(partFolder, AndGateComponent.class, Component::placeClick, AndGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.and_gate", ICON_PART_GROUP);
+		Registries.registerPart(partFolder, OrGateComponent.class, Component::placeClick, OrGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.or_gate",ICON_PART_GROUP);
+		Registries.registerPart(partFolder, NandGateComponent.class, Component::placeClick, NandGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.nor_gate",ICON_PART_GROUP);
+		Registries.registerPart(partFolder, NorGateComponent.class, Component::placeClick, NorGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.nand_gate",ICON_PART_GROUP);
+		Registries.registerPart(partFolder, XorGateComponent.class, Component::placeClick, XorGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.xor_gate",ICON_PART_GROUP);
+		Registries.registerPart(partFolder, ButtonComponent.class, Component::placeClick, ButtonComponent::coursorMove, Component::abbortPlacement, "circuit.components.button",ICON_PART_GROUP);
+		
+		Registries.registerPart(wireFolder, ConnectorWire.class, ConnectorWire::placeClick, ConnectorWire::coursorMove, ConnectorWire::abbortPlacement, "circuit.components.wire", ConnectorWire.ICON_B64);
+		
+		Registries.registerLangFolder("/de/m_marvin/logicsim/lang");
 	}
 	
 }

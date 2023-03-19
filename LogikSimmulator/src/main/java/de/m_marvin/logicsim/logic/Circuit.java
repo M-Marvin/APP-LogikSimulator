@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import de.m_marvin.logicsim.logic.nodes.Node;
+
 public class Circuit {
 	
 	public static Random floatingValue = new Random();

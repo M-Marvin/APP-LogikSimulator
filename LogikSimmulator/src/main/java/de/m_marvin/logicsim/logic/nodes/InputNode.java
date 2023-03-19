@@ -1,5 +1,6 @@
-package de.m_marvin.logicsim.logic;
+package de.m_marvin.logicsim.logic.nodes;
 
+import de.m_marvin.logicsim.logic.Component;
 import de.m_marvin.univec.impl.Vec2i;
 
 public class InputNode extends Node {

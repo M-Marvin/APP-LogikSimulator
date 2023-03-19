@@ -5,6 +5,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import com.google.gson.JsonObject;
+
+import de.m_marvin.logicsim.logic.nodes.InputNode;
+import de.m_marvin.logicsim.logic.nodes.Node;
+import de.m_marvin.logicsim.logic.nodes.OutputNode;
+import de.m_marvin.logicsim.logic.nodes.PassivNode;
 import de.m_marvin.univec.impl.Vec2i;
 
 public abstract class Component {
@@ -112,6 +118,18 @@ public abstract class Component {
 	public abstract void updateIO();
 	
 	public void click(Vec2i clickPosition) {}
+	
+	public void serialize(JsonObject json) {
+		json.addProperty("label", this.label);
+		json.addProperty("x", this.visualPosition.x);
+		json.addProperty("y", this.visualPosition.y);
+	}
+	
+	public void deserialize(JsonObject json) {
+		this.label = json.get("label").getAsString();
+		this.visualPosition.x = json.get("x").getAsInt();
+		this.visualPosition.y = json.get("y").getAsInt();
+	}
 	
 	@Override
 	public boolean equals(Object obj) {
