@@ -7,7 +7,7 @@ import java.util.HashMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import de.m_marvin.logicsim.Registries;
+import de.m_marvin.logicsim.util.Registries;
 
 public class Translator {
 	

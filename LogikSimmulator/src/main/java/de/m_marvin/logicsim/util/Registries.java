@@ -1,4 +1,4 @@
-package de.m_marvin.logicsim;
+package de.m_marvin.logicsim.util;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package de.m_marvin.logicsim;
+package de.m_marvin.logicsim.util;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

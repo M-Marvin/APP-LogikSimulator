@@ -1,16 +1,25 @@
 {
 "editor.menu.file": "File",
 "editor.menu.file.save": "Save",
-"editor.menu.file.load": "Lode",
+"editor.menu.file.save_as": "Save as ...",
+"editor.menu.file.load": "Load ...",
+"editor.window.info": "Information",
+"editor.window.override_request": "Do you want to override this file?",
 
 "info.error.save_file": "Failed to save file! An IOException was thrown: %0",
 "info.error.load_file": "Failed to load file! An IOException was thrown: %0",
 
+"circuit.folders.basic": "Basics",
+"circuit.folders.wires": "Wires",
+
+"circuit.components.wire": "Logik Wire",
 "circuit.components.and_gate": "And Gate",
 "circuit.components.or_gate": "Or Gate",
 "circuit.components.nand_gate": "Nand Gate",
 "circuit.components.nor_gate": "Nor Gate",
 "circuit.components.xor_gate": "Xor Gate",
-"circuit.components.button": "Button"
+"circuit.components.not_gate": "Not Gate",
+"circuit.components.button": "Button",
+"circuit.components.lamp": "Lamp"
 
 }

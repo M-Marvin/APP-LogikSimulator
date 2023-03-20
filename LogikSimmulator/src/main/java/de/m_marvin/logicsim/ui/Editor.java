@@ -31,12 +31,12 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
-import de.m_marvin.logicsim.CircuitSerializer;
 import de.m_marvin.logicsim.LogicSim;
-import de.m_marvin.logicsim.Registries;
-import de.m_marvin.logicsim.Registries.ComponentEntry;
-import de.m_marvin.logicsim.Registries.ComponentFolder;
 import de.m_marvin.logicsim.logic.Circuit;
+import de.m_marvin.logicsim.util.CircuitSerializer;
+import de.m_marvin.logicsim.util.Registries;
+import de.m_marvin.logicsim.util.Registries.ComponentEntry;
+import de.m_marvin.logicsim.util.Registries.ComponentFolder;
 
 public class Editor {
 	
@@ -45,6 +45,7 @@ public class Editor {
 	protected Tree partSelector;
 	protected ToolBar toolBar;
 	protected Menu titleBar;
+	protected File openFile;
 	
 	public static Image decodeImage(String imageString) {
 		return new Image(LogicSim.getInstance().getDisplay(), new ImageData(new ByteArrayInputStream(Base64.getDecoder().decode(imageString))));
@@ -63,22 +64,20 @@ public class Editor {
 		fileTab.setText (Translator.translate("editor.menu.file"));
 		Menu fileMenu = new Menu(shell, SWT.DROP_DOWN);
 		fileTab.setMenu(fileMenu);
+		MenuItem saveAsOpt = new MenuItem(fileMenu, SWT.PUSH);
+		saveAsOpt.setText(Translator.translate("editor.menu.file.save_as"));
+		saveAsOpt.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				saveCircuit(true);
+			}
+		});
 		MenuItem saveOpt = new MenuItem(fileMenu, SWT.PUSH);
 		saveOpt.setText(Translator.translate("editor.menu.file.save"));
 		saveOpt.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				FileDialog fileDialog = new FileDialog(shell, SWT.SAVE);
-				// TODO
-				String filePath = fileDialog.open();
-				if (filePath != null) {
-					try {
-						CircuitSerializer.saveCircuit(LogicSim.getInstance().getCircuit(), new File(filePath));
-					} catch (IOException ex) {
-						showErrorInfo("info.error.save_file", ex);
-						ex.printStackTrace();
-					}
-				}
+				saveCircuit(false);
 			}
 		});
 		MenuItem loadOpt = new MenuItem(fileMenu, SWT.PUSH);
@@ -86,17 +85,7 @@ public class Editor {
 		loadOpt.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				FileDialog fileDialog = new FileDialog(shell, SWT.OPEN);
-				// TODO
-				String filePath = fileDialog.open();
-				if (filePath != null) {
-					try {
-						LogicSim.getInstance().setCircuit(CircuitSerializer.loadCircuit(new File(filePath)));
-					} catch (IOException ex) {
-						showErrorInfo("info.error.load_file", ex);
-						ex.printStackTrace();
-					}
-				}
+				loadCircuit();
 			}
 		});
 		
@@ -139,6 +128,62 @@ public class Editor {
 		this.editorArea.setCircuit(LogicSim.getInstance().getCircuit());
 		
 		this.shell.open();
+		updateTitle();
+	}
+	
+	public void updateTitle() {
+		this.shell.setText("LogikSimmulator - alpha" + (this.openFile != null ? " - " + this.openFile.toString() : ""));
+	}
+	
+	public void saveCircuit(boolean saveAs) {
+		if (saveAs || this.openFile == null || !this.openFile.exists()) {
+			FileDialog fileDialog = new FileDialog(shell, SWT.SAVE);
+			// TODO
+			String path = fileDialog.open();
+			if (path != null) {
+				File filePath = new File(path);
+				if (filePath.exists()) {
+					MessageBox msg = new MessageBox(shell, SWT.YES | SWT.NO | SWT.ICON_QUESTION);
+					msg.setMessage(Translator.translate("editor.window.override_request"));
+					msg.setText(Translator.translate("editor.window.info"));
+					if (msg.open() == SWT.NO) return;
+				}
+				this.openFile = filePath;
+				updateTitle();
+			}
+		}
+		try {
+			CircuitSerializer.saveCircuit(LogicSim.getInstance().getCircuit(), this.openFile);
+		} catch (IOException ex) {
+			showErrorInfo("info.error.save_file", ex);
+			ex.printStackTrace();
+		}
+	}
+	
+	public void loadCircuit() {
+		FileDialog fileDialog = new FileDialog(shell, SWT.OPEN);
+		// TODO
+		String path = fileDialog.open();
+		if (path != null) {
+			File filePath = new File(path);
+			try {
+				LogicSim.getInstance().setCircuit(CircuitSerializer.loadCircuit(filePath));
+				this.openFile = filePath;
+				updateTitle();
+			} catch (IOException ex) {
+				showErrorInfo("info.error.load_file", ex);
+				ex.printStackTrace();
+			}
+		}
+	}
+
+	public void showErrorInfo(String messageKey, Exception e) {
+		StringWriter writer = new StringWriter();
+		e.printStackTrace(new PrintWriter(writer));
+		MessageBox msg = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+		msg.setText("An Exception was thrown!");
+		msg.setMessage(Translator.translate(messageKey, writer.toString()));
+		msg.open();
 	}
 	
 	public void changeCircuit(Circuit circuit) {
@@ -173,15 +218,6 @@ public class Editor {
 
 	public void render() {
 		this.editorArea.render();
-	}
-	
-	public void showErrorInfo(String messageKey, Exception e) {
-		StringWriter writer = new StringWriter();
-		e.printStackTrace(new PrintWriter(writer));
-		MessageBox msg = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-		msg.setText("An Exception was thrown!");
-		msg.setMessage(Translator.translate(messageKey, writer.toString()));
-		msg.open();
 	}
 	
 }

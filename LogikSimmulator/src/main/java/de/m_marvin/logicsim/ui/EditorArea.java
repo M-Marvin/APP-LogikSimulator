@@ -15,9 +15,9 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLCapabilities;
 
-import de.m_marvin.logicsim.Registries.ComponentEntry;
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Component;
+import de.m_marvin.logicsim.util.Registries.ComponentEntry;
 import de.m_marvin.univec.impl.Vec2i;
 
 public class EditorArea extends Canvas implements MouseListener, MouseMoveListener, KeyListener {
