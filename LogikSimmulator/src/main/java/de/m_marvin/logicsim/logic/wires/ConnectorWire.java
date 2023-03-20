@@ -2,6 +2,8 @@ package de.m_marvin.logicsim.logic.wires;
 
 import java.util.Optional;
 
+import com.google.gson.JsonObject;
+
 import de.m_marvin.univec.impl.Vec2i;
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Circuit.NetState;
@@ -144,6 +146,24 @@ public class ConnectorWire extends NetConnector {
 	@Override
 	public int getVisualHeight() {
 		return Math.abs(this.posA.y - this.posB.y) + 6;
+	}
+	
+	@Override
+	public void serialize(JsonObject json) {
+		super.serialize(json);
+		json.addProperty("x1", this.posA.x);
+		json.addProperty("y1", this.posA.y);
+		json.addProperty("x2", this.posB.x);
+		json.addProperty("y2", this.posB.y);
+	}
+	
+	@Override
+	public void deserialize(JsonObject json) {
+		super.deserialize(json);
+		this.posA.x = json.get("x1").getAsInt();
+		this.posA.y = json.get("y1").getAsInt();
+		this.posB.x = json.get("x2").getAsInt();
+		this.posB.y = json.get("y2").getAsInt();
 	}
 	
 }

@@ -3,6 +3,9 @@
 "editor.menu.file.save": "Save",
 "editor.menu.file.load": "Lode",
 
+"info.error.save_file": "Failed to save file! An IOException was thrown: %0",
+"info.error.load_file": "Failed to load file! An IOException was thrown: %0",
+
 "circuit.components.and_gate": "And Gate",
 "circuit.components.or_gate": "Or Gate",
 "circuit.components.nand_gate": "Nand Gate",

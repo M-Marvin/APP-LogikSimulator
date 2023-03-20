@@ -1,13 +1,17 @@
 package de.m_marvin.logicsim.ui;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -16,15 +20,18 @@ import org.eclipse.swt.layout.BorderLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
+import de.m_marvin.logicsim.CircuitSerializer;
 import de.m_marvin.logicsim.LogicSim;
 import de.m_marvin.logicsim.Registries;
 import de.m_marvin.logicsim.Registries.ComponentEntry;
@@ -58,8 +65,40 @@ public class Editor {
 		fileTab.setMenu(fileMenu);
 		MenuItem saveOpt = new MenuItem(fileMenu, SWT.PUSH);
 		saveOpt.setText(Translator.translate("editor.menu.file.save"));
+		saveOpt.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				FileDialog fileDialog = new FileDialog(shell, SWT.SAVE);
+				// TODO
+				String filePath = fileDialog.open();
+				if (filePath != null) {
+					try {
+						CircuitSerializer.saveCircuit(LogicSim.getInstance().getCircuit(), new File(filePath));
+					} catch (IOException ex) {
+						showErrorInfo("info.error.save_file", ex);
+						ex.printStackTrace();
+					}
+				}
+			}
+		});
 		MenuItem loadOpt = new MenuItem(fileMenu, SWT.PUSH);
 		loadOpt.setText(Translator.translate("editor.menu.file.load"));
+		loadOpt.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				FileDialog fileDialog = new FileDialog(shell, SWT.OPEN);
+				// TODO
+				String filePath = fileDialog.open();
+				if (filePath != null) {
+					try {
+						LogicSim.getInstance().setCircuit(CircuitSerializer.loadCircuit(new File(filePath)));
+					} catch (IOException ex) {
+						showErrorInfo("info.error.load_file", ex);
+						ex.printStackTrace();
+					}
+				}
+			}
+		});
 		
 		// Left tool group
 		
@@ -74,7 +113,7 @@ public class Editor {
 		
 		this.partSelector = new Tree(groupLeft, SWT.SINGLE);
 		this.partSelector.setLayoutData(new RowData(200, 400));
-		this.partSelector.addSelectionListener(new SelectionListener() {
+		this.partSelector.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				if (Editor.this.editorArea.getActivePlacement() != null) {
@@ -88,8 +127,6 @@ public class Editor {
 					Editor.this.editorArea.forceFocus();
 				}
 			}
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
 		updatePartSelector();
 		
@@ -136,6 +173,15 @@ public class Editor {
 
 	public void render() {
 		this.editorArea.render();
+	}
+	
+	public void showErrorInfo(String messageKey, Exception e) {
+		StringWriter writer = new StringWriter();
+		e.printStackTrace(new PrintWriter(writer));
+		MessageBox msg = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+		msg.setText("An Exception was thrown!");
+		msg.setMessage(Translator.translate(messageKey, writer.toString()));
+		msg.open();
 	}
 	
 }

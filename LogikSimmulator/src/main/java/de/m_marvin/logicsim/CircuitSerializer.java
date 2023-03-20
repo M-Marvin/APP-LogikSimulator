@@ -1,9 +1,11 @@
 package de.m_marvin.logicsim;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -22,21 +24,29 @@ public class CircuitSerializer {
 	
 	public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	
-	public static void saveCircuit(Circuit circuit, File file) throws FileNotFoundException {
+	public static void saveCircuit(Circuit circuit, File file) throws IOException {
 		serializeCircuit(circuit, new FileOutputStream(file));
 	}
 	
-	public static Circuit loadCircuit(File file) throws FileNotFoundException {
+	public static Circuit loadCircuit(File file) throws IOException {
 		return deserializeCircuit(new FileInputStream(file));
 	}
 	
-	public static void serializeCircuit(Circuit circuit, OutputStream stream) {
+	public static void serializeCircuit(Circuit circuit, OutputStream stream) throws IOException {
 		JsonObject json = serializeCircuit(circuit);
-		GSON.toJson(json, new OutputStreamWriter(stream));
+		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stream));
+		writer.write(GSON.toJson(json));
+		writer.close();
 	}
 	
-	public static Circuit deserializeCircuit(InputStream stream) {
-		JsonObject json = GSON.fromJson(new InputStreamReader(stream), JsonObject.class);
+	public static Circuit deserializeCircuit(InputStream stream) throws IOException {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+		String line;
+		StringBuilder sb = new StringBuilder();
+		while ((line = reader.readLine()) != null) sb.append(line);
+		reader.close();
+		
+		JsonObject json = GSON.fromJson(sb.toString(), JsonObject.class);
 		return deserializeCircuit(json);
 	}
 	
@@ -60,6 +70,8 @@ public class CircuitSerializer {
 				System.err.println("Failed to load component '" + componentJson.toString() + "'");
 			}
 		});
+		
+		circuit.getComponents().forEach(component -> circuit.reconnect(false, component));
 		
 		return circuit;
 		

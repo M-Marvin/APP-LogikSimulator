@@ -14,6 +14,7 @@ import de.m_marvin.logicsim.logic.parts.LogicGateComponent.OrGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.XorGateComponent;
 import de.m_marvin.logicsim.logic.wires.ConnectorWire;
 import de.m_marvin.logicsim.ui.Editor;
+import de.m_marvin.logicsim.ui.TextRenderer;
 import de.m_marvin.logicsim.ui.Translator;
 
 public class LogicSim {
@@ -78,6 +79,7 @@ public class LogicSim {
 			render();
 		}
 		
+		TextRenderer.cleanUpOpenGL();
 		this.display.dispose();
 		
 	}

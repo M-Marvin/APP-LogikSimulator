@@ -22,8 +22,6 @@ import de.m_marvin.univec.impl.Vec2i;
 
 public class EditorArea extends Canvas implements MouseListener, MouseMoveListener, KeyListener {
 	
-	public static final int VISUAL_BUNDING_BOX_OFFSET = 5;
-	
 	public Circuit circuit;
 	public Vec2i visualOffset = new Vec2i(0, 0);
 	public int rasterSize = 10;
@@ -59,6 +57,8 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
         GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GL11.glDisable(GL11.GL_CULL_FACE);
 	    this.resized = true;
 	    this.initialized = false;
 	}
@@ -213,6 +213,8 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 
 	@Override
 	public void keyReleased(KeyEvent event) {}
+
+	public static final int VISUAL_BUNDING_BOX_OFFSET = 5;
 	
 	public void render() {
 		
@@ -240,6 +242,8 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 		circuit.getComponents().forEach(component -> {
 			
 			component.render();
+			
+			swapColor(1, 1, 1, 1);
 			
 			component.getInputs().forEach(inputNode -> {
 				Vec2i position = inputNode.getVisualOffset().add(component.getVisualPosition());
@@ -271,7 +275,7 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 		
 	}
 	
-	public void drawNode(Vec2i position, int type) {
+	public static void drawNode(Vec2i position, int type) {
 		switch (type) {
 		case 1:
 			drawCircle(1, position.x, position.y, 5);
@@ -366,6 +370,38 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 			GL11.glVertex2d(x + cx, y + cy);
 		}
 		GL11.glEnd();
+	}
+	
+	public static void drawComponentFrame(float x, float y, float w, float h) {
+		
+		int f = 2;
+		int f1 = (int) (h / 3);
+		
+		GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
+		GL11.glVertex2f(x + f, y + f + 1);
+		GL11.glVertex2f(x + w - f - 1, y + f + 1);
+		GL11.glVertex2f(x + f, y + h - f - 1);
+		GL11.glVertex2f(x + w - f - 1, y + h - f - 1);
+		GL11.glEnd();
+		
+		swapColor(1F, 0.4F, 0, 1);
+		
+		GL11.glBegin(GL11.GL_LINES);
+		GL11.glVertex2f(x, y + (h - f1) / 2);
+		GL11.glVertex2f(x, y);
+		GL11.glVertex2f(x, y);
+		GL11.glVertex2f(x + w, y);
+		GL11.glVertex2f(x + w, y + (h - f1) / 2);
+		GL11.glVertex2f(x + w, y);
+		
+		GL11.glVertex2f(x, y + h - (h - f1) / 2);
+		GL11.glVertex2f(x, y + h);
+		GL11.glVertex2f(x, y + h);
+		GL11.glVertex2f(x + w, y + h);
+		GL11.glVertex2f(x + w, y + h - (h - f1) / 2);
+		GL11.glVertex2f(x + w, y + h);
+		GL11.glEnd();
+		
 	}
 	
 }

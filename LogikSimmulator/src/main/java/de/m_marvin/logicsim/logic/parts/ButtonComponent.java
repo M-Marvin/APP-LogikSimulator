@@ -4,6 +4,7 @@ import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Component;
 import de.m_marvin.logicsim.logic.nodes.OutputNode;
 import de.m_marvin.logicsim.ui.EditorArea;
+import de.m_marvin.logicsim.ui.TextRenderer;
 import de.m_marvin.univec.impl.Vec2i;
 
 public class ButtonComponent extends Component {
@@ -24,7 +25,7 @@ public class ButtonComponent extends Component {
 		super(circuit);
 		
 		this.label = "button";
-		this.outputs.add(new OutputNode(this, 2, "out", new Vec2i(40, 20)));
+		this.outputs.add(new OutputNode(this, 2, "out", new Vec2i(50, 20)));
 	}
 	
 	@Override
@@ -50,8 +51,14 @@ public class ButtonComponent extends Component {
 	@Override
 	public void render()  {
 		
+		if (toggle) {
+			EditorArea.swapColor(0, 0, 1, 0.4F);
+		} else {
+			EditorArea.swapColor(0, 1, 1, 0.4F);
+		}
+		EditorArea.drawComponentFrame(visualPosition.x, visualPosition.y, getVisualWidth(), getVisualHeight());
 		EditorArea.swapColor(1, 1, 1, 1);
-		EditorArea.drawRectangle(VISUAL_LINE_WIDTH, visualPosition.x, visualPosition.y, getVisualWidth(), getVisualHeight());
+		TextRenderer.drawText(visualPosition.x + getVisualWidth() / 2, visualPosition.y + getVisualHeight() / 2, 12, this.toggle ? "ON" : "OFF");
 		
 	}
 	

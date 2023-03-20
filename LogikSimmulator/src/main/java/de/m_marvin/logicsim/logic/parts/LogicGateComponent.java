@@ -8,8 +8,9 @@ import de.m_marvin.logicsim.logic.Component;
 import de.m_marvin.logicsim.logic.nodes.InputNode;
 import de.m_marvin.logicsim.logic.nodes.OutputNode;
 import de.m_marvin.logicsim.ui.EditorArea;
+import de.m_marvin.logicsim.ui.TextRenderer;
 
-public class LogicGateComponent extends Component {
+public abstract class LogicGateComponent extends Component {
 	
 	public static final String ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABfSURBVDhPY6AUMELp/1CaVMCIMOC/FpRJJGC8BiZBBkBshxkAkcANUNUxMoE5FAD8XoC5Brcc5S6g1ID/A+4C6oQBuakQDPC7ABR92KIQCYAMgKUFsgDFmQlKkwsYGACUohNq0IMdxAAAAABJRU5ErkJggg==";
 
@@ -22,6 +23,9 @@ public class LogicGateComponent extends Component {
 		public static boolean coursorMove(Circuit circuit, Vec2i coursorPosition) {
 			return Component.coursorMove(circuit, coursorPosition, () -> new AndGateComponent(circuit));
 		}
+		public String getTextLabel() {
+			return "AND";
+		}
 	}
 
 	public static class OrGateComponent extends LogicGateComponent {
@@ -30,6 +34,9 @@ public class LogicGateComponent extends Component {
 		}
 		public static boolean coursorMove(Circuit circuit, Vec2i coursorPosition) {
 			return Component.coursorMove(circuit, coursorPosition, () -> new OrGateComponent(circuit));
+		}
+		public String getTextLabel() {
+			return "OR";
 		}
 	}
 
@@ -40,6 +47,9 @@ public class LogicGateComponent extends Component {
 		public static boolean coursorMove(Circuit circuit, Vec2i coursorPosition) {
 			return Component.coursorMove(circuit, coursorPosition, () -> new NandGateComponent(circuit));
 		}
+		public String getTextLabel() {
+			return "NAND";
+		}
 	}
 
 	public static class NorGateComponent extends LogicGateComponent {
@@ -49,6 +59,9 @@ public class LogicGateComponent extends Component {
 		public static boolean coursorMove(Circuit circuit, Vec2i coursorPosition) {
 			return Component.coursorMove(circuit, coursorPosition, () -> new NorGateComponent(circuit));
 		}
+		public String getTextLabel() {
+			return "NOR";
+		}
 	}
 
 	public static class XorGateComponent extends LogicGateComponent {
@@ -57,6 +70,9 @@ public class LogicGateComponent extends Component {
 		}
 		public static boolean coursorMove(Circuit circuit, Vec2i coursorPosition) {
 			return Component.coursorMove(circuit, coursorPosition, () -> new XorGateComponent(circuit));
+		}
+		public String getTextLabel() {
+			return "XOR";
 		}
 	}
 
@@ -87,9 +103,9 @@ public class LogicGateComponent extends Component {
 		this.logicalFuntion = logicalFuntion;
 		
 		this.label = "logic_gate";
-		this.inputs.add(new InputNode(this, 0, "in1", new Vec2i(0, 10)));
-		this.inputs.add(new InputNode(this, 1, "in2", new Vec2i(0, 30)));
-		this.outputs.add(new OutputNode(this, 2, "out", new Vec2i(40, 20)));
+		this.inputs.add(new InputNode(this, 0, "in1", new Vec2i(-10, 10)));
+		this.inputs.add(new InputNode(this, 1, "in2", new Vec2i(-10, 30)));
+		this.outputs.add(new OutputNode(this, 2, "out", new Vec2i(50, 20)));
 	}
 	
 	@Override
@@ -102,6 +118,8 @@ public class LogicGateComponent extends Component {
 		return 40;
 	}
 	
+	public abstract String getTextLabel();
+	
 	@Override
 	public void updateIO() {
 		
@@ -111,9 +129,11 @@ public class LogicGateComponent extends Component {
 	
 	@Override
 	public void render()  {
-
+		
+		EditorArea.swapColor(0, 1, 0, 0.4F);
+		EditorArea.drawComponentFrame(visualPosition.x, visualPosition.y, getVisualWidth(), getVisualHeight());
 		EditorArea.swapColor(1, 1, 1, 1);
-		EditorArea.drawRectangle(VISUAL_LINE_WIDTH, visualPosition.x, visualPosition.y, getVisualWidth(), getVisualHeight());
+		TextRenderer.drawText(visualPosition.x + getVisualWidth() / 2, visualPosition.y + getVisualHeight() / 2, 12, this.getTextLabel());
 		
 	}
 	

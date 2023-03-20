@@ -28,9 +28,12 @@ public class Translator {
 		});
 	}
 	
-	public static String translate(String key) {
+	public static String translate(String key, String... args) {
 		String translationPattern = translations.get(key);
 		if (translationPattern == null) return key;
+		for (int i = 0; i < args.length; i++) {
+			translationPattern = translationPattern.replace("%" + i, args[i]);
+		}
 		return translationPattern;
 	}
 	
