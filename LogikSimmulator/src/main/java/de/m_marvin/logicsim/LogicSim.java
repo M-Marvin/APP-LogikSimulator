@@ -116,7 +116,7 @@ public class LogicSim {
 		
 		Registries.registerPart(wireFolder, ConnectorWire.class, ConnectorWire::placeClick, ConnectorWire::coursorMove, ConnectorWire::abbortPlacement, "circuit.components.wire", ConnectorWire.ICON_B64);
 		
-		Registries.registerLangFolder("/de/m_marvin/logicsim/lang");
+		Registries.registerLangFolder("/lang");
 	}
 	
 }
