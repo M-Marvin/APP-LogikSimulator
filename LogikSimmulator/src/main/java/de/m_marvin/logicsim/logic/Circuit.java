@@ -6,10 +6,12 @@ import java.util.List;
 import java.util.OptionalInt;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import de.m_marvin.logicsim.logic.nodes.Node;
+import de.m_marvin.univec.impl.Vec4i;
 
 public class Circuit {
 	
@@ -226,6 +228,17 @@ public class Circuit {
 		OptionalInt lastId = this.components.stream().mapToInt(Component::getComponentNr).max();
 		if (lastId.isEmpty()) return 0;
 		return lastId.getAsInt() + 1;
+	}
+
+	public Vec4i getCircuitBounds(Predicate<Component> componentPredicate) {
+		if (this.components.stream().anyMatch(componentPredicate)) {
+			int minX = this.components.stream().filter(componentPredicate).mapToInt(component -> component.getVisualPosition().x).min().getAsInt();
+			int minY = this.components.stream().filter(componentPredicate).mapToInt(component -> component.getVisualPosition().y).min().getAsInt();
+			int maxX = this.components.stream().filter(componentPredicate).mapToInt(component -> component.getVisualPosition().x).max().getAsInt();
+			int maxY = this.components.stream().filter(componentPredicate).mapToInt(component -> component.getVisualPosition().y).max().getAsInt();
+			return new Vec4i(minX, minY, maxX, maxY);
+		}
+		return new Vec4i(0, 0, 0, 0);
 	}
 	
 }

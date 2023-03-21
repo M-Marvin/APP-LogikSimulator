@@ -11,6 +11,7 @@ import de.m_marvin.logicsim.logic.nodes.InputNode;
 import de.m_marvin.logicsim.logic.nodes.Node;
 import de.m_marvin.logicsim.logic.nodes.OutputNode;
 import de.m_marvin.logicsim.logic.nodes.PassivNode;
+import de.m_marvin.logicsim.ui.EditorArea;
 import de.m_marvin.univec.impl.Vec2i;
 
 public abstract class Component {
@@ -29,7 +30,7 @@ public abstract class Component {
 		if (currentComponent == null) {
 			currentComponent = constructor.get();
 			circuit.add(currentComponent);
-			placeOffset = new Vec2i(-currentComponent.getVisualWidth(), -currentComponent.getVisualHeight()).div(2);
+			placeOffset = new Vec2i(-currentComponent.getVisualWidth(), -currentComponent.getVisualHeight()).div(EditorArea.RASTER_SIZE).div(2).mul(EditorArea.RASTER_SIZE);
 		}
 		coursorPosition.x = Math.max(-placeOffset.x, coursorPosition.x);
 		coursorPosition.y = Math.max(-placeOffset.y, coursorPosition.y);

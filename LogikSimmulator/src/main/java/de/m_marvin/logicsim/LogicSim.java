@@ -9,6 +9,7 @@ import de.m_marvin.logicsim.logic.parts.ButtonComponent;
 import de.m_marvin.logicsim.logic.parts.LampComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent;
 import de.m_marvin.logicsim.logic.parts.NotGateComponent;
+import de.m_marvin.logicsim.logic.parts.SubCircuitComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.AndGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.NandGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.NorGateComponent;
@@ -122,6 +123,9 @@ public class LogicSim {
 		Registries.registerPart(partFolder, LampComponent.class, Component::placeClick, LampComponent::coursorMove, Component::abbortPlacement, "circuit.components.lamp", LampComponent.ICON_B64);
 		
 		Registries.registerPart(wireFolder, ConnectorWire.class, ConnectorWire::placeClick, ConnectorWire::coursorMove, ConnectorWire::abbortPlacement, "circuit.components.wire", ConnectorWire.ICON_B64);
+		
+		// DEBUGING ONLY
+		Registries.registerPart(partFolder, SubCircuitComponent.class, Component::placeClick, SubCircuitComponent::coursorMove, Component::abbortPlacement, "circuit.component.sub_circuit", SubCircuitComponent.ICON_B64);
 		
 		Registries.registerLangFolder("/lang");
 	}

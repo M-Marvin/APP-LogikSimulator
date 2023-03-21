@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -17,8 +19,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.layout.BorderData;
 import org.eclipse.swt.layout.BorderLayout;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
@@ -33,6 +34,7 @@ import org.eclipse.swt.widgets.TreeItem;
 
 import de.m_marvin.logicsim.LogicSim;
 import de.m_marvin.logicsim.logic.Circuit;
+import de.m_marvin.logicsim.logic.parts.SubCircuitComponent;
 import de.m_marvin.logicsim.util.CircuitSerializer;
 import de.m_marvin.logicsim.util.Registries;
 import de.m_marvin.logicsim.util.Registries.ComponentEntry;
@@ -40,12 +42,14 @@ import de.m_marvin.logicsim.util.Registries.ComponentFolder;
 
 public class Editor {
 	
-	protected Shell shell;
-	protected EditorArea editorArea;
-	protected Tree partSelector;
-	protected ToolBar toolBar;
-	protected Menu titleBar;
 	protected File openFile;
+	protected Shell shell;
+	protected Menu titleBar;
+	protected EditorArea editorArea;
+	protected ToolBar toolBar;
+	protected Tree partSelector;
+	protected EditorArea subCircuitView;
+	protected SubCircuitComponent viewComponent;
 	
 	public static Image decodeImage(String imageString) {
 		return new Image(LogicSim.getInstance().getDisplay(), new ImageData(new ByteArrayInputStream(Base64.getDecoder().decode(imageString))));
@@ -91,17 +95,17 @@ public class Editor {
 		
 		// Left tool group
 		
-		Group groupLeft = new Group(shell, SWT.SHADOW_NONE);
-		groupLeft.setLayoutData(new BorderData(SWT.LEFT));
-		groupLeft.setLayout(new RowLayout(SWT.VERTICAL));
+		Composite groupLeft = new Composite(shell, SWT.NONE);
+		groupLeft.setLayoutData(new BorderData(SWT.LEFT, 200, SWT.DEFAULT));
+		groupLeft.setLayout(new BorderLayout());
 		
 		this.toolBar = new ToolBar(groupLeft, SWT.NONE);
-		this.toolBar.setLayoutData(new RowData(200, 50));
+		this.toolBar.setLayoutData(new BorderData(SWT.TOP));
 		ToolItem placePartTool = new ToolItem(this.toolBar, SWT.PUSH);
 		placePartTool.setText("TEST");
 		
 		this.partSelector = new Tree(groupLeft, SWT.SINGLE);
-		this.partSelector.setLayoutData(new RowData(200, 400));
+		this.partSelector.setLayoutData(new BorderData(SWT.CENTER));
 		this.partSelector.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
@@ -119,6 +123,17 @@ public class Editor {
 		});
 		updatePartSelector();
 		
+		// Sub-circuit view
+		
+		Group groupIO = new Group(groupLeft, SWT.NONE);
+		groupIO.setLayoutData(new BorderData(SWT.BOTTOM, SWT.DEFAULT, SWT.DEFAULT));
+		groupIO.setLayout(new BorderLayout());
+		groupIO.setText("Test ddd");
+		
+		this.subCircuitView = new EditorArea(groupIO);
+		this.subCircuitView.setLayoutData(new BorderData(SWT.CENTER, 200, 200));
+		this.subCircuitView.setCircuit(new Circuit());
+		
 		// Editor area
 		
 		this.editorArea = new EditorArea(shell);
@@ -126,6 +141,17 @@ public class Editor {
 		this.editorArea.setLocation(50, 20);
 		this.editorArea.setBackground(new Color(128, 128, 0));
 		this.editorArea.setCircuit(LogicSim.getInstance().getCircuit());
+		
+		// TODO Better callback for pinout-change
+		this.editorArea.getGlCanvas().addMouseListener(new MouseListener() {
+			public void mouseUp(MouseEvent e) {
+				updateComponentView();
+			}
+			public void mouseDown(MouseEvent e) {
+				updateComponentView();
+			}
+			public void mouseDoubleClick(MouseEvent e) {}
+		});
 		
 		this.shell.open();
 		updateTitle();
@@ -138,7 +164,7 @@ public class Editor {
 	public void saveCircuit(boolean saveAs) {
 		if (saveAs || this.openFile == null || !this.openFile.exists()) {
 			FileDialog fileDialog = new FileDialog(shell, SWT.SAVE);
-			// TODO
+			// TODO File-type specific dialog
 			String path = fileDialog.open();
 			if (path != null) {
 				File filePath = new File(path);
@@ -162,7 +188,7 @@ public class Editor {
 	
 	public void loadCircuit() {
 		FileDialog fileDialog = new FileDialog(shell, SWT.OPEN);
-		// TODO
+		// TODO File-type specific dialog
 		String path = fileDialog.open();
 		if (path != null) {
 			File filePath = new File(path);
@@ -188,6 +214,14 @@ public class Editor {
 	
 	public void changeCircuit(Circuit circuit) {
 		this.editorArea.setCircuit(circuit);
+		this.subCircuitView.getCircuit().clear();
+		this.viewComponent = new SubCircuitComponent(this.subCircuitView.getCircuit(), circuit);
+		this.subCircuitView.getCircuit().add(this.viewComponent);
+		this.viewComponent.updatePinout(false);
+	}
+	
+	public void updateComponentView() {
+		this.viewComponent.updatePinout(false);
 	}
 	
 	public void updatePartSelector() {
@@ -212,12 +246,17 @@ public class Editor {
 		this.partSelector.setRedraw(true);
 	}
 	
+	public SubCircuitComponent getViewComponent() {
+		return viewComponent;
+	}
+	
 	public Shell getShell() {
 		return shell;
 	}
 
 	public void render() {
 		this.editorArea.render();
+		this.subCircuitView.render();
 	}
 	
 }

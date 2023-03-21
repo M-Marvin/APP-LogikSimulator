@@ -22,9 +22,10 @@ import de.m_marvin.univec.impl.Vec2i;
 
 public class EditorArea extends Canvas implements MouseListener, MouseMoveListener, KeyListener {
 	
+	public static final int RASTER_SIZE = 10;
+	
 	public Circuit circuit;
 	public Vec2i visualOffset = new Vec2i(0, 0);
-	public int rasterSize = 10;
 	
 	protected Component grabedComponent = null;
 	protected Vec2i grabOffset = new Vec2i(0, 0);
@@ -69,6 +70,10 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 	
 	public Circuit getCircuit() {
 		return circuit;
+	}
+	
+	public GLCanvas getGlCanvas() {
+		return glCanvas;
 	}
 	
 	public void setActivePlacement(ComponentEntry activePlacement) {
@@ -135,6 +140,7 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 		if (this.circuit == null) return;
 		
 		if (this.activePlacement == null) {
+			
 			if (this.grabedComponent == null) {
 				for (Component component : this.circuit.getComponents()) {
 					if (component.getVisualPosition().x <= this.mousePosition.x &&
@@ -163,7 +169,7 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 		if (this.circuit == null) return;
 		
 		this.mousePosition = new Vec2i(event.x, event.y).clamp(this.grabOffset, Vec2i.fromVec(this.getSize()));
-		Vec2i rasterOffset = this.mousePosition.add(rasterSize / 2, rasterSize / 2).module(rasterSize).sub(rasterSize / 2, rasterSize / 2);
+		Vec2i rasterOffset = this.mousePosition.add(RASTER_SIZE / 2, RASTER_SIZE / 2).module(RASTER_SIZE).sub(RASTER_SIZE / 2, RASTER_SIZE / 2);
 		this.mousePosition.subI(rasterOffset);
 		
 		if (this.activePlacement != null) {
@@ -296,24 +302,24 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 		
 		int rasterSize1 = 10;
 		
-		Vec2i rasterOffset = this.visualOffset.module(this.rasterSize);
+		Vec2i rasterOffset = this.visualOffset.module(RASTER_SIZE);
 		Vec2i renderOffset = this.visualOffset.sub(rasterOffset);
 		
 		swapColor(1.0F, 0.5F, 0.0F, 0.4F);
 		
 		GL11.glBegin(GL11.GL_LINES);
-		for (int i = 0; i < this.getSize().x; i+= this.rasterSize * rasterSize1) {
+		for (int i = 0; i < this.getSize().x; i+= RASTER_SIZE * rasterSize1) {
 			GL11.glVertex2f(i + renderOffset.x, renderOffset.y);
 			GL11.glVertex2f(i + renderOffset.x, renderOffset.y + this.getSize().y);
 		}
-		for (int j = 0; j < this.getSize().x; j += this.rasterSize * rasterSize1) {
+		for (int j = 0; j < this.getSize().x; j += RASTER_SIZE * rasterSize1) {
 			GL11.glVertex2f(renderOffset.x, j + renderOffset.y);
 			GL11.glVertex2f(renderOffset.x + this.getSize().x, j + renderOffset.y);
 		}
 		GL11.glEnd();
 		
-		for (int i = 0; i < this.getSize().x; i+= this.rasterSize * rasterSize1) {
-			for (int j = 0; j < this.getSize().x; j += this.rasterSize * rasterSize1) {
+		for (int i = 0; i < this.getSize().x; i+= RASTER_SIZE * rasterSize1) {
+			for (int j = 0; j < this.getSize().x; j += RASTER_SIZE * rasterSize1) {
 				drawRectangle(1, i + renderOffset.x - 5, j + renderOffset.y - 5, 10, 10);
 			}
 		}
@@ -322,9 +328,9 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 		
 		GL11.glPointSize(1);
 		GL11.glBegin(GL11.GL_POINTS);
-		for (int i = 0; i < this.getSize().x; i += this.rasterSize) {
-			for (int j = 0; j < this.getSize().y; j += this.rasterSize) {
-				if (i % (rasterSize1 * rasterSize) != 0 && j % (rasterSize1 * rasterSize) != 0) GL11.glVertex2f(i + renderOffset.x, j + renderOffset.y);
+		for (int i = 0; i < this.getSize().x; i += RASTER_SIZE) {
+			for (int j = 0; j < this.getSize().y; j += RASTER_SIZE) {
+				if (i % (rasterSize1 * RASTER_SIZE) != 0 && j % (rasterSize1 * RASTER_SIZE) != 0) GL11.glVertex2f(i + renderOffset.x, j + renderOffset.y);
 			}
 		}
 		GL11.glEnd();
