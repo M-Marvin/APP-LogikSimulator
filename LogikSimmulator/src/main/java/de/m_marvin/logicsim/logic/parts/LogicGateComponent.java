@@ -70,7 +70,7 @@ public abstract class LogicGateComponent extends Component {
 
 	public static class XorGateComponent extends LogicGateComponent {
 		public XorGateComponent(Circuit circuit) {
-			super(circuit, (a, b) -> a || b && (!a || !b));
+			super(circuit, (a, b) -> (a || b) && (!a || !b));
 		}
 		public static boolean coursorMove(Circuit circuit, Vec2i coursorPosition) {
 			return Component.coursorMove(circuit, coursorPosition, () -> new XorGateComponent(circuit));
