@@ -31,6 +31,7 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 	protected Vec2i grabOffset = new Vec2i(0, 0);
 	protected Vec2i mousePosition = new Vec2i(0, 0);
 	protected ComponentEntry activePlacement;
+	protected boolean allowEditing = true;
 	
 	protected GLData glData;
 	protected GLCanvas glCanvas;
@@ -62,6 +63,14 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
         GL11.glDisable(GL11.GL_CULL_FACE);
 	    this.resized = true;
 	    this.initialized = false;
+	}
+	
+	public void setAllowEditing(boolean allowEditing) {
+		this.allowEditing = allowEditing;
+	}
+	
+	public boolean isAllowedEditing() {
+		return allowEditing;
 	}
 	
 	public void setCircuit(Circuit circuit) {
@@ -125,6 +134,7 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 	@Override
 	public void mouseUp(MouseEvent event) {
 
+		if (!this.isAllowedEditing()) return;
 		if (this.circuit == null) return;
 		
 		if (event.button == 1) {
@@ -132,11 +142,13 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 				this.releaseGrabbedComponent();
 			}
 		}
+		
 	}
 	
 	@Override
 	public void mouseDown(MouseEvent event) {
 
+		if (!this.isAllowedEditing()) return;
 		if (this.circuit == null) return;
 		
 		if (this.activePlacement == null) {
@@ -165,7 +177,8 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 
 	@Override
 	public void mouseMove(MouseEvent event) {
-		
+
+		if (!this.isAllowedEditing()) return;
 		if (this.circuit == null) return;
 		
 		this.mousePosition = new Vec2i(event.x, event.y).clamp(this.grabOffset, Vec2i.fromVec(this.getSize()));
@@ -189,6 +202,7 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 	@Override
 	public void keyPressed(KeyEvent event) {
 
+		if (!this.isAllowedEditing()) return;
 		if (this.circuit == null) return;
 		
 		if (event.keyCode == SWT.DEL) {

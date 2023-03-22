@@ -3,14 +3,17 @@
 "editor.menu.file.save": "Save",
 "editor.menu.file.save_as": "Save as ...",
 "editor.menu.file.load": "Load ...",
-"editor.window.info": "Information",
-"editor.window.override_request": "Do you want to override this file?",
-
-"info.error.save_file": "Failed to save file! An IOException was thrown: %0",
-"info.error.load_file": "Failed to load file! An IOException was thrown: %0",
+"editor.sub_circuit_view.title": "Integrated Circuit View",
+"editor.window.info.title": "Information",
+"editor.window.info.override_request": "Do you want to override this file?",
+"editor.window.error.title": "An exception was thrown!",
+"editor.window.error.load_sub_circuit": "Failed to load sub-circuit from file! An IOException was thrown: %1",
+"editor.window.error.save_file": "Failed to save file! An IOException was thrown: %0",
+"editor.window.error.load_file": "Failed to load file! An IOException was thrown: %0",
 
 "circuit.folders.basic": "Basics",
 "circuit.folders.wires": "Wires",
+"circuit.folders.ics": "Integrated Circuits",
 
 "circuit.components.wire": "Logik Wire",
 "circuit.components.and_gate": "And Gate",

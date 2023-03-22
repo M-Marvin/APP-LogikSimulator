@@ -1,5 +1,7 @@
 package de.m_marvin.logicsim.logic.parts;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -13,6 +15,7 @@ import de.m_marvin.logicsim.logic.nodes.Node;
 import de.m_marvin.logicsim.logic.nodes.OutputNode;
 import de.m_marvin.logicsim.logic.nodes.PassivNode;
 import de.m_marvin.logicsim.ui.EditorArea;
+import de.m_marvin.logicsim.util.CircuitSerializer;
 import de.m_marvin.univec.impl.Vec2f;
 import de.m_marvin.univec.impl.Vec2i;
 import de.m_marvin.univec.impl.Vec4i;
@@ -23,8 +26,17 @@ public class SubCircuitComponent extends Component {
 	
 	/* Factory methods */
 
-	public static boolean coursorMove(Circuit circuit, Vec2i coursorPosition) {
-		return Component.coursorMove(circuit, coursorPosition, () -> new SubCircuitComponent(circuit, LogicSim.getInstance().getCircuit()));
+	public static boolean coursorMove(Circuit circuit, Vec2i coursorPosition, File circuitFile) {
+		Circuit subCircuit;
+		try {
+			subCircuit = CircuitSerializer.loadCircuit(circuitFile);
+		} catch (IOException e) {
+			LogicSim.getInstance().getMainWindow().showErrorInfo("info.error.load_sub_circuit", e);
+			subCircuit = new Circuit();
+		}
+		
+		Circuit subCircuitFinal = subCircuit;
+		return Component.coursorMove(circuit, coursorPosition, () -> new SubCircuitComponent(circuit, subCircuitFinal));
 	}
 	
 	/* End of factory methods */
@@ -59,7 +71,7 @@ public class SubCircuitComponent extends Component {
 		this.outputs.clear();
 		this.passives.clear();
 		
-		Vec4i circuitBounds = this.subCircuit.getCircuitBounds(component -> component instanceof ISubCircuitIO);
+		Vec4i circuitBounds = this.subCircuit.getCircuitBounds(component -> true, component -> component instanceof ISubCircuitIO);
 		Map<ISubCircuitIO, Vec2f> subCircuitIOs = new HashMap<>();
 		Set<Float> ypositions = new HashSet<Float>();
 		

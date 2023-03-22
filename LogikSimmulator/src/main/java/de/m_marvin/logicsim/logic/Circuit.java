@@ -229,13 +229,17 @@ public class Circuit {
 		if (lastId.isEmpty()) return 0;
 		return lastId.getAsInt() + 1;
 	}
-
+	
 	public Vec4i getCircuitBounds(Predicate<Component> componentPredicate) {
-		if (this.components.stream().anyMatch(componentPredicate)) {
-			int minX = this.components.stream().filter(componentPredicate).mapToInt(component -> component.getVisualPosition().x).min().getAsInt();
-			int minY = this.components.stream().filter(componentPredicate).mapToInt(component -> component.getVisualPosition().y).min().getAsInt();
-			int maxX = this.components.stream().filter(componentPredicate).mapToInt(component -> component.getVisualPosition().x).max().getAsInt();
-			int maxY = this.components.stream().filter(componentPredicate).mapToInt(component -> component.getVisualPosition().y).max().getAsInt();
+		return getCircuitBounds(componentPredicate, componentPredicate);
+	}
+	
+	public Vec4i getCircuitBounds(Predicate<Component> componentPredicateX, Predicate<Component> componentPredicateY) {
+		if (this.components.stream().anyMatch(componentPredicateX) && this.components.stream().anyMatch(componentPredicateY)) {
+			int minX = this.components.stream().filter(componentPredicateX).mapToInt(component -> component.getVisualPosition().x).min().getAsInt();
+			int minY = this.components.stream().filter(componentPredicateY).mapToInt(component -> component.getVisualPosition().y).min().getAsInt();
+			int maxX = this.components.stream().filter(componentPredicateX).mapToInt(component -> component.getVisualPosition().x).max().getAsInt();
+			int maxY = this.components.stream().filter(componentPredicateY).mapToInt(component -> component.getVisualPosition().y).max().getAsInt();
 			return new Vec4i(minX, minY, maxX, maxY);
 		}
 		return new Vec4i(0, 0, 0, 0);

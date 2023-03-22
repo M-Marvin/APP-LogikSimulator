@@ -8,13 +8,12 @@ import de.m_marvin.logicsim.logic.Component;
 import de.m_marvin.logicsim.logic.parts.ButtonComponent;
 import de.m_marvin.logicsim.logic.parts.LampComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent;
-import de.m_marvin.logicsim.logic.parts.NotGateComponent;
-import de.m_marvin.logicsim.logic.parts.SubCircuitComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.AndGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.NandGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.NorGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.OrGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.XorGateComponent;
+import de.m_marvin.logicsim.logic.parts.NotGateComponent;
 import de.m_marvin.logicsim.logic.wires.ConnectorWire;
 import de.m_marvin.logicsim.ui.Editor;
 import de.m_marvin.logicsim.ui.TextRenderer;
@@ -48,6 +47,10 @@ public class LogicSim {
 
 	public Device getDisplay() {
 		return this.display;
+	}
+	
+	public Editor getMainWindow() {
+		return mainWindow;
 	}
 	
 	public boolean shouldTerminate() {
@@ -108,10 +111,12 @@ public class LogicSim {
 	
 	public static final String ICON_PART_GROUP = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGKSURBVFhHzZU7LwVBGIYPoaLmB0hEQaEhQkkodQqNoDhRSUQn8Rc0otT4EwoKEjoFlQSdQic0BOF553LInN2zK7uT3Sd5Mpfd7HzzzWUbVdPlSs+3K2PTGrfblbVBGYiZhbbvV54BH0DsmadSmwxURm0C0LkM74SyGHdlImkXUdi/isP4icd4jnlYxzWcMq2E7+dZglPcxi9UEGc4i1EIj+MIqj1nWpY73LLVTJSBS1s1hN/PzECvKwdduYhDeG9aEWiLEA7wEXdQz5qYl7QMJI1jSHqwgup7w0l1OPZwwVZTyQwgawm0gw9xF/XuMnqWsMdWy6MVGfThC26Ylt3577iPM6j3BrAThZZAm031edOyKAj1PeOROjIodAq0029xE0fVAa94hUq9AhzDQmTtAc2gH29QkZ/gBWrwB7zGaSyNthQ5dA9Ify94/P2QRqEl+MuT88O0flFfIXwAaTMvgwlXJuL/SuHgsX7Nfpx//Q2jUpsAlJJYae9I5RkIZx3rJITUZxNWTKPxA3CzXvc4mpIqAAAAAElFTkSuQmCC";
 	public static final String ICON_WIRE_GROUP = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAGUExURQAAAAAAAKVnuc8AAAACdFJOU/8A5bcwSgAAAAlwSFlzAAAOwwAADsMBx2+oZAAAAFpJREFUOE/djsESgCAIROX/f1qUxchwKGM69C7q7lMpFJApeCpnRvCY70lmN+kCF5cNVvCtgDm3hcFDAc9a+Nx/O0Ch3BEMoRAO+RvhREukUFAoLZFizVuBqALkLQNcVg88CgAAAABJRU5ErkJggg==";
+	public static final String ICON_IC_GROUP = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAGzSURBVFhHxZeNcoMgEIRD07R5/6dtJ20Je7rOegEBJek3syOKnsvxI4YY4zWE8HWaeE+KU9HQMtiqO6VYH+nwNp214Q38JYWp2E2r8XPSJekHJ97trxwhGFIhEOWBcQpxVXgptQYZmIvglpQLPgrGR1cbzAAu0P0zYfylkTQAZ0jxY4qeDA2w7wn7uSSSq4OaoYHe1OuL2HXUFqxfTNIApoRNixkflBoODXwmYW5iHLSghpgNzUozNLAXnxl/XsUb6Hp4B4y/GgOtaX8JXG5LlPq5dN3zEP+/ugALH/TwQrorGWlpZQ/h6Cw4TG8GSrQ+5zO4ygAfHp1movHx9cXCd3gh8iC4qgQ+ftkd0csZ3QWIURoH2fg0gD5ZtkkH0RdUGwMDEBaFb1wYxFYmwGohggHdEWG51K7pAfHQ6my6ZzS+TUPvtJq2gyzx0478TCe42LIjqikH63Jj7ML042gLwyDQoK1MZhciOuSD2KKjXlVrLdB79D7uOxB/WYj0BhiwkbkTbbFvvTYKL7bW238pCjM0oDNC64Ge+7pWYMYybwbcv6FyS3/NaqbGljlfZ+mPMV7ve+GNTka+RrwAAAAASUVORK5CYII=";
 	
 	public void registerIncludedParts() {
 		ComponentFolder wireFolder = Registries.registerFolder("circuit.folders.wires", ICON_WIRE_GROUP);
 		ComponentFolder partFolder = Registries.registerFolder("circuit.folders.basic", ICON_PART_GROUP);
+		ComponentFolder icFolder = Registries.registerFolder("circuit.folders.ics", ICON_IC_GROUP);
 		
 		Registries.registerPart(partFolder, AndGateComponent.class, Component::placeClick, AndGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.and_gate", LogicGateComponent.ICON_AND_B64 );
 		Registries.registerPart(partFolder, OrGateComponent.class, Component::placeClick, OrGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.or_gate",LogicGateComponent.ICON_OR_B64);
@@ -125,7 +130,7 @@ public class LogicSim {
 		Registries.registerPart(wireFolder, ConnectorWire.class, ConnectorWire::placeClick, ConnectorWire::coursorMove, ConnectorWire::abbortPlacement, "circuit.components.wire", ConnectorWire.ICON_B64);
 		
 		// DEBUGING ONLY
-		Registries.registerPart(partFolder, SubCircuitComponent.class, Component::placeClick, SubCircuitComponent::coursorMove, Component::abbortPlacement, "circuit.component.sub_circuit", SubCircuitComponent.ICON_B64);
+		//Registries.registerPart(partFolder, SubCircuitComponent.class, Component::placeClick, SubCircuitComponent::coursorMove, Component::abbortPlacement, "circuit.component.sub_circuit", SubCircuitComponent.ICON_B64);
 		
 		Registries.registerLangFolder("/lang");
 	}

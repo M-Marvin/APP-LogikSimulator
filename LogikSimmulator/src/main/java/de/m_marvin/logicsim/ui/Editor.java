@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -39,6 +41,7 @@ import de.m_marvin.logicsim.util.CircuitSerializer;
 import de.m_marvin.logicsim.util.Registries;
 import de.m_marvin.logicsim.util.Registries.ComponentEntry;
 import de.m_marvin.logicsim.util.Registries.ComponentFolder;
+import de.m_marvin.univec.impl.Vec2i;
 
 public class Editor {
 	
@@ -96,7 +99,7 @@ public class Editor {
 		// Left tool group
 		
 		Composite groupLeft = new Composite(shell, SWT.NONE);
-		groupLeft.setLayoutData(new BorderData(SWT.LEFT, 200, SWT.DEFAULT));
+		groupLeft.setLayoutData(new BorderData(SWT.LEFT, SWT.DEFAULT, SWT.DEFAULT));
 		groupLeft.setLayout(new BorderLayout());
 		
 		this.toolBar = new ToolBar(groupLeft, SWT.NONE);
@@ -126,13 +129,14 @@ public class Editor {
 		// Sub-circuit view
 		
 		Group groupIO = new Group(groupLeft, SWT.NONE);
-		groupIO.setLayoutData(new BorderData(SWT.BOTTOM, SWT.DEFAULT, SWT.DEFAULT));
+		groupIO.setLayoutData(new BorderData(SWT.BOTTOM));
 		groupIO.setLayout(new BorderLayout());
-		groupIO.setText("Test ddd");
+		groupIO.setText(Translator.translate("editor.sub_circuit_view.title"));
 		
 		this.subCircuitView = new EditorArea(groupIO);
 		this.subCircuitView.setLayoutData(new BorderData(SWT.CENTER, 200, 200));
 		this.subCircuitView.setCircuit(new Circuit());
+		this.subCircuitView.setAllowEditing(false);
 		
 		// Editor area
 		
@@ -141,8 +145,6 @@ public class Editor {
 		this.editorArea.setLocation(50, 20);
 		this.editorArea.setBackground(new Color(128, 128, 0));
 		this.editorArea.setCircuit(LogicSim.getInstance().getCircuit());
-		
-		// TODO Better callback for pinout-change
 		this.editorArea.getGlCanvas().addMouseListener(new MouseListener() {
 			public void mouseUp(MouseEvent e) {
 				updateComponentView();
@@ -151,6 +153,12 @@ public class Editor {
 				updateComponentView();
 			}
 			public void mouseDoubleClick(MouseEvent e) {}
+		});
+		this.editorArea.getGlCanvas().addKeyListener(new KeyListener() {
+			public void keyPressed(KeyEvent e) {
+				updateComponentView();
+			}
+			public void keyReleased(KeyEvent e) {}
 		});
 		
 		this.shell.open();
@@ -170,7 +178,7 @@ public class Editor {
 				File filePath = new File(path);
 				if (filePath.exists()) {
 					MessageBox msg = new MessageBox(shell, SWT.YES | SWT.NO | SWT.ICON_QUESTION);
-					msg.setMessage(Translator.translate("editor.window.override_request"));
+					msg.setMessage(Translator.translate("editor.window.info.override_request"));
 					msg.setText(Translator.translate("editor.window.info"));
 					if (msg.open() == SWT.NO) return;
 				}
@@ -181,7 +189,7 @@ public class Editor {
 		try {
 			CircuitSerializer.saveCircuit(LogicSim.getInstance().getCircuit(), this.openFile);
 		} catch (IOException ex) {
-			showErrorInfo("info.error.save_file", ex);
+			showErrorInfo("editor.window.error.save_file", ex);
 			ex.printStackTrace();
 		}
 	}
@@ -207,7 +215,7 @@ public class Editor {
 		StringWriter writer = new StringWriter();
 		e.printStackTrace(new PrintWriter(writer));
 		MessageBox msg = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-		msg.setText("An Exception was thrown!");
+		msg.setText(Translator.translate("editor.window.error.title"));
 		msg.setMessage(Translator.translate(messageKey, writer.toString()));
 		msg.open();
 	}
@@ -217,11 +225,13 @@ public class Editor {
 		this.subCircuitView.getCircuit().clear();
 		this.viewComponent = new SubCircuitComponent(this.subCircuitView.getCircuit(), circuit);
 		this.subCircuitView.getCircuit().add(this.viewComponent);
-		this.viewComponent.updatePinout(false);
+		updateComponentView();
 	}
 	
 	public void updateComponentView() {
 		this.viewComponent.updatePinout(false);
+		Vec2i position = new Vec2i(-this.viewComponent.getVisualWidth(), -this.viewComponent.getVisualHeight()).div(2).add(Vec2i.fromVec(this.subCircuitView.getSize()).div(2));
+		this.viewComponent.setVisualPosition(position);
 	}
 	
 	public void updatePartSelector() {
