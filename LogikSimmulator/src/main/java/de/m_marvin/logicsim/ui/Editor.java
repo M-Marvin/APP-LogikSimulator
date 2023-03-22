@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -58,9 +60,17 @@ public class Editor {
 		return new Image(LogicSim.getInstance().getDisplay(), new ImageData(new ByteArrayInputStream(Base64.getDecoder().decode(imageString))));
 	}
 	
-	public Editor(Display display) {
+	public Editor(Display display, Circuit circuit) {
 		this.shell = new Shell(display);
 		this.shell.setLayout(new BorderLayout());
+		this.shell.addFocusListener(new FocusListener() {
+			public void focusLost(FocusEvent e) {}
+			public void focusGained(FocusEvent e) {
+				LogicSim.getInstance().setLastInteracted(Editor.this);
+			}
+		});
+		
+		if (circuit == null) circuit = new Circuit();
 		
 		// Top menu bar
 		
@@ -112,15 +122,16 @@ public class Editor {
 		this.partSelector.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				if (Editor.this.editorArea.getActivePlacement() != null) {
+				if (Editor.this.editorArea.getActivePlacement() == event.item.getData()) {
 					if (!(event.item.getData() instanceof Class) || Editor.this.editorArea.getActivePlacement().componentClass() == event.item.getData()) {
 						Editor.this.editorArea.removeActivePlacement();
 						return;
 					}
-				}
-				if (event.item.getData() instanceof Class) {
-					Editor.this.editorArea.setActivePlacement(Registries.getPartEntry((Class<?>) event.item.getData()));
+				} else if (event.item.getData() instanceof ComponentEntry entry) {
+					Editor.this.editorArea.setActivePlacement(entry);
 					Editor.this.editorArea.forceFocus();
+				} else {
+					Editor.this.editorArea.setActivePlacement(null);
 				}
 			}
 		});
@@ -144,7 +155,6 @@ public class Editor {
 		this.editorArea.setSize(300, 300);
 		this.editorArea.setLocation(50, 20);
 		this.editorArea.setBackground(new Color(128, 128, 0));
-		this.editorArea.setCircuit(LogicSim.getInstance().getCircuit());
 		this.editorArea.getGlCanvas().addMouseListener(new MouseListener() {
 			public void mouseUp(MouseEvent e) {
 				updateComponentView();
@@ -162,6 +172,7 @@ public class Editor {
 		});
 		
 		this.shell.open();
+		changeCircuit(circuit);
 		updateTitle();
 	}
 	
@@ -183,14 +194,15 @@ public class Editor {
 					if (msg.open() == SWT.NO) return;
 				}
 				this.openFile = filePath;
+				try {
+					CircuitSerializer.saveCircuit(getCurrentCurcit(), this.openFile);
+				} catch (IOException ex) {
+					showErrorInfo(this.shell, "editor.window.error.save_file", ex);
+					ex.printStackTrace();
+				}
 				updateTitle();
+				LogicSim.getInstance().updateSubCircuitCache();
 			}
-		}
-		try {
-			CircuitSerializer.saveCircuit(LogicSim.getInstance().getCircuit(), this.openFile);
-		} catch (IOException ex) {
-			showErrorInfo("editor.window.error.save_file", ex);
-			ex.printStackTrace();
 		}
 	}
 	
@@ -201,23 +213,27 @@ public class Editor {
 		if (path != null) {
 			File filePath = new File(path);
 			try {
-				LogicSim.getInstance().setCircuit(CircuitSerializer.loadCircuit(filePath));
+				changeCircuit(CircuitSerializer.loadCircuit(filePath));
 				this.openFile = filePath;
 				updateTitle();
 			} catch (IOException ex) {
-				showErrorInfo("info.error.load_file", ex);
+				showErrorInfo(this.shell, "info.error.load_file", ex);
 				ex.printStackTrace();
 			}
 		}
 	}
 
-	public void showErrorInfo(String messageKey, Exception e) {
+	public static void showErrorInfo(Shell shell, String messageKey, Exception e) {
 		StringWriter writer = new StringWriter();
 		e.printStackTrace(new PrintWriter(writer));
 		MessageBox msg = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
 		msg.setText(Translator.translate("editor.window.error.title"));
 		msg.setMessage(Translator.translate(messageKey, writer.toString()));
 		msg.open();
+	}
+	
+	public Circuit getCurrentCurcit() {
+		return this.editorArea.getCircuit();
 	}
 	
 	public void changeCircuit(Circuit circuit) {
@@ -236,7 +252,7 @@ public class Editor {
 	
 	public void updatePartSelector() {
 		this.partSelector.setRedraw(false);
-		this.partSelector.clearAll(true);
+		this.partSelector.removeAll();
 		Map<ComponentFolder, TreeItem> partFolders = new HashMap<>();
 		for (ComponentFolder folder : Registries.getRegisteredFolderList()) {
 			TreeItem item = new TreeItem(this.partSelector, SWT.NONE);
@@ -250,7 +266,16 @@ public class Editor {
 				TreeItem item = new TreeItem(folderItem, SWT.NONE);
 				item.setImage(decodeImage(entry.icon()));
 				item.setText(Translator.translate(entry.name()));
-				item.setData(entry.componentClass());
+				item.setData(entry);
+			}
+		}
+		for (ComponentEntry entry : Registries.getCachedSubCircuitParts()) {
+			TreeItem folderItem = partFolders.get(entry.folder());
+			if (folderItem != null) {
+				TreeItem item = new TreeItem(folderItem, SWT.NONE);
+				item.setImage(decodeImage(entry.icon()));
+				item.setText(Translator.translate(entry.name()));
+				item.setData(entry);
 			}
 		}
 		this.partSelector.setRedraw(true);

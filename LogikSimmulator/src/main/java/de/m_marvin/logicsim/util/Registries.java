@@ -1,13 +1,14 @@
 package de.m_marvin.logicsim.util;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-import de.m_marvin.univec.impl.Vec2i;
 import de.m_marvin.logicsim.logic.Circuit;
+import de.m_marvin.univec.impl.Vec2i;
 
 public class Registries {
 	
@@ -63,6 +64,22 @@ public class Registries {
 	
 	public static List<String> getLangFolders() {
 		return langFolders;
+	}
+	
+	/* Sub Circuit cache */
+	
+	protected static List<ComponentEntry> subCircuitParts = new ArrayList<ComponentEntry>();
+	
+	public static void cacheSubCircuit(File circuitFile, Class<?> component, ComponentFolder folder, BiConsumer<Circuit, Vec2i> placementClickMethod, BiFunction<Circuit, Vec2i, Boolean> placementMoveMethod, Consumer<Circuit> placementAbbortMethod, String name, String icon) {
+		subCircuitParts.add(new ComponentEntry(folder, component, placementClickMethod, placementMoveMethod, placementAbbortMethod, name, icon));
+	}
+	
+	public static void clearSubCircuitCache() {
+		subCircuitParts.clear();
+	}
+	
+	public static List<ComponentEntry> getCachedSubCircuitParts() {
+		return subCircuitParts;
 	}
 	
 }

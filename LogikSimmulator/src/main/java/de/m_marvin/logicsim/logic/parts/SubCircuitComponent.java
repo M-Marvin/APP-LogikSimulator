@@ -1,7 +1,6 @@
 package de.m_marvin.logicsim.logic.parts;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -14,6 +13,7 @@ import de.m_marvin.logicsim.logic.nodes.InputNode;
 import de.m_marvin.logicsim.logic.nodes.Node;
 import de.m_marvin.logicsim.logic.nodes.OutputNode;
 import de.m_marvin.logicsim.logic.nodes.PassivNode;
+import de.m_marvin.logicsim.ui.Editor;
 import de.m_marvin.logicsim.ui.EditorArea;
 import de.m_marvin.logicsim.util.CircuitSerializer;
 import de.m_marvin.univec.impl.Vec2f;
@@ -27,16 +27,18 @@ public class SubCircuitComponent extends Component {
 	/* Factory methods */
 
 	public static boolean coursorMove(Circuit circuit, Vec2i coursorPosition, File circuitFile) {
-		Circuit subCircuit;
-		try {
-			subCircuit = CircuitSerializer.loadCircuit(circuitFile);
-		} catch (IOException e) {
-			LogicSim.getInstance().getMainWindow().showErrorInfo("info.error.load_sub_circuit", e);
-			subCircuit = new Circuit();
-		}
 		
-		Circuit subCircuitFinal = subCircuit;
-		return Component.coursorMove(circuit, coursorPosition, () -> new SubCircuitComponent(circuit, subCircuitFinal));
+		return Component.coursorMove(circuit, coursorPosition, () -> {
+			Circuit subCircuit;
+			try {
+				subCircuit = CircuitSerializer.loadCircuit(circuitFile);
+			} catch (Exception e) {
+				Editor.showErrorInfo(LogicSim.getInstance().getLastInteractedEditor().getShell(), "editor.window.error.load_sub_circuit", e);
+				subCircuit = new Circuit();
+			}
+			
+			return new SubCircuitComponent(circuit, subCircuit);
+		});
 	}
 	
 	/* End of factory methods */
@@ -155,7 +157,7 @@ public class SubCircuitComponent extends Component {
 	@Override
 	public void updateIO() {
 		// TODO Auto-generated method stub
-		
+		System.out.println("TEST");
 	}
 
 }
