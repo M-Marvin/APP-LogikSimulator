@@ -25,7 +25,7 @@ public class LampComponent extends Component implements ISubCircuitIO {
 	/* End of factory methods */
 	
 	protected Optional<OutputNode> subCircuitOutput = Optional.empty();
-	protected boolean state;
+	public boolean state;
 	
 	public LampComponent(Circuit circuit) {
 		super(circuit);

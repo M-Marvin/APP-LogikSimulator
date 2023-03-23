@@ -9,6 +9,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.m_marvin.logicsim.util.ThruthTableGenerator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -105,6 +106,26 @@ public class Editor {
 				loadCircuit();
 			}
 		});
+
+		//TEST->
+		MenuItem toolsTab = new MenuItem (titleBar, SWT.CASCADE);
+		toolsTab.setText (Translator.translate("editor.menu.tools"));
+		Menu toolsMenu = new Menu(shell, SWT.DROP_DOWN);
+		toolsTab.setMenu(toolsMenu);
+		MenuItem truthTableOpt = new MenuItem(toolsMenu, SWT.PUSH);
+		truthTableOpt.setText(Translator.translate("editor.menu.tools.truth_table"));
+		truthTableOpt.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				String table = ThruthTableGenerator.getThruthTableFromCircuit(LogicSim.getInstance().getCircuit());
+				MessageBox dialog = new MessageBox(shell, SWT.OK);
+				dialog.setText(Translator.translate("editor.menu.tools.truth_table.box"));
+				dialog.setMessage(table);
+
+				dialog.open();
+			}
+		});
+		//<-TEST
 		
 		// Left tool group
 		

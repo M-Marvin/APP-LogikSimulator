@@ -25,7 +25,7 @@ public class ButtonComponent extends Component implements ISubCircuitIO {
 	/* End of factory methods */
 	
 	protected Optional<InputNode> subCircuitInput = Optional.empty();
-	protected boolean toggle;
+	public boolean toggle;
 	
 	public ButtonComponent(Circuit circuit) {
 		super(circuit);
