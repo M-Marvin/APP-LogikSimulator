@@ -74,7 +74,7 @@ public class ThruthTableGenerator {
             }
 
             String outs = add0frontToLength(Integer.toBinaryString(val), inputs.size()).replaceAll(".(?!$)", "$0 ");
-            table.append(outs).append("    | |  ").append(output).append("\n");
+            table.append(outs).append("  | |  ").append(output).append("\n");
 
             val++;
         }
