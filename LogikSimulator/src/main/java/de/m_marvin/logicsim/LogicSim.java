@@ -22,7 +22,6 @@ import de.m_marvin.logicsim.logic.parts.NotGateComponent;
 import de.m_marvin.logicsim.logic.parts.SubCircuitComponent;
 import de.m_marvin.logicsim.logic.wires.ConnectorWire;
 import de.m_marvin.logicsim.ui.Editor;
-import de.m_marvin.logicsim.ui.TextRenderer;
 import de.m_marvin.logicsim.ui.Translator;
 import de.m_marvin.logicsim.util.Registries;
 import de.m_marvin.logicsim.util.Registries.ComponentFolder;
@@ -92,14 +91,13 @@ public class LogicSim {
 		
 		openEditor(null);
 		openEditor(null);
-		openEditor(null);
+		//openEditor(null);
 		
 		while (!shouldTerminate()) {
 			update();
 			render();
 		}
 		
-		TextRenderer.cleanUpOpenGL();
 		this.display.dispose();
 		this.processor.terminate();
 		
