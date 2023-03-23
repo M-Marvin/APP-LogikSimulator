@@ -107,7 +107,6 @@ public class Editor {
 			}
 		});
 
-		//TEST->
 		MenuItem toolsTab = new MenuItem (titleBar, SWT.CASCADE);
 		toolsTab.setText (Translator.translate("editor.menu.tools"));
 		Menu toolsMenu = new Menu(shell, SWT.DROP_DOWN);
@@ -117,7 +116,7 @@ public class Editor {
 		truthTableOpt.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				String table = ThruthTableGenerator.getThruthTableFromCircuit(LogicSim.getInstance().getCircuit());
+				String table = ThruthTableGenerator.getThruthTableFromCircuit(editorArea.getCircuit());
 				MessageBox dialog = new MessageBox(shell, SWT.OK);
 				dialog.setText(Translator.translate("editor.menu.tools.truth_table.box"));
 				dialog.setMessage(table);
@@ -125,7 +124,6 @@ public class Editor {
 				dialog.open();
 			}
 		});
-		//<-TEST
 		
 		// Left tool group
 		

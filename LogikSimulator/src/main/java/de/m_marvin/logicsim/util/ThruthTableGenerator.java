@@ -23,9 +23,7 @@ public class ThruthTableGenerator {
     }
 
     public static String add0(String sIn, int amount) {
-        StringBuilder sInBuilder = new StringBuilder(sIn);
-        sInBuilder.append("0".repeat(Math.max(0, amount)));
-        sIn = sInBuilder.toString();
+        sIn = sIn + "0".repeat(Math.max(0, amount));
         return sIn;
     }
 
@@ -71,12 +69,12 @@ public class ThruthTableGenerator {
                 if (o instanceof LampComponent) {
                     boolean s = ((LampComponent) o).state;
                     int s_int = !s ? 0 : 1;
-                    output.append(s_int);
+                    output.append(s_int).append(" ");
                 }
             }
 
-            String outs = add0frontToLength(Integer.toBinaryString(val), inputs.size());
-            table.append(outs).append(" || ").append(output).append("\n");
+            String outs = add0frontToLength(Integer.toBinaryString(val), inputs.size()).replaceAll(".(?!$)", "$0 ");
+            table.append(outs).append("    | |  ").append(output).append("\n");
 
             val++;
         }
