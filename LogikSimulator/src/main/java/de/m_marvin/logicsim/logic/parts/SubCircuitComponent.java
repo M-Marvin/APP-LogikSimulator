@@ -6,6 +6,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.gson.JsonObject;
+
+import de.m_marvin.logicsim.CircuitProcessor;
 import de.m_marvin.logicsim.LogicSim;
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Component;
@@ -27,17 +30,10 @@ public class SubCircuitComponent extends Component {
 	/* Factory methods */
 
 	public static boolean coursorMove(Circuit circuit, Vec2i coursorPosition, File circuitFile) {
-		
 		return Component.coursorMove(circuit, coursorPosition, () -> {
-			Circuit subCircuit;
-			try {
-				subCircuit = CircuitSerializer.loadCircuit(circuitFile);
-			} catch (Exception e) {
-				Editor.showErrorInfo(LogicSim.getInstance().getLastInteractedEditor().getShell(), "editor.window.error.load_sub_circuit", e);
-				subCircuit = new Circuit();
-			}
-			
-			return new SubCircuitComponent(circuit, subCircuit);
+			SubCircuitComponent component = new SubCircuitComponent(circuit);
+			component.setSubCircuitFile(circuitFile);
+			return component;
 		});
 	}
 	
@@ -56,15 +52,12 @@ public class SubCircuitComponent extends Component {
 	protected int width;
 	protected int height;
 	protected int nodeCount;
-	protected final Circuit subCircuit;
+	protected Circuit subCircuit;
+	
 	protected final Map<Integer, ISubCircuitIO> node2subComponent = new HashMap<>();
 	
-	public SubCircuitComponent(Circuit circuit, Circuit subCurcuit) {
+	public SubCircuitComponent(Circuit circuit) {
 		super(circuit);
-		this.subCircuit = subCurcuit;
-		
-		this.label = "sub_circuit";
-		updatePinout(true);
 	}
 	
 	public void updatePinout(boolean connectToCircuit) {
@@ -132,6 +125,20 @@ public class SubCircuitComponent extends Component {
 		});
 	}
 	
+	public void setSubCircuitFile(File subCircuitFile) {
+		try {
+			subCircuit = CircuitSerializer.loadCircuit(subCircuitFile);
+		} catch (Exception e) {
+			Editor.showErrorInfo(LogicSim.getInstance().getLastInteractedEditor().getShell(), "editor.window.error.load_sub_circuit", e);
+			subCircuit = new Circuit();
+		}
+		updatePinout(true);
+	}
+
+	public void setSubCircuit(Circuit subCircuit) {
+		this.subCircuit = subCircuit;
+		updatePinout(true);
+	}
 	public Circuit getSubCircuit() {
 		return subCircuit;
 	}
@@ -145,6 +152,35 @@ public class SubCircuitComponent extends Component {
 	public int getVisualHeight() {
 		return this.height;
 	}
+	
+	public String getRelativeCircuitPath() {
+		File subCircuitFile = getSubCircuit().getCircuitFile();
+		if (subCircuitFile.toString().startsWith(LogicSim.getInstance().getSubCircuitFolder().toString())) {
+			return LogicSim.getInstance().getSubCircuitFolder().toURI().relativize(subCircuitFile.toURI()).toString();
+		} else {
+			return getCircuit().getCircuitFile().getParentFile().toURI().relativize(subCircuitFile.toURI()).toString();
+		}
+	}
+	
+	public void setRelativeCircuitPath(String relativeCircuitFile) {
+		File absolutePath = new File(LogicSim.getInstance().getSubCircuitFolder(), relativeCircuitFile);
+		if (!absolutePath.isFile()) {
+			absolutePath = new File(getCircuit().getCircuitFile().getParentFile(), relativeCircuitFile);
+		}
+		setSubCircuitFile(absolutePath);
+	}
+	
+	@Override
+	public void serialize(JsonObject json) {
+		super.serialize(json);
+		json.addProperty("subCircuitFile", getRelativeCircuitPath());
+	}
+	
+	@Override
+	public void deserialize(JsonObject json) {
+		super.deserialize(json);
+		setRelativeCircuitPath(json.get("subCircuitFile").getAsString());
+	}
 
 	@Override
 	public void render() {
@@ -156,8 +192,9 @@ public class SubCircuitComponent extends Component {
 
 	@Override
 	public void updateIO() {
-		// TODO Auto-generated method stub
-		System.out.println("TEST");
+		CircuitProcessor processor = LogicSim.getInstance().getCircuitProcessor();
+		if (!processor.isExecuting(getSubCircuit())) processor.addProcess(getCircuit(), getSubCircuit());
+		processor.notifyActivity(getSubCircuit());
 	}
 
 }

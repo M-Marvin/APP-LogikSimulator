@@ -1,0 +1,30 @@
+{
+  "shortCircuitType": "HIGH_LOW_SHORT",
+  "components": [
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.SubCircuitComponent",
+      "label": "unnamed",
+      "x": 230,
+      "y": 220,
+      "subCircuitFile": "test_component.json"
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.ButtonComponent",
+      "label": "button",
+      "x": 170,
+      "y": 210
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.ButtonComponent",
+      "label": "button",
+      "x": 170,
+      "y": 250
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LampComponent",
+      "label": "lamp",
+      "x": 290,
+      "y": 230
+    }
+  ]
+}

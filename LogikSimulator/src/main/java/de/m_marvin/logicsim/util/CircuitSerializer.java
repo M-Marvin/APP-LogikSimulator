@@ -25,11 +25,15 @@ public class CircuitSerializer {
 	public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	
 	public static void saveCircuit(Circuit circuit, File file) throws IOException {
+		if (!file.equals(circuit.getCircuitFile())) circuit.setCircuitFile(file);
 		serializeCircuit(circuit, new FileOutputStream(file));
 	}
 	
 	public static Circuit loadCircuit(File file) throws IOException {
-		return deserializeCircuit(new FileInputStream(file));
+		Circuit circuit = new Circuit();
+		circuit.setCircuitFile(file);
+		deserializeCircuit(circuit, new FileInputStream(file));
+		return circuit;
 	}
 	
 	public static void serializeCircuit(Circuit circuit, OutputStream stream) throws IOException {
@@ -39,7 +43,7 @@ public class CircuitSerializer {
 		writer.close();
 	}
 	
-	public static Circuit deserializeCircuit(InputStream stream) throws IOException {
+	public static void deserializeCircuit(Circuit circuit, InputStream stream) throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 		String line;
 		StringBuilder sb = new StringBuilder();
@@ -47,12 +51,10 @@ public class CircuitSerializer {
 		reader.close();
 		
 		JsonObject json = GSON.fromJson(sb.toString(), JsonObject.class);
-		return deserializeCircuit(json);
+		deserializeCircuit(circuit, json);
 	}
 	
-	public static Circuit deserializeCircuit(JsonObject json) {
-		
-		Circuit circuit = new Circuit();
+	public static void deserializeCircuit(Circuit circuit, JsonObject json) {
 		
 		circuit.setShortCircuitMode(ShortCircuitType.valueOf(json.get("shortCircuitType").getAsString()));
 		
@@ -68,12 +70,11 @@ public class CircuitSerializer {
 				circuit.add(component);
 			} catch (Exception e) {
 				System.err.println("Failed to load component '" + componentJson.toString() + "'");
+				e.printStackTrace();
 			}
 		});
 		
 		circuit.getComponents().forEach(component -> circuit.reconnect(false, component));
-		
-		return circuit;
 		
 	}
 	

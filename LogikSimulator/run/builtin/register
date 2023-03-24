@@ -1,0 +1,178 @@
+{
+  "shortCircuitType": "HIGH_LOW_SHORT",
+  "components": [
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.ButtonComponent",
+      "label": "button",
+      "x": 230,
+      "y": 230
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.ButtonComponent",
+      "label": "button",
+      "x": 230,
+      "y": 430
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.SubCircuitComponent",
+      "label": "unnamed",
+      "x": 530,
+      "y": 320,
+      "subCircuitFile": "sr_latch"
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 430,
+      "y": 350
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 430,
+      "y": 310
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.NotGateComponent",
+      "label": "not_gate",
+      "x": 330,
+      "y": 430
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LampComponent",
+      "label": "lamp",
+      "x": 630,
+      "y": 330
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 477,
+      "y": 327,
+      "x1": 3,
+      "y1": 3,
+      "x2": 43,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 477,
+      "y": 367,
+      "x1": 43,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 277,
+      "y": 247,
+      "x1": 3,
+      "y1": 3,
+      "x2": 103,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 377,
+      "y": 247,
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 73
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 377,
+      "y": 317,
+      "x1": 3,
+      "y1": 3,
+      "x2": 43,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 377,
+      "y": 357,
+      "x1": 3,
+      "y1": 3,
+      "x2": 43,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 377,
+      "y": 317,
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 43
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 317,
+      "y": 337,
+      "x1": 103,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 317,
+      "y": 337,
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 113
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 277,
+      "y": 447,
+      "x1": 43,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 377,
+      "y": 447,
+      "x1": 3,
+      "y1": 3,
+      "x2": 43,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 417,
+      "y": 377,
+      "x1": 3,
+      "y1": 73,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 577,
+      "y": 347,
+      "x1": 3,
+      "y1": 3,
+      "x2": 43,
+      "y2": 3
+    }
+  ]
+}

@@ -21,6 +21,7 @@ import de.m_marvin.logicsim.logic.parts.LogicGateComponent.XorGateComponent;
 import de.m_marvin.logicsim.logic.parts.NotGateComponent;
 import de.m_marvin.logicsim.logic.parts.SubCircuitComponent;
 import de.m_marvin.logicsim.logic.wires.ConnectorWire;
+import de.m_marvin.logicsim.ui.CircuitViewer;
 import de.m_marvin.logicsim.ui.Editor;
 import de.m_marvin.logicsim.ui.Translator;
 import de.m_marvin.logicsim.util.Registries;
@@ -36,12 +37,13 @@ public class LogicSim {
 	protected Display display;
 	protected CircuitProcessor processor;
 	protected List<Editor> openEditors = new ArrayList<>();
-	protected Editor lastInteractedEditor = null;
+	protected CircuitViewer circuitWindow;
+	protected Editor lastInteractedEditor;
 	
 	public static void main(String... args) {
 		
 		LogicSim logicSim = new LogicSim();
-
+		
 		CommandLineParser parser = new CommandLineParser();
 		parser.parseInput(args);
 		logicSim.subCircuitFolder = new File(parser.getOption("sub-circuit-folder"));
@@ -52,6 +54,10 @@ public class LogicSim {
 	
 	public LogicSim() {
 		INSTANCE = this;
+	}
+	
+	public File getSubCircuitFolder() {
+		return subCircuitFolder;
 	}
 	
 	public static LogicSim getInstance() {
@@ -87,11 +93,8 @@ public class LogicSim {
 		
 		this.display = new Display();
 		this.processor = new CircuitProcessor();
-		this.processor.start();
 		
 		openEditor(null);
-		openEditor(null);
-		//openEditor(null);
 		
 		while (!shouldTerminate()) {
 			update();
@@ -106,7 +109,13 @@ public class LogicSim {
 	public void openEditor(Circuit circuit) {
 		this.openEditors.add(new Editor(display, circuit));
 	}
-
+	
+	public void openCircuitViewer() {
+		if (this.circuitWindow == null || this.circuitWindow.getShell().isDisposed()) {
+			this.circuitWindow = new CircuitViewer(display);
+		}
+	}
+	
 	public void triggerMenuUpdates() {
 		this.openEditors.forEach(Editor::updatePartSelector);
 	}
@@ -126,6 +135,8 @@ public class LogicSim {
 			if (editor.getShell().isDisposed()) disposedEditors.add(editor);
 		});
 		this.openEditors.removeAll(disposedEditors);
+		
+		if (this.circuitWindow != null && !this.circuitWindow.getShell().isDisposed()) this.circuitWindow.updateView();
 		
 		if (this.openEditors.isEmpty()) this.terminate();
 		

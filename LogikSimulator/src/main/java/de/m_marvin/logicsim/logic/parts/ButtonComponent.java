@@ -46,7 +46,11 @@ public class ButtonComponent extends Component implements ISubCircuitIO {
 
 	@Override
 	public void updateIO() {
-		if (this.subCircuitInput.isPresent()) this.toggle = this.subCircuitInput.get().getState();
+		if (this.subCircuitInput.isPresent()) {
+			synchronized (this.subCircuitInput.get().getCircuit()) {
+				this.toggle = this.subCircuitInput.get().getState();
+			}
+		}
 		this.outputs.get(0).setState(this.toggle);
 	}
 	

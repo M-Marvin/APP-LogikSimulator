@@ -47,7 +47,11 @@ public class LampComponent extends Component implements ISubCircuitIO {
 	@Override
 	public void updateIO() {
 		this.state = this.inputs.get(0).getState();
-		if (this.subCircuitOutput.isPresent()) this.subCircuitOutput.get().setState(this.state);
+		if (this.subCircuitOutput.isPresent()) {
+			synchronized (this.subCircuitOutput.get().getCircuit()) {
+				this.subCircuitOutput.get().setState(this.state);
+			}
+		}
 	}
 	
 	@Override
