@@ -46,8 +46,6 @@ public abstract class Component {
 	}
 	
 	/* End of factory methods */
-
-	public static final float VISUAL_LINE_WIDTH = 2.0F;
 	
 	protected Vec2i visualPosition = new Vec2i(0, 0);
 	protected String label = "unnamed";
@@ -115,7 +113,6 @@ public abstract class Component {
 	public abstract int getVisualHeight();
 	
 	public abstract void render();
-	
 	public abstract void updateIO();
 	
 	public void click(Vec2i clickPosition) {}
@@ -146,6 +143,11 @@ public abstract class Component {
 	@Override
 	public int hashCode() {
 		return Objects.hash(this.componentNr, this.visualPosition);
+	}
+	
+	@Override
+	public String toString() {
+		return "Component{ident=" + makeIdentifier() + ",pos=" + this.visualPosition + "}";
 	}
 	
 }

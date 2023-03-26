@@ -49,11 +49,6 @@ public class Node {
 	}
 	
 	@Override
-	public String toString() {
-		return makeIdentifier();
-	}
-	
-	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Node other) return 
 				other.component.getComponentNr() == this.component.getComponentNr() && 
@@ -64,6 +59,11 @@ public class Node {
 	@Override
 	public int hashCode() {
 		return Objects.hash(this.component, this.nodeNr);
+	}
+
+	@Override
+	public String toString() {
+		return "Node{ident=" + makeIdentifier() + "}";
 	}
 	
 }
