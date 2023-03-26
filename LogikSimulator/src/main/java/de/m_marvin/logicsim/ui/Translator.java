@@ -28,11 +28,11 @@ public class Translator {
 		});
 	}
 	
-	public static String translate(String key, String... args) {
+	public static String translate(String key, Object... args) {
 		String translationPattern = translations.get(key);
 		if (translationPattern == null) return key;
 		for (int i = 0; i < args.length; i++) {
-			translationPattern = translationPattern.replace("%" + i, args[i]);
+			translationPattern = translationPattern.replace("%" + i, args[i].toString());
 		}
 		return translationPattern;
 	}

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.m_marvin.logicsim.logic.Circuit;
+import de.m_marvin.logicsim.ui.Editor;
 
 public class CircuitProcessor {
 	
@@ -15,8 +16,7 @@ public class CircuitProcessor {
 		public long executionStart;
 		public long executionEnd;
 		public long executionTime;
-		public long lastNotification;
-		public boolean active;
+		protected boolean active;
 		
 		public final Circuit parentCircuit;
 		public final Circuit circuit;
@@ -24,7 +24,6 @@ public class CircuitProcessor {
 		public CircuitProcess(Circuit parentCircuit, Circuit circuit) {
 			this.parentCircuit = parentCircuit;
 			this.circuit = circuit;
-			this.lastNotification = getCurrentTime();
 		}
 		
 		@Override
@@ -39,43 +38,44 @@ public class CircuitProcessor {
 	
 	public class CircuitProcessorThread extends Thread {
 		
-		public List<CircuitProcess> processes = new ArrayList<>();
+		public final List<CircuitProcess> processes = new ArrayList<>();
 		public long lastExecutionTime;
-		
-		public String name2;
 		
 		public CircuitProcessorThread(String name) {
 			super(name);
-			name2 = name;
 		}
 		
 		@Override
 		public void run() {
 			try {
 				while (!requestShutdown) {
-					if (allowedToExecute) {
-						this.lastExecutionTime = 0;
-						synchronized (this) {
-							this.processes.forEach(process -> {
-								if (process.active) process.run();
-								CircuitProcessorThread.this.lastExecutionTime += process.executionTime;
-							});
-						}
-						if (this.processes.isEmpty()) {
+					try {
+						if (allowedToExecute) {
+							this.lastExecutionTime = 0;
+							synchronized (this) {
+								this.processes.forEach(process -> {
+									if (process.active) process.run();
+									CircuitProcessorThread.this.lastExecutionTime += process.executionTime;
+								});
+							}
+							if (this.processes.isEmpty()) {
+								Thread.sleep(1000);
+							}
+						} else {
 							Thread.sleep(1000);
 						}
-					} else {
-						Thread.sleep(1000);
-					}
+					} catch (InterruptedException e) {}
 				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			} catch (Throwable e) {
+				LogicSim.getInstance().getDisplay().asyncExec(() -> {
+					if (!LogicSim.getInstance().getLastInteractedEditor().getShell().isDisposed()) Editor.showErrorInfo(LogicSim.getInstance().getLastInteractedEditor().getShell(), "editor.window.error.processor_crash", e);
+				});
+				this.processes.forEach(process -> process.active = false);
 			}
 		}
 		
 	}
 	
-	protected boolean allowedToHandle = false;
 	protected boolean allowedToExecute = false;
 	protected boolean requestShutdown = false;
 	protected List<CircuitProcessorThread> threads = new ArrayList<>();
@@ -86,20 +86,17 @@ public class CircuitProcessor {
 	
 	public CircuitProcessor() {
 		
-		for (int i = 0; i < 1; i++) { // TODO
+		for (int i = 0; i < getAvailableCores(); i++) { // TODO
 			this.threads.add(new CircuitProcessorThread("processor-" + i));
 		}
 		this.threads.forEach(Thread::start);
 		
 		this.processorMasterThread = new Thread(() -> {
-			try {
-				while (!requestShutdown) {
+			while (!requestShutdown) {
+				try {
 					this.update();
 					Thread.sleep(100);
-				}
-			} catch (InterruptedException e) {
-				System.err.println("Unexpected error occured in circuit processor master thread!");
-				terminate();
+				} catch (InterruptedException e) {}
 			}
 		}, "processor-master");
 		this.processorMasterThread.start();
@@ -119,12 +116,10 @@ public class CircuitProcessor {
 	}
 	
 	public static long getCurrentTime() {
-		return System.nanoTime();
+		return System.currentTimeMillis();
 	}
 	
 	public void update() {
-		
-		if (this.mainProcess != null) this.mainProcess.lastNotification = getCurrentTime();
 		
 		// Find slowest and fastest thread and remove inactive processes
 		
@@ -148,8 +143,7 @@ public class CircuitProcessor {
 		
 		this.inactives.clear();
 		
-		
-		if (allowedToHandle) {
+		if (allowedToExecute) {
 			
 			// Distribute processing load over active threads
 			
@@ -171,7 +165,7 @@ public class CircuitProcessor {
 					if (!process.active) {
 						newProcesses.add(process);
 						process.active = true;
-					} else if (getCurrentTime() - process.lastNotification > 2000000 && process.parentCircuit != null) {
+					} else if (process.parentCircuit != null ? !holdsCircuit(process.parentCircuit) : this.mainProcess != process) {
 						process.active = false;
 						inactives.put(process.circuit, process);
 					}
@@ -183,17 +177,14 @@ public class CircuitProcessor {
 		
 	}
 	
+	public void removeProcess(Circuit circuit) {
+		if (processes.containsKey(circuit)) this.processes.remove(circuit).active = false;		
+	}
+	
 	public synchronized void addProcess(Circuit ownerCircuit, Circuit circuit) {
 		CircuitProcess process = new CircuitProcess(ownerCircuit, circuit);
 		this.processes.put(circuit, process);
 		if (ownerCircuit == null) this.mainProcess = process;
-	}
-
-	public void notifyActivity(Circuit circuit) {
-		CircuitProcess process = this.processes.get(circuit);
-		if (process != null) {
-			process.lastNotification = getCurrentTime();
-		}
 	}
 	
 	public boolean isExecuting(Circuit circuit) {
@@ -204,20 +195,25 @@ public class CircuitProcessor {
 		return this.processes.containsKey(circuit);
 	}
 	
+	public CircuitProcessorThread getProcessorThreadOf(CircuitProcess process) {
+		for (CircuitProcessorThread processor : this.threads) {
+			if (processor.processes.contains(process)) return processor;
+		}
+		return null;
+	}
+	
 	public void start() {
-		this.processes.keySet().forEach(this::notifyActivity);
+		this.threads.forEach(Thread::interrupt);
 		this.allowedToExecute = true;
-		this.allowedToHandle = true;
 	}
 
 	public void pause() {
 		this.allowedToExecute = false;
-		this.allowedToHandle = false;
 	}
 
 	public void stop() {
 		this.allowedToExecute = false;
-		this.allowedToHandle = true;
+		this.processes.keySet().forEach(circuit -> circuit.resetNetworks());
 	}
 	
 	public void terminate() {

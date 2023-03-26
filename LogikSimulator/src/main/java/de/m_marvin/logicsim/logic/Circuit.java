@@ -34,19 +34,29 @@ public class Circuit {
 		switch (type) {
 		default:
 		case HIGH_LOW_SHORT:
-			if (stateA == NetState.SHORT_CIRCUIT) return NetState.SHORT_CIRCUIT;
-			if (stateB == NetState.SHORT_CIRCUIT) return NetState.SHORT_CIRCUIT;
-			if (stateA != stateB) return NetState.SHORT_CIRCUIT;
+			if (stateA == NetState.SHORT_CIRCUIT) {
+				return NetState.SHORT_CIRCUIT;
+			}
+			if (stateB == NetState.SHORT_CIRCUIT) {
+				return NetState.SHORT_CIRCUIT;
+			}
+			if (stateA != stateB) {
+				return NetState.SHORT_CIRCUIT;
+			}
 			return stateA;
 		case PREFER_HIGH:
 			if (stateA == NetState.SHORT_CIRCUIT) return NetState.HIGH;
 			if (stateB == NetState.SHORT_CIRCUIT) return NetState.HIGH;
-			if (stateA != stateB) return NetState.SHORT_CIRCUIT;
+			if (stateA != stateB) {
+				return NetState.SHORT_CIRCUIT;
+			}
 			return stateA == NetState.HIGH || stateB == NetState.HIGH ? NetState.HIGH : NetState.LOW;
 		case PREFER_LOW:
 			if (stateA == NetState.SHORT_CIRCUIT) return NetState.LOW;
 			if (stateB == NetState.SHORT_CIRCUIT) return NetState.LOW;
-			if (stateA != stateB) return NetState.SHORT_CIRCUIT;
+			if (stateA != stateB) {
+				return NetState.SHORT_CIRCUIT;
+			}
 			return stateA == NetState.LOW || stateB == NetState.LOW ? NetState.LOW : NetState.HIGH;
 		}
 	}
@@ -198,8 +208,8 @@ public class Circuit {
 	}
 
 	public synchronized void resetNetworks() {
-		for (int i = 0; i < this.values.size(); i++) this.values.set(i, NetState.FLOATING);
-		for (int i = 0; i < this.valueBuffer.size(); i++) this.valueBuffer.set(i, NetState.FLOATING);
+		for (int i = 0; i < this.values.size(); i++) this.values.set(i, NetState.LOW);
+		for (int i = 0; i < this.valueBuffer.size(); i++) this.valueBuffer.set(i, NetState.LOW);
 	}
 	
 	protected synchronized void cloneNetBuffer() {
@@ -220,10 +230,12 @@ public class Circuit {
 	
 	
 	public synchronized void add(Component component) {
+		component.created();
 		this.components.add(component);
 	}
 	
 	public synchronized void remove(Component component) {
+		component.dispose();
 		this.components.remove(component);
 	}
 	

@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.widgets.Display;
 
 import de.m_marvin.commandlineparser.CommandLineParser;
@@ -64,7 +63,7 @@ public class LogicSim {
 		return INSTANCE;
 	}
 
-	public Device getDisplay() {
+	public Display getDisplay() {
 		return this.display;
 	}
 	

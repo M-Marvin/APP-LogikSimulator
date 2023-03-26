@@ -119,6 +119,8 @@ public abstract class Component {
 	public abstract void updateIO();
 	
 	public void click(Vec2i clickPosition) {}
+	public void created() {}
+	public void dispose() {}
 	
 	public void serialize(JsonObject json) {
 		json.addProperty("label", this.label);

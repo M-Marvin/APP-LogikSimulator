@@ -47,9 +47,7 @@ public class ButtonComponent extends Component implements ISubCircuitIO {
 	@Override
 	public void updateIO() {
 		if (this.subCircuitInput.isPresent()) {
-			synchronized (this.subCircuitInput.get().getCircuit()) {
-				this.toggle = this.subCircuitInput.get().getState();
-			}
+			this.toggle = this.subCircuitInput.get().getState();
 		}
 		this.outputs.get(0).setState(this.toggle);
 	}
@@ -72,14 +70,16 @@ public class ButtonComponent extends Component implements ISubCircuitIO {
 		TextRenderer.drawText(visualPosition.x + getVisualWidth() / 2, visualPosition.y + getVisualHeight() / 2, 12, this.toggle ? "ON" : "OFF");
 		
 	}
-
+	
 	@Override
 	public Node makeNode(Component subCircuitComponent, int id, Vec2i offset, boolean connectToCircuit) {
 		InputNode overrideNode = new InputNode(subCircuitComponent, id, this.label, offset);
-		if (connectToCircuit) {
-			this.subCircuitInput = Optional.of(overrideNode);
-		} else {
-			this.subCircuitInput = Optional.empty();
+		if (this.subCircuitInput.isEmpty() || !isTransProcessNodeValid(this.subCircuitInput.get())) {
+			if (connectToCircuit) {
+				this.subCircuitInput = Optional.of(overrideNode);
+			} else {
+				this.subCircuitInput = Optional.empty();
+			}
 		}
 		return overrideNode;
 	}

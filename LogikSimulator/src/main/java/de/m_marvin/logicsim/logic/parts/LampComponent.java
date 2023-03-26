@@ -48,9 +48,7 @@ public class LampComponent extends Component implements ISubCircuitIO {
 	public void updateIO() {
 		this.state = this.inputs.get(0).getState();
 		if (this.subCircuitOutput.isPresent()) {
-			synchronized (this.subCircuitOutput.get().getCircuit()) {
-				this.subCircuitOutput.get().setState(this.state);
-			}
+			this.subCircuitOutput.get().setState(this.state);
 		}
 	}
 	
@@ -71,10 +69,12 @@ public class LampComponent extends Component implements ISubCircuitIO {
 	@Override
 	public Node makeNode(Component subCircuitComponent, int id, Vec2i offset, boolean connectToCircuit) {
 		OutputNode overrideNode = new OutputNode(subCircuitComponent, id, this.label, offset);
-		if (connectToCircuit) {
-			this.subCircuitOutput = Optional.of(overrideNode);
-		} else {
-			this.subCircuitOutput = Optional.empty();
+		if (this.subCircuitOutput.isEmpty() || !isTransProcessNodeValid(this.subCircuitOutput.get())) {
+			if (connectToCircuit) {
+				this.subCircuitOutput = Optional.of(overrideNode);
+			} else {
+				this.subCircuitOutput = Optional.empty();
+			}
 		}
 		return overrideNode;
 	}

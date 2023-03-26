@@ -102,7 +102,7 @@ public class Editor {
 		Menu viewsMenu = new Menu(shell, SWT.DROP_DOWN);
 		viewsTab.setMenu(viewsMenu);
 		MenuItem circuitsOpt = new MenuItem(viewsMenu, SWT.PUSH);
-		circuitsOpt.setText(Translator.translate("editor.menu.views.circuits"));
+		circuitsOpt.setText(Translator.translate("editor.menu.views.circuit_viewer"));
 		circuitsOpt.addListener(SWT.Selection, (e) -> LogicSim.getInstance().openCircuitViewer());
 		
 		// Left tool group
@@ -200,7 +200,7 @@ public class Editor {
 	}
 	
 	public void updateTitle() {
-		this.shell.setText("LogikSimmulator - alpha" + (this.editorArea.getCircuit().getCircuitFile() != null ? " - " + this.editorArea.getCircuit().getCircuitFile().toString() : ""));
+		this.shell.setText(Translator.translate("editor.title") + (this.editorArea.getCircuit().getCircuitFile() != null ? " - " + this.editorArea.getCircuit().getCircuitFile().toString() : ""));
 	}
 	
 	public void saveCircuit(boolean saveAs) {
@@ -246,7 +246,7 @@ public class Editor {
 		}
 	}
 
-	public static void showErrorInfo(Shell shell, String messageKey, Exception e) {
+	public static void showErrorInfo(Shell shell, String messageKey, Throwable e) {
 		String message = null;
 		if (e instanceof FileNotFoundException) {
 			message = e.getMessage();

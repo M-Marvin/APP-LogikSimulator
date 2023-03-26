@@ -47,6 +47,10 @@ public class SubCircuitComponent extends Component {
 		
 		public Node makeNode(Component subCircuitComponent, int id, Vec2i offset, boolean connectToCircuit);
 		
+		public default boolean isTransProcessNodeValid(Node node) {
+			return LogicSim.getInstance().getCircuitProcessor().holdsCircuit(node.getCircuit());
+		}
+		
 	}
 	
 	protected int width;
@@ -100,8 +104,8 @@ public class SubCircuitComponent extends Component {
 			}
 		}
 		
-		this.width = Math.max(MIN_COMPONENT_SIZE, this.height / 3);
-		this.width -= this.width % EditorArea.RASTER_SIZE;
+		this.width = Math.max(MIN_COMPONENT_SIZE, this.height / 2);
+		this.width -= this.width % NODE_RASTER;
 		
 		this.nodeCount = 0;
 		subCircuitIOs.forEach((subIO, position) -> {
@@ -191,10 +195,17 @@ public class SubCircuitComponent extends Component {
 	}
 
 	@Override
-	public void updateIO() {
+	public void updateIO() {}
+	
+	@Override
+	public void created() {
 		CircuitProcessor processor = LogicSim.getInstance().getCircuitProcessor();
-		if (!processor.isExecuting(getSubCircuit())) processor.addProcess(getCircuit(), getSubCircuit());
-		processor.notifyActivity(getSubCircuit());
+		if (!processor.holdsCircuit(getSubCircuit())) processor.addProcess(getCircuit(), getSubCircuit());
 	}
-
+	
+	@Override
+	public void dispose() {
+		LogicSim.getInstance().getCircuitProcessor().removeProcess(this.subCircuit);
+	}
+	
 }
