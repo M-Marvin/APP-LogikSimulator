@@ -45,6 +45,7 @@ public class SubCircuitComponent extends Component {
 	
 	public static interface ISubCircuitIO {
 		
+		public void queryIO();
 		public Node makeNode(Component subCircuitComponent, int id, Vec2i offset, boolean connectToCircuit);
 		
 		public default boolean isTransProcessNodeValid(Node node) {
@@ -64,7 +65,7 @@ public class SubCircuitComponent extends Component {
 		super(circuit);
 	}
 	
-	public void updatePinout(boolean connectToCircuit) {
+	public void updatePinout() {
 		this.node2subComponent.clear();
 		this.inputs.clear();
 		this.outputs.clear();
@@ -116,7 +117,8 @@ public class SubCircuitComponent extends Component {
 			offset.y += EditorArea.RASTER_SIZE;
 			offset.x += offset.x > 0 ? +10 : -10;
 			
-			Node node = subIO.makeNode(this, this.nodeCount++, new Vec2i(offset), connectToCircuit);
+			Node node = subIO.makeNode(this, this.nodeCount, new Vec2i(offset), !this.circuit.isVirtual());
+			this.node2subComponent.put(this.nodeCount++, subIO);
 			
 			if (node instanceof InputNode input) {
 				this.inputs.add(input);
@@ -136,12 +138,12 @@ public class SubCircuitComponent extends Component {
 			Editor.showErrorInfo(LogicSim.getInstance().getLastInteractedEditor().getShell(), "editor.window.error.load_sub_circuit", e);
 			subCircuit = new Circuit();
 		}
-		updatePinout(true);
+		updatePinout();
 	}
 
 	public void setSubCircuit(Circuit subCircuit) {
 		this.subCircuit = subCircuit;
-		updatePinout(true);
+		updatePinout();
 	}
 	public Circuit getSubCircuit() {
 		return subCircuit;
@@ -195,12 +197,18 @@ public class SubCircuitComponent extends Component {
 	}
 
 	@Override
-	public void updateIO() {}
+	public void updateIO() {
+		
+		this.node2subComponent.values().forEach(ISubCircuitIO::queryIO);
+		
+	}
 	
 	@Override
 	public void created() {
-		CircuitProcessor processor = LogicSim.getInstance().getCircuitProcessor();
-		if (!processor.holdsCircuit(getSubCircuit())) processor.addProcess(getCircuit(), getSubCircuit());
+		if (!getCircuit().isVirtual()) {
+			CircuitProcessor processor = LogicSim.getInstance().getCircuitProcessor();
+			if (!processor.holdsCircuit(getSubCircuit())) processor.addProcess(getCircuit(), getSubCircuit());
+		}
 	}
 	
 	@Override

@@ -84,7 +84,16 @@ public class Circuit {
 	protected final List<NetState> values = new ArrayList<>();
 	protected final List<Component> components = new ArrayList<>();
 	protected File circuitFile;
+	protected final boolean virtual;
 	protected ShortCircuitType shortCircuitType = ShortCircuitType.HIGH_LOW_SHORT;
+	
+	public Circuit() {
+		this(false);
+	}
+
+	public Circuit(boolean virtual) {
+		this.virtual = virtual;
+	}
 	
 	public File getCircuitFile() {
 		return this.circuitFile;
@@ -100,6 +109,10 @@ public class Circuit {
 	
 	public synchronized void setShortCircuitMode(ShortCircuitType shortCircuitType) {
 		this.shortCircuitType = shortCircuitType;
+	}
+
+	public boolean isVirtual() {
+		return this.virtual;
 	}
 	
 	
@@ -210,20 +223,20 @@ public class Circuit {
 	public synchronized void resetNetworks() {
 		for (int i = 0; i < this.values.size(); i++) this.values.set(i, NetState.LOW);
 		for (int i = 0; i < this.valueBuffer.size(); i++) this.valueBuffer.set(i, NetState.LOW);
+		this.components.forEach(Component::reset);
 	}
 	
 	protected synchronized void cloneNetBuffer() {
-		this.valueBuffer.clear();
-		this.valueBuffer.addAll(this.values);
+//		this.valueBuffer.clear();
+//		this.valueBuffer.addAll(this.values);
 		this.values.clear();
 		this.valueBuffer.forEach((v) -> this.values.add(NetState.FLOATING));
 	}
 
 	public synchronized void updateCircuit() {
-		
+		assert !this.virtual : "Can't simulate virtual circuit!";
 		this.components.forEach(Component::updateIO);
 		cloneNetBuffer();
-		
 	}
 	
 	

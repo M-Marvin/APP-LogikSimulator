@@ -135,6 +135,7 @@ public class LogicSim {
 		});
 		this.openEditors.removeAll(disposedEditors);
 		
+		this.openEditors.forEach(editor -> editor.updateTitle());
 		if (this.circuitWindow != null && !this.circuitWindow.getShell().isDisposed()) this.circuitWindow.updateView();
 		
 		if (this.openEditors.isEmpty()) this.terminate();

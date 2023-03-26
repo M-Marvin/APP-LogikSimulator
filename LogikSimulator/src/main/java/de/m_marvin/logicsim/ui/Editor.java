@@ -49,10 +49,10 @@ import de.m_marvin.univec.impl.Vec2i;
 
 public class Editor {
 	
-	public static final String SET_MAIN_CIRCUIT_ICON_B64 = LogicSim.ICON_IC_GROUP;
-	public static final String START_SIMULATION_ICON_B64 = LogicSim.ICON_IC_GROUP;
-	public static final String PAUSE_SIMULATION_ICON_B64 = LogicSim.ICON_IC_GROUP;
-	public static final String STOP_SIMULATION_ICON_B64 = LogicSim.ICON_IC_GROUP;
+	public static final String SET_MAIN_CIRCUIT_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAA6SURBVChTY2Qo3/6fAR0ofWNgSA9mBDGZwBx0TAoAG2NhYYFhzdevXxkuX77MyATjoGOiAaVWMDAAAGWnNDjnjwLQAAAAAElFTkSuQmCC";
+	public static final String START_SIMULATION_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABESURBVChTY2D4z/EfjHEARgxJxh+MUBYYYCqAAahC3AqgAKcC3vM/wDSGApjEZyOgHBDAFaBLwAHvOYb/IAzlogEGBgAn2R2n/6vpZQAAAABJRU5ErkJggg==";
+	public static final String PAUSE_SIMULATION_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAsSURBVChTYzxyjuE/AxBcucTAkJHAwAhiI4sxgRj4wNBQAPIKCCMDhBgDAwCAMw/f3Kx0cwAAAABJRU5ErkJggg==";
+	public static final String STOP_SIMULATION_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAsSURBVChTYyAK/Odg+I+Ot7Mx/AfJMYFV4AF0UMAIImAOQgeevyDyeAADAwCL3A7k6GJNugAAAABJRU5ErkJggg==";
 	
 	protected Shell shell;
 	protected Menu titleBar;
@@ -169,7 +169,7 @@ public class Editor {
 		
 		this.subCircuitView = new EditorArea(groupIO);
 		this.subCircuitView.setLayoutData(new BorderData(SWT.CENTER, 200, 200));
-		this.subCircuitView.setCircuit(new Circuit());
+		this.subCircuitView.setCircuit(new Circuit(true));
 		this.subCircuitView.setAllowEditing(false);
 		
 		// Editor area
@@ -200,7 +200,8 @@ public class Editor {
 	}
 	
 	public void updateTitle() {
-		this.shell.setText(Translator.translate("editor.title") + (this.editorArea.getCircuit().getCircuitFile() != null ? " - " + this.editorArea.getCircuit().getCircuitFile().toString() : ""));
+		boolean instanced = LogicSim.getInstance().getCircuitProcessor().holdsCircuit(this.editorArea.getCircuit());
+		this.shell.setText(Translator.translate("editor.title") + (this.editorArea.getCircuit().getCircuitFile() != null ? " - " + this.editorArea.getCircuit().getCircuitFile().toString() : "") + (instanced ? Translator.translate("editor.title.instanced") : ""));
 	}
 	
 	public void saveCircuit(boolean saveAs) {
@@ -275,7 +276,7 @@ public class Editor {
 	}
 	
 	public void updateComponentView() {
-		this.viewComponent.updatePinout(false);
+		this.viewComponent.updatePinout();
 		Vec2i position = new Vec2i(-this.viewComponent.getVisualWidth(), -this.viewComponent.getVisualHeight()).div(2).add(Vec2i.fromVec(this.subCircuitView.getSize()).div(2));
 		this.viewComponent.setVisualPosition(position);
 	}

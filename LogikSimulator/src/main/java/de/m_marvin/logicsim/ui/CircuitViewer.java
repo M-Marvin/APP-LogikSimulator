@@ -46,7 +46,6 @@ public class CircuitViewer {
 	protected Label executionTimeLabel;
 	protected Label parentProcessLabel;
 	protected Button openInEditorButton;
-	protected Button terminateProcessButton;
 	
 	public static Image decodeImage(String imageString) {
 		return new Image(LogicSim.getInstance().getDisplay(), new ImageData(new ByteArrayInputStream(Base64.getDecoder().decode(imageString))));
@@ -88,11 +87,8 @@ public class CircuitViewer {
 		this.openInEditorButton = new Button(processGroup, SWT.PUSH);
 		this.openInEditorButton.setText(Translator.translate("circuit_viewer.process_group.open_in_editor"));
 		this.openInEditorButton.addListener(SWT.Selection, (e) -> openInEditor());
-		
-		this.terminateProcessButton = new Button(processGroup, SWT.PUSH);
-		this.terminateProcessButton.setText(Translator.translate("circuit_viewer.process_group.terminate_process"));
-		this.terminateProcessButton.addListener(SWT.Selection, (e) -> terminateProcess());
-		
+
+
 		updateView();
 		this.shell.pack();
 		this.shell.open();
@@ -126,13 +122,16 @@ public class CircuitViewer {
 		CircuitProcessorThread thread = LogicSim.getInstance().getCircuitProcessor().getProcessorThreadOf(process);
 		float processLoad = (process != null && thread != null) ? process.executionTime / Math.max(thread.lastExecutionTime, 1) : 0;
 		int executionTime = (int) (process != null ? process.executionTime : 0);
-		String parentProcess = process != null ? process.parentCircuit != null ? process.parentCircuit.getCircuitFile() != null ? process.parentCircuit.getCircuitFile().getName() : "unkown" : "unknown" : "not available";
+		String parentProcess = process != null ? process.parentCircuit != null ? process.parentCircuit.getCircuitFile() != null ? process.parentCircuit.getCircuitFile().getName() : Translator.translate("circuit_viewer.process_group.parent_process.no_name") : Translator.translate("circuit_viewer.process_group.parent_process.main_process") : Translator.translate("circuit_viewer.process_group.parent_process.not_available");
 		
 		this.processorLoadBar.setSelection((int) (processLoad * 100));
 		this.processorLoadBar.setState(processLoad > 0.8F ? SWT.ERROR : SWT.NORMAL);
 		this.processorLoadLabel.setText(Translator.translate("circuit_viewer.process_group.process_load", (int) (processLoad * 100)));
+		this.processorLoadLabel.pack();
 		this.executionTimeLabel.setText(Translator.translate("circuit_viewer.process_group.execution_time", executionTime));
+		this.executionTimeLabel.pack();
 		this.parentProcessLabel.setText(Translator.translate("circuit_viewer.process_group.parent_process", parentProcess));
+		this.parentProcessLabel.pack();
 		
 	}
 	
@@ -147,6 +146,7 @@ public class CircuitViewer {
 			Optional<CircuitProcess> mainProcess = processor.getProcesses().stream().filter(process -> process.parentCircuit == null).findAny();
 			
 			if (mainProcess.isPresent()) listSubProcesses(processor.getProcesses(), mainProcess.get());
+			listUnknownProcesses(processor.getProcesses());
 			
 			List<Circuit> removed = new ArrayList<>();
 			this.viewItems.entrySet().forEach((entry) -> {
@@ -172,12 +172,26 @@ public class CircuitViewer {
 			Optional<TreeItem> parent = this.viewItems.values().stream().filter(item ->  !item.isDisposed() ? ((CircuitProcess) item.getData()).circuit == process.parentCircuit : false).findAny();
 			TreeItem item = parent.isPresent() ? new TreeItem(parent.get(), SWT.NONE) : new TreeItem(this.treeView, SWT.NONE);
 			item.setData(process);
-			item.setText("Unknown");
+			item.setText("N/A");
 			this.viewItems.put(process.circuit, item);
 		}
 		
 		processes.stream().filter(process1 -> process1.parentCircuit == process.circuit).forEach(subProcess -> {
 			listSubProcesses(processes, subProcess);
+		});
+		
+	}
+	
+	protected void listUnknownProcesses(Collection<CircuitProcess> processes) {
+		
+		processes.forEach(process -> {
+			if (!this.viewItems.containsKey(process.circuit)) {
+				Optional<TreeItem> parent = this.viewItems.values().stream().filter(item ->  !item.isDisposed() ? ((CircuitProcess) item.getData()).circuit == process.parentCircuit : false).findAny();
+				TreeItem item = parent.isPresent() ? new TreeItem(parent.get(), SWT.NONE) : new TreeItem(this.treeView, SWT.NONE);
+				item.setData(process);
+				item.setText("Unknown");
+				this.viewItems.put(process.circuit, item);
+			}
 		});
 		
 	}

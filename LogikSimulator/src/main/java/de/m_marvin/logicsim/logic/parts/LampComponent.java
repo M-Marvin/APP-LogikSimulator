@@ -47,9 +47,6 @@ public class LampComponent extends Component implements ISubCircuitIO {
 	@Override
 	public void updateIO() {
 		this.state = this.inputs.get(0).getState();
-		if (this.subCircuitOutput.isPresent()) {
-			this.subCircuitOutput.get().setState(this.state);
-		}
 	}
 	
 	@Override
@@ -65,7 +62,19 @@ public class LampComponent extends Component implements ISubCircuitIO {
 		TextRenderer.drawText(visualPosition.x + getVisualWidth() / 2, visualPosition.y + getVisualHeight() / 2, 12, this.state ? "ON" : "OFF");
 		
 	}
-
+	
+	@Override
+	public void reset() {
+		this.state = false;
+	}
+	
+	@Override
+	public void queryIO() {
+		if (this.subCircuitOutput.isPresent()) {
+			this.subCircuitOutput.get().setState(this.state);
+		}
+	}
+	
 	@Override
 	public Node makeNode(Component subCircuitComponent, int id, Vec2i offset, boolean connectToCircuit) {
 		OutputNode overrideNode = new OutputNode(subCircuitComponent, id, this.label, offset);
