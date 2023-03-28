@@ -1,8 +1,10 @@
 package de.m_marvin.logicsim.logic.parts;
 
+import java.util.Map;
 import java.util.Optional;
 
 import de.m_marvin.logicsim.logic.Circuit;
+import de.m_marvin.logicsim.logic.Circuit.NetState;
 import de.m_marvin.logicsim.logic.Component;
 import de.m_marvin.logicsim.logic.nodes.InputNode;
 import de.m_marvin.logicsim.logic.nodes.Node;
@@ -25,6 +27,7 @@ public class ButtonComponent extends Component implements ISubCircuitIO {
 	/* End of factory methods */
 	
 	protected Optional<InputNode> subCircuitInput = Optional.empty();
+	protected Map<String, NetState> laneReferenceCache;
 	protected boolean toggle;
 	
 	public ButtonComponent(Circuit circuit) {
@@ -46,12 +49,25 @@ public class ButtonComponent extends Component implements ISubCircuitIO {
 
 	@Override
 	public void updateIO() {
-		this.outputs.get(0).setState(this.toggle);
+		if (this.subCircuitInput.isPresent() && this.laneReferenceCache != null) {
+			// If the node in the parent circuit only receives a one lane signal or has a lane label to filter out that specific
+			// lane then only read that one lane and write it as normal output from this button (applying the lane tag of this button)
+			// If not, copy all received lanes one to one
+			String laneTag = this.subCircuitInput.get().getLaneTag();
+			if (laneReferenceCache.size() == 1 || !laneTag.equals(Circuit.DEFAULT_BUS_LANE)) {
+				this.toggle = laneReferenceCache.getOrDefault(laneTag, NetState.FLOATING).getLogicState();
+				this.outputs.get(0).setState(this.toggle);
+			} else {
+				this.outputs.get(0).writeLanes(laneReferenceCache);
+			}
+		} else {
+			this.outputs.get(0).setState(this.toggle);
+		}
 	}
 	
 	@Override
 	public void click(Vec2i clickPosition) {
-		this.toggle = !this.toggle;
+		if (this.subCircuitInput.isEmpty()) this.toggle = !this.toggle;
 	}
 	
 	@Override
@@ -69,14 +85,14 @@ public class ButtonComponent extends Component implements ISubCircuitIO {
 		}
 		EditorArea.drawComponentFrame(visualPosition.x, visualPosition.y, getVisualWidth(), getVisualHeight());
 		EditorArea.swapColor(1, 1, 1, 1);
-		TextRenderer.drawText(visualPosition.x + getVisualWidth() / 2, visualPosition.y + getVisualHeight() / 2, 12, this.toggle ? "ON" : "OFF");
+		TextRenderer.drawText(visualPosition.x + getVisualWidth() / 2, visualPosition.y + getVisualHeight() / 2, 12,  this.subCircuitInput.isPresent() ? "IN" : this.toggle ? "ON" : "OFF");
 		
 	}
 	
 	@Override
 	public void queryIO() {
 		if (this.subCircuitInput.isPresent()) {
-			this.toggle = this.subCircuitInput.get().getState();
+			this.laneReferenceCache = this.subCircuitInput.get().getLaneReference();
 		}
 	}
 	

@@ -170,14 +170,29 @@ public class TextRenderer {
 		return width;
 	}
 	
+	public static final int RESIZED = 1 << 0;
+	public static final int ORIGIN_LEFT = 1 << 1;
+	public static final int ORIGIN_RIGHT = 1 << 2;
+	public static final int ORIGIN_TOP = 1 << 3;
+	public static final int ORIGIN_BOTTOM = 1 << 4;
+	
 	/*
 	 * Draws an text with the current ascii-map
 	 */
-	public static void drawText(float x, float y, float size, String text, boolean resized, boolean centered) {
+	public static int drawText(float x, float y, float size, String text, int mode) {
 		
-		if (centered) {
-			float width = (getTextWidth(text, resized) / (float) CHARACTER_SIZE) * size;
+		boolean resized = (mode & RESIZED) > 0;
+		float width = (getTextWidth(text, resized) / (float) CHARACTER_SIZE) * size;
+		
+		if ((mode & ORIGIN_RIGHT) > 0) {
+			x = x - width;
+		} else if ((mode & ORIGIN_LEFT) == 0) {
 			x = x - width / 2;
+		}
+		
+		if ((mode & ORIGIN_BOTTOM) > 0) {
+			y = y - size;
+		} else if ((mode & ORIGIN_TOP) == 0) {
 			y = y - size / 2;
 		}
 		
@@ -196,20 +211,15 @@ public class TextRenderer {
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 		GL11.glPopMatrix();
 		
+		return (int) width;
+		
 	}
 	
 	/*
-	 * Draws an text with the current ascii-map
+	 * Draws an text with the current ascii-map and default settings (xy centered, resized)
 	 */
-	public static void drawText(float x, float y, float size, String text, boolean centered) {
-		drawText(x, y, size, text, true, centered);
-	}
-
-	/*
-	 * Draws an text with the current ascii-map
-	 */
-	public static void drawText(float x, float y, float size, String text) {
-		drawText(x, y, size, text, true, true);
+	public static int drawText(float x, float y, float size, String text) {
+		return drawText(x, y, size, text, RESIZED);
 	}
 	
 }

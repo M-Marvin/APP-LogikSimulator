@@ -1,4 +1,4 @@
-package de.m_marvin.logicsim;
+package de.m_marvin.logicsim.logic.simulator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,11 +6,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.m_marvin.logicsim.LogicSim;
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.ui.Editor;
 
+/**
+ * This class handles the creation and load balancing of the multiple simulation threads.
+ * The objects returned by the getProcesses and getProcessors methods are <b>not thread safe</b> and should not be used directly.
+ * Informations about these can be obtained by the SimulationMonitor.
+ * 
+ * @author Marvin K.
+ */
 public class CircuitProcessor {
 	
+	/**
+	 * Represents an circuit that is executed on an thread
+	 * Contains execution-time data and a reference to the parent circuit (which is null if this is the main process).
+	 * 
+	 * @author Marvin K.
+	 */
 	public class CircuitProcess implements Runnable {
 		
 		public long executionStart;
@@ -28,18 +42,28 @@ public class CircuitProcessor {
 		
 		@Override
 		public void run() {
-			executionStart = getCurrentTime();
-			circuit.updateCircuit();
 			executionEnd = getCurrentTime();
 			executionTime = executionEnd - executionStart;
+			executionStart = getCurrentTime();
+			circuit.updateCircuit();
 		}
 		
 	}
 	
+	/**
+	 * Represents a thread that is running some circuit simulations.
+	 * Contains a list of circuit process that are executed and some execution time data.
+	 * Normally there should not be more simulation threads as CPU cores.
+	 * 
+	 * @author Marvin K.
+	 */
 	public class CircuitProcessorThread extends Thread {
 		
 		public final List<CircuitProcess> processes = new ArrayList<>();
-		public long lastExecutionTime;
+		
+		public long executionStart;
+		public long executionEnd;
+		public long executionTime;
 		
 		public CircuitProcessorThread(String name) {
 			super(name);
@@ -51,12 +75,12 @@ public class CircuitProcessor {
 				while (!requestShutdown) {
 					try {
 						if (allowedToExecute) {
-							this.lastExecutionTime = 0;
-							synchronized (this) {
-								this.processes.forEach(process -> {
-									if (process.active) process.run();
-									CircuitProcessorThread.this.lastExecutionTime += process.executionTime;
-								});
+							this.executionEnd = getCurrentTime();
+							this.executionTime = this.executionEnd - this.executionStart;
+							this.executionStart = getCurrentTime();
+							for (int i = 0; i < this.processes.size(); i++) {
+								CircuitProcess process = processes.size() > i ? processes.get(i) : null;
+								if (process != null ? process.active : false) process.run();
 							}
 							if (this.processes.isEmpty()) {
 								Thread.sleep(1000);
@@ -76,6 +100,7 @@ public class CircuitProcessor {
 		
 	}
 	
+	protected boolean resetCircuits = true;
 	protected boolean allowedToExecute = false;
 	protected boolean requestShutdown = false;
 	protected List<CircuitProcessorThread> threads = new ArrayList<>();
@@ -86,7 +111,7 @@ public class CircuitProcessor {
 	
 	public CircuitProcessor() {
 		
-		for (int i = 0; i < getAvailableCores(); i++) { // TODO
+		for (int i = 0; i < getAvailableCores(); i++) {
 			this.threads.add(new CircuitProcessorThread("processor-" + i));
 		}
 		this.threads.forEach(Thread::start);
@@ -119,21 +144,21 @@ public class CircuitProcessor {
 		return System.currentTimeMillis();
 	}
 	
-	public void update() {
+	protected void update() {
 		
-		// Find slowest and fastest thread and remove inactive processes
+		// Find least and most loaded thread and remove inactive processes
 		
-		long fastestExecution = -1;
-		long slowestExecution = 0;
+		long leastExecutions = -1;
+		long mostExecutions = 0;
 		CircuitProcessorThread slowest = null;
 		CircuitProcessorThread fastest = null;
 		for (CircuitProcessorThread thread : this.threads) {
-			if (slowestExecution < thread.lastExecutionTime) {
-				slowestExecution = thread.lastExecutionTime;
+			if (mostExecutions < thread.processes.size()) {
+				mostExecutions = thread.processes.size();
 				slowest = thread;
 			}
-			if (fastestExecution > thread.lastExecutionTime || fastestExecution == -1) {
-				fastestExecution = thread.lastExecutionTime;
+			if (leastExecutions > thread.processes.size() || leastExecutions == -1) {
+				leastExecutions = thread.processes.size();
 				fastest = thread;
 			}
 			synchronized (thread) { thread.processes.removeAll(inactives.values()); }
@@ -143,7 +168,7 @@ public class CircuitProcessor {
 		
 		this.inactives.clear();
 		
-		if (allowedToExecute) {
+		if (allowedToExecute || resetCircuits) {
 			
 			// Distribute processing load over active threads
 			
@@ -162,6 +187,7 @@ public class CircuitProcessor {
 			List<CircuitProcess> newProcesses = new ArrayList<>();
 			synchronized (this) {
 				for (CircuitProcess process : this.processes.values()) {
+					if (this.resetCircuits) process.circuit.resetNetworks();
 					if (!process.active) {
 						newProcesses.add(process);
 						process.active = true;
@@ -170,6 +196,7 @@ public class CircuitProcessor {
 						inactives.put(process.circuit, process);
 					}
 				}
+				this.resetCircuits = false;
 			}
 			synchronized (fastest) { fastest.processes.addAll(newProcesses); }
 			
@@ -177,14 +204,18 @@ public class CircuitProcessor {
 		
 	}
 	
-	public void removeProcess(Circuit circuit) {
+	public synchronized void removeProcess(Circuit circuit) {
 		if (processes.containsKey(circuit)) this.processes.remove(circuit).active = false;		
 	}
 	
 	public synchronized void addProcess(Circuit ownerCircuit, Circuit circuit) {
 		CircuitProcess process = new CircuitProcess(ownerCircuit, circuit);
 		this.processes.put(circuit, process);
-		if (ownerCircuit == null) this.mainProcess = process;
+		circuit.resetNetworks();
+		if (ownerCircuit == null) {
+			this.mainProcess = process;
+			this.stop();
+		}
 	}
 	
 	public boolean isExecuting(Circuit circuit) {
@@ -203,8 +234,8 @@ public class CircuitProcessor {
 	}
 	
 	public void start() {
-		this.threads.forEach(Thread::interrupt);
 		this.allowedToExecute = true;
+		this.threads.forEach(Thread::interrupt);
 	}
 
 	public void pause() {
@@ -213,7 +244,7 @@ public class CircuitProcessor {
 
 	public void stop() {
 		this.allowedToExecute = false;
-		this.processes.keySet().forEach(circuit -> circuit.resetNetworks());
+		this.resetCircuits = true;
 	}
 	
 	public void terminate() {

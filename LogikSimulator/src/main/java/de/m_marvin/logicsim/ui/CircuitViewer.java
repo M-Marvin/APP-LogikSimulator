@@ -25,12 +25,13 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
-import de.m_marvin.logicsim.CircuitProcessor;
-import de.m_marvin.logicsim.CircuitProcessor.CircuitProcess;
-import de.m_marvin.logicsim.CircuitProcessor.CircuitProcessorThread;
 import de.m_marvin.logicsim.LogicSim;
 import de.m_marvin.logicsim.logic.Circuit;
+import de.m_marvin.logicsim.logic.simulator.CircuitProcessor;
+import de.m_marvin.logicsim.logic.simulator.CircuitProcessor.CircuitProcess;
+import de.m_marvin.logicsim.logic.simulator.CircuitProcessor.CircuitProcessorThread;
 
+// TODO Rework with SimulationMonitor
 public class CircuitViewer {
 	
 	public static final String RUNNING_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABESURBVChTY2D4z/EfjHEARgxJxh+MUBYYYCqAAahC3AqgAKcC3vM/wDSGApjEZyOgHBDAFaBLwAHvOYb/IAzlogEGBgAn2R2n/6vpZQAAAABJRU5ErkJggg==";
@@ -120,12 +121,13 @@ public class CircuitViewer {
 		
 		CircuitProcess process = getSelectedProcess();
 		CircuitProcessorThread thread = LogicSim.getInstance().getCircuitProcessor().getProcessorThreadOf(process);
-		float processLoad = (process != null && thread != null) ? process.executionTime / Math.max(thread.lastExecutionTime, 1) : 0;
+		float processLoad = (process != null && thread != null) ? process.executionTime / Math.max(thread.executionTime, 1) : 0;
 		int executionTime = (int) (process != null ? process.executionTime : 0);
 		String parentProcess = process != null ? process.parentCircuit != null ? process.parentCircuit.getCircuitFile() != null ? process.parentCircuit.getCircuitFile().getName() : Translator.translate("circuit_viewer.process_group.parent_process.no_name") : Translator.translate("circuit_viewer.process_group.parent_process.main_process") : Translator.translate("circuit_viewer.process_group.parent_process.not_available");
 		
 		this.processorLoadBar.setSelection((int) (processLoad * 100));
-		this.processorLoadBar.setState(processLoad > 0.8F ? SWT.ERROR : SWT.NORMAL);
+		boolean criticalLoad = processLoad > 0.7F;
+		if (this.processorLoadBar.getState() == SWT.ERROR != criticalLoad) this.processorLoadBar.setState(processLoad > 0F ? SWT.ERROR : SWT.NORMAL);
 		this.processorLoadLabel.setText(Translator.translate("circuit_viewer.process_group.process_load", (int) (processLoad * 100)));
 		this.processorLoadLabel.pack();
 		this.executionTimeLabel.setText(Translator.translate("circuit_viewer.process_group.execution_time", executionTime));
@@ -140,30 +142,26 @@ public class CircuitViewer {
 		updateProcessGroupInformations();
 		
 		CircuitProcessor processor = LogicSim.getInstance().getCircuitProcessor();
+
+		Optional<CircuitProcess> mainProcess = processor.getProcesses().stream().filter(process -> process.parentCircuit == null).findAny();
 		
-		synchronized (processor) {
-			
-			Optional<CircuitProcess> mainProcess = processor.getProcesses().stream().filter(process -> process.parentCircuit == null).findAny();
-			
-			if (mainProcess.isPresent()) listSubProcesses(processor.getProcesses(), mainProcess.get());
-			listUnknownProcesses(processor.getProcesses());
-			
-			List<Circuit> removed = new ArrayList<>();
-			this.viewItems.entrySet().forEach((entry) -> {
-				if (!entry.getValue().isDisposed()) {
-					if (!processor.holdsCircuit(((CircuitProcess) entry.getValue().getData()).circuit)) {
-						removed.add(entry.getKey());
-					} else {
-						updateCircuitDescription(processor, entry.getValue());
-					}
+		if (mainProcess.isPresent()) listSubProcesses(processor.getProcesses(), mainProcess.get());
+		listUnknownProcesses(processor.getProcesses());
+		
+		List<Circuit> removed = new ArrayList<>();
+		this.viewItems.entrySet().forEach((entry) -> {
+			if (!entry.getValue().isDisposed()) {
+				if (!processor.holdsCircuit(((CircuitProcess) entry.getValue().getData()).circuit)) {
+					removed.add(entry.getKey());
+				} else {
+					updateCircuitDescription(processor, entry.getValue());
 				}
-			});
-			removed.forEach(circuit -> {
-				this.viewItems.get(circuit).dispose();
-				this.viewItems.remove(circuit);
-			});
-		}
-		
+			}
+		});
+		removed.forEach(circuit -> {
+			this.viewItems.get(circuit).dispose();
+			this.viewItems.remove(circuit);
+		});
 	}
 
 	protected void listSubProcesses(Collection<CircuitProcess> processes, CircuitProcess process) {

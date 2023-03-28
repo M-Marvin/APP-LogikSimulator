@@ -16,6 +16,15 @@ import java.util.stream.Stream;
 import de.m_marvin.logicsim.logic.nodes.Node;
 import de.m_marvin.univec.impl.Vec4i;
 
+/**
+ * The class containing all information about an circuit and its current simulation state.
+ * The methods of this class are thread safe when calling them but the methods that return Lists, Maps or Sets do return the internal object.
+ * Modifications or calls to that object are <b>NOT guaranteed to threads safe</b> and should by surrounded by an synchronized block with the circuit as lock-object!
+ * The returned objects are mainly intended to be used to directly read data from the simulation without querying the objects over and over.
+ * 
+ * @author Marvin K.
+ *
+ */
 public class Circuit {
 	
 	public static final String DEFAULT_BUS_LANE = "bus0";
@@ -29,7 +38,7 @@ public class Circuit {
 	
 	public synchronized static boolean getShortCircuitValue() {
 		shortCircuitValue = !shortCircuitValue;
-		return shortCircuitValue;
+		return floatingValue.nextBoolean();
 	}
 	
 	public static NetState combineStates(NetState stateA, NetState stateB, ShortCircuitType type) {
@@ -183,7 +192,7 @@ public class Circuit {
 		return this.networks.remove(netId);
 	}
 	
-	protected synchronized OptionalInt findNet(Node node) {
+	protected OptionalInt findNet(Node node) {
 		for (int i = 0; i < this.networks.size(); i++) {
 			for (Node n : this.networks.get(i)) {
 				if (n.equals(node)) return OptionalInt.of(i);
@@ -197,8 +206,12 @@ public class Circuit {
 		reconnectNet(nodes, excludeComponents);
 	}
 	
-	protected synchronized NetState getNetValue(int netId, String lane) {
-		return this.valuesSec.size() > netId ? this.valuesSec.get(netId).getOrDefault(lane, NetState.LOW) : NetState.FLOATING;
+	protected NetState getNetValue(int netId, String lane) {
+		return this.valuesSec.size() > netId ? this.valuesSec.get(netId).getOrDefault(lane, NetState.FLOATING) : NetState.FLOATING;
+	}
+
+	protected synchronized Map<String, NetState> getNetLanes(int netId) {
+		return this.valuesSec.size() > netId ? this.valuesSec.get(netId) : null;
 	}
 
 	protected synchronized void applyNetValue(int netId, NetState state, String lane) {
@@ -206,6 +219,17 @@ public class Circuit {
 		NetState resultingState = combineStates(this.valuesPri.get(netId).getOrDefault(lane, NetState.FLOATING), state, this.shortCircuitType);
 		this.valuesPri.get(netId).put(lane, resultingState);
 		this.valuesSec.get(netId).put(lane, resultingState);
+	}
+	
+	protected synchronized void applyNetLanes(int netId, Map<String, NetState> laneStates) {
+		if (netId >= this.valuesPri.size()) return;
+		Map<String, NetState> laneStatesPri = this.valuesPri.get(netId);
+		Map<String, NetState> laneStatesSec = this.valuesSec.get(netId);
+		laneStates.forEach((lane, state) -> {
+			NetState resultingState = combineStates(laneStatesPri.getOrDefault(lane, NetState.FLOATING), state, this.shortCircuitType);
+			laneStatesPri.put(lane, resultingState);
+			laneStatesSec.put(lane, resultingState);
+		});
 	}
 	
 	public NetState getNetState(Node node) {
@@ -218,8 +242,20 @@ public class Circuit {
 		return getNetValue(netId.getAsInt(), lane);
 	}
 	
+	public Map<String, NetState> getLaneMapReference(Node node) {
+		OptionalInt netId = findNet(node);
+		if (netId.isEmpty()) return null;
+		return getNetLanes(netId.getAsInt());
+	}
+	
 	public void setNetState(Node node, NetState state) {
 		setNetState(node, state, DEFAULT_BUS_LANE);
+	}
+	
+	public void writeLanes(Node node, Map<String, NetState> laneStates) {
+		if (laneStates == null || laneStates.isEmpty()) return;
+		OptionalInt netId = findNet(node);
+		if (netId.isPresent()) applyNetLanes(netId.getAsInt(), laneStates);
 	}
 	
 	public void setNetState(Node node, NetState state, String lane) {
@@ -228,8 +264,12 @@ public class Circuit {
 	}
 
 	public synchronized void resetNetworks() {
-		for (int i = 0; i < this.valuesPri.size(); i++) this.valuesPri.get(i).clear();;
-		for (int i = 0; i < this.valuesSec.size(); i++) this.valuesSec.get(i).clear();
+		for (int i = 0; i < this.valuesPri.size(); i++) this.valuesPri.get(i).clear();
+		for (int i = 0; i < this.valuesSec.size(); i++) {
+			for (String lane : this.valuesSec.get(i).keySet()) {
+				this.valuesSec.get(i).put(lane, NetState.LOW);
+			}
+		}
 		this.components.forEach(Component::reset);
 	}
 	
@@ -255,6 +295,10 @@ public class Circuit {
 	
 	public List<Component> getComponents() {
 		return this.components;
+	}
+
+	public List<Component> getComponents(Predicate<Component> componentPredicate) {
+		return this.components.stream().filter(componentPredicate).toList();
 	}
 	
 	public synchronized void clear() {

@@ -8,7 +8,6 @@ import java.util.Set;
 
 import com.google.gson.JsonObject;
 
-import de.m_marvin.logicsim.CircuitProcessor;
 import de.m_marvin.logicsim.LogicSim;
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Component;
@@ -16,6 +15,7 @@ import de.m_marvin.logicsim.logic.nodes.InputNode;
 import de.m_marvin.logicsim.logic.nodes.Node;
 import de.m_marvin.logicsim.logic.nodes.OutputNode;
 import de.m_marvin.logicsim.logic.nodes.PassivNode;
+import de.m_marvin.logicsim.logic.simulator.CircuitProcessor;
 import de.m_marvin.logicsim.ui.Editor;
 import de.m_marvin.logicsim.ui.EditorArea;
 import de.m_marvin.logicsim.util.CircuitSerializer;
@@ -184,8 +184,8 @@ public class SubCircuitComponent extends Component {
 	
 	@Override
 	public void deserialize(JsonObject json) {
-		super.deserialize(json);
 		setRelativeCircuitPath(json.get("subCircuitFile").getAsString());
+		super.deserialize(json);
 	}
 
 	@Override
@@ -204,7 +204,7 @@ public class SubCircuitComponent extends Component {
 	}
 	
 	@Override
-	public void created() {
+	public void reset() {
 		if (!getCircuit().isVirtual()) {
 			CircuitProcessor processor = LogicSim.getInstance().getCircuitProcessor();
 			if (!processor.holdsCircuit(getSubCircuit())) processor.addProcess(getCircuit(), getSubCircuit());

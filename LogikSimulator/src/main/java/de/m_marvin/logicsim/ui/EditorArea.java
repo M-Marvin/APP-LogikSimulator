@@ -17,6 +17,7 @@ import org.lwjgl.opengl.GLCapabilities;
 
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Component;
+import de.m_marvin.logicsim.logic.nodes.Node;
 import de.m_marvin.logicsim.util.Registries.ComponentEntry;
 import de.m_marvin.univec.impl.Vec2i;
 
@@ -156,6 +157,14 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 			
 			if (this.grabedComponent == null) {
 				for (Component component : this.circuit.getComponents()) {
+					for (Node node : component.getAllNodes()) {
+						if (node.getVisualPosition().equals(mousePosition)) {
+							Vec2i location = Vec2i.fromVec(event.display.getCursorLocation());
+							if (node.click(location)) return;
+						}
+					}
+				}
+				for (Component component : this.circuit.getComponents()) {
 					if (component.getVisualPosition().x <= this.mousePosition.x &&
 						component.getVisualPosition().x + component.getVisualWidth() >= this.mousePosition.x &&
 						component.getVisualPosition().y <= this.mousePosition.y &&
@@ -166,7 +175,7 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 						} else {
 							component.click(mousePosition);
 						}
-						break;			
+						return;			
 					}
 				}
 			}
@@ -268,15 +277,15 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 			
 			component.getInputs().forEach(inputNode -> {
 				Vec2i position = inputNode.getVisualOffset().add(component.getVisualPosition());
-				drawNode(position, 1);
+				drawNode(position, 1, inputNode.getLaneTag());
 			});
 			component.getOutputs().forEach(outputNode -> {
 				Vec2i position = outputNode.getVisualOffset().add(component.getVisualPosition());
-				drawNode(position, 2);
+				drawNode(position, 2, outputNode.getLaneTag());
 			});
 			component.getPassives().forEach(passivNode -> {
 				Vec2i position = passivNode.getVisualOffset().add(component.getVisualPosition());
-				drawNode(position, 3);
+				drawNode(position, 3, passivNode.getLaneTag());
 			});
 			
 		});
@@ -296,7 +305,8 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 		
 	}
 	
-	public static void drawNode(Vec2i position, int type) {
+	public static void drawNode(Vec2i position, int type, String laneTag) {
+		swapColor(1, 1, 1, 1);
 		switch (type) {
 		case 1:
 			drawCircle(1, position.x, position.y, 5);
@@ -310,6 +320,16 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 		case 3:
 			drawCircle(1, position.x, position.y, 5);
 			break;
+		}
+		if (!laneTag.equals(Circuit.DEFAULT_BUS_LANE)) {
+			
+			int i1 = type == 1 ? -1 : 1;
+			int i2 = type == 1 ? TextRenderer.ORIGIN_RIGHT : TextRenderer.ORIGIN_LEFT;
+			int tagLength = TextRenderer.drawText(position.x + 10 * i1, position.y - 10, 13, laneTag, i2 | TextRenderer.ORIGIN_BOTTOM | TextRenderer.RESIZED);
+			
+			swapColor(1F, 0.4F, 0, 1);
+			drawLine(1, position.x + 10 * i1, position.y - 9, (int) (position.x + (10 + tagLength / 1.5) * i1), position.y - 9);
+			drawLine(1, position.x, position.y, position.x + 10 * i1, position.y - 9);
 		}
 	}
 	

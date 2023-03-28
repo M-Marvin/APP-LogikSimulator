@@ -17,6 +17,7 @@ import de.m_marvin.logicsim.logic.parts.LogicGateComponent.NandGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.NorGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.OrGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.XorGateComponent;
+import de.m_marvin.logicsim.logic.simulator.CircuitProcessor;
 import de.m_marvin.logicsim.logic.parts.NotGateComponent;
 import de.m_marvin.logicsim.logic.parts.SubCircuitComponent;
 import de.m_marvin.logicsim.logic.wires.ConnectorWire;
@@ -118,7 +119,7 @@ public class LogicSim {
 	public void triggerMenuUpdates() {
 		this.openEditors.forEach(Editor::updatePartSelector);
 	}
-
+	
 	public void setLastInteracted(Editor editor) {
 		this.lastInteractedEditor = editor;
 	}
@@ -176,18 +177,18 @@ public class LogicSim {
 	
 	public void updateSubCircuitCache() {
 		Registries.clearSubCircuitCache();
-		fillSubCircuitCache(this.builtinIcFolder, this.subCircuitFolder);
+		_fillSubCircuitCache(this.builtinIcFolder, this.subCircuitFolder);
 		triggerMenuUpdates();
 	}
 	
-	protected void fillSubCircuitCache(ComponentFolder folder, File circuitFolder) {
+	protected void _fillSubCircuitCache(ComponentFolder folder, File circuitFolder) {
 		if (this.subCircuitFolder.list() == null) return;
 		for (String entry : this.subCircuitFolder.list()) {
 			File entryPath = new File(circuitFolder, entry);
 			if (entryPath.isFile()) {
 				Registries.cacheSubCircuit(circuitFolder, SubCircuitComponent.class, folder, Component::placeClick, (circuit, pos) -> SubCircuitComponent.coursorMove(circuit, pos, entryPath), Component::abbortPlacement, entry, SubCircuitComponent.ICON_B64);
 			} else {
-				fillSubCircuitCache(folder, entryPath);
+				_fillSubCircuitCache(folder, entryPath);
 			}
 		}
 	}
