@@ -1,5 +1,8 @@
 package de.m_marvin.logicsim.logic.simulator;
 
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import com.sun.management.OperatingSystemMXBean;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -64,6 +67,7 @@ public class CircuitProcessor {
 		public long executionStart;
 		public long executionEnd;
 		public long executionTime;
+		public int tps;
 		
 		public CircuitProcessorThread(String name) {
 			super(name);
@@ -72,23 +76,48 @@ public class CircuitProcessor {
 		@Override
 		public void run() {
 			try {
+				float frameDelta = 0;
+				long lastFrameTime = 0;
+				long frameTime = 0;
+				int frameCount = 0;
+				long secondTimer = getCurrentTime();
 				while (!requestShutdown) {
 					try {
 						if (allowedToExecute) {
-							this.executionEnd = getCurrentTime();
-							this.executionTime = this.executionEnd - this.executionStart;
-							this.executionStart = getCurrentTime();
-							for (int i = 0; i < this.processes.size(); i++) {
-								CircuitProcess process = processes.size() > i ? processes.get(i) : null;
-								if (process != null ? process.active : false) process.run();
+							if (minFrameTime > 0) {
+								lastFrameTime = frameTime;
+								frameTime = getCurrentTime();
+								frameDelta += (frameTime - lastFrameTime) / minFrameTime;
 							}
-							if (this.processes.isEmpty()) {
-								Thread.sleep(1000);
+							if (getCurrentTime() - secondTimer > 1000) {
+								secondTimer += 1000;
+								tps = frameCount;
+								frameCount = 0;
+							}
+							if (minFrameTime <= 0 || frameDelta >= 1) {
+								frameDelta--;
+								frameCount += 1;
+								this.executionEnd = getCurrentTime();
+								this.executionTime = this.executionEnd - this.executionStart;
+								this.executionStart = getCurrentTime();
+								for (int i = 0; i < this.processes.size(); i++) {
+									CircuitProcess process = processes.size() > i ? processes.get(i) : null;
+									if (process != null ? process.active : false) process.run();
+								}
+								if (this.processes.isEmpty()) {
+									Thread.sleep(1000);
+								}
+							} else {
+								Thread.sleep((long) (minFrameTime / 2));
 							}
 						} else {
 							Thread.sleep(1000);
 						}
-					} catch (InterruptedException e) {}
+					} catch (InterruptedException e) {
+						frameDelta = 0;
+						frameTime = getCurrentTime();
+						secondTimer = getCurrentTime();
+					}
 				}
 			} catch (Throwable e) {
 				LogicSim.getInstance().getDisplay().asyncExec(() -> {
@@ -108,8 +137,20 @@ public class CircuitProcessor {
 	protected Map<Circuit, CircuitProcess> processes = new HashMap<>();
 	protected CircuitProcess mainProcess = null;
 	protected Thread processorMasterThread;
+	protected float minFrameTime = 50;
+	protected double cpuLoad = 0;
+	protected OperatingSystemMXBean osBean;
+	protected long cpuLoadTimer = 0;
 	
 	public CircuitProcessor() {
+
+		try {
+			this.osBean = ManagementFactory.newPlatformMXBeanProxy(ManagementFactory.getPlatformMBeanServer(), ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
+			
+		} catch (IOException e) {
+			System.err.println("Failed to create mx os bean");
+			e.printStackTrace();
+		}
 		
 		for (int i = 0; i < getAvailableCores(); i++) {
 			this.threads.add(new CircuitProcessorThread("processor-" + i));
@@ -144,6 +185,7 @@ public class CircuitProcessor {
 		return System.currentTimeMillis();
 	}
 	
+	@SuppressWarnings("deprecation")
 	protected void update() {
 		
 		// Find least and most loaded thread and remove inactive processes
@@ -202,6 +244,12 @@ public class CircuitProcessor {
 			
 		}
 		
+		if (getCurrentTime() - cpuLoadTimer > 1000) {
+			cpuLoad = (float) osBean.getSystemCpuLoad();
+		}
+		
+		minFrameTime = 0;
+		
 	}
 	
 	public synchronized void removeProcess(Circuit circuit) {
@@ -231,6 +279,14 @@ public class CircuitProcessor {
 			if (processor.processes.contains(process)) return processor;
 		}
 		return null;
+	}
+	
+	public void setMinFrameTime(float frameTime) {
+		minFrameTime = frameTime;
+	}
+	
+	public float getMinFrameTime() {
+		return minFrameTime;
 	}
 	
 	public void start() {

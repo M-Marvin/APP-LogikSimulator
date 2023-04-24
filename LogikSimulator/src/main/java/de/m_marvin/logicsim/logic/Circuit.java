@@ -19,7 +19,7 @@ import de.m_marvin.univec.impl.Vec4i;
 /**
  * The class containing all information about an circuit and its current simulation state.
  * The methods of this class are thread safe when calling them but the methods that return Lists, Maps or Sets do return the internal object.
- * Modifications or calls to that object are <b>NOT guaranteed to threads safe</b> and should by surrounded by an synchronized block with the circuit as lock-object!
+ * Modifications or calls to that object are <b>NOT guaranteed to be threads safe</b> and should be surrounded by an synchronized block with the circuit as lock-object!
  * The returned objects are mainly intended to be used to directly read data from the simulation without querying the objects over and over.
  * 
  * @author Marvin K.

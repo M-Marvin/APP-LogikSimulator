@@ -18,6 +18,7 @@ import de.m_marvin.logicsim.logic.parts.LogicGateComponent.NorGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.OrGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.XorGateComponent;
 import de.m_marvin.logicsim.logic.simulator.CircuitProcessor;
+import de.m_marvin.logicsim.logic.simulator.SimulationMonitor;
 import de.m_marvin.logicsim.logic.parts.NotGateComponent;
 import de.m_marvin.logicsim.logic.parts.SubCircuitComponent;
 import de.m_marvin.logicsim.logic.wires.ConnectorWire;
@@ -28,6 +29,14 @@ import de.m_marvin.logicsim.util.Registries;
 import de.m_marvin.logicsim.util.Registries.ComponentFolder;
 
 public class LogicSim {
+	 
+	// TODO
+//	- TPS limits (UI)
+//	- TPS anzeige (UI)
+//	- Bezeichnung für Integrierte Schaltungen
+//	- Verschieben des Schaltplans in der Ansicht
+//	- Prozess view
+//	- Multi-Auswahl
 	
 	private static LogicSim INSTANCE;
 	
@@ -36,6 +45,7 @@ public class LogicSim {
 	protected boolean shouldTerminate;
 	protected Display display;
 	protected CircuitProcessor processor;
+	protected SimulationMonitor simulationMonitor;
 	protected List<Editor> openEditors = new ArrayList<>();
 	protected CircuitViewer circuitWindow;
 	protected Editor lastInteractedEditor;
@@ -84,6 +94,10 @@ public class LogicSim {
 		return processor;
 	}
 	
+	public SimulationMonitor getSimulationMonitor() {
+		return simulationMonitor;
+	}
+	
 	private void start() {
 
 		registerIncludedParts();
@@ -93,6 +107,7 @@ public class LogicSim {
 		
 		this.display = new Display();
 		this.processor = new CircuitProcessor();
+		this.simulationMonitor = new SimulationMonitor(processor);
 		
 		openEditor(null);
 		
@@ -129,6 +144,8 @@ public class LogicSim {
 	}
 	
 	private void update() {
+		
+		this.simulationMonitor.update();
 		
 		List<Editor> disposedEditors = new ArrayList<>();
 		this.openEditors.forEach(editor -> {

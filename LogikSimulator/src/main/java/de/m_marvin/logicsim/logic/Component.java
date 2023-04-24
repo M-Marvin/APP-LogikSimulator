@@ -33,6 +33,7 @@ public abstract class Component {
 	
 	public static void placeClick(Circuit circuit, Vec2i coursorPosition) {
 		if (currentComponent != null) circuit.reconnect(false, currentComponent);
+		currentComponent.reset();
 		currentComponent = null;
 	}
 	

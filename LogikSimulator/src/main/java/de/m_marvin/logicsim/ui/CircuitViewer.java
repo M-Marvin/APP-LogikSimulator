@@ -3,7 +3,6 @@ package de.m_marvin.logicsim.ui;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,11 +26,10 @@ import org.eclipse.swt.widgets.TreeItem;
 
 import de.m_marvin.logicsim.LogicSim;
 import de.m_marvin.logicsim.logic.Circuit;
-import de.m_marvin.logicsim.logic.simulator.CircuitProcessor;
 import de.m_marvin.logicsim.logic.simulator.CircuitProcessor.CircuitProcess;
-import de.m_marvin.logicsim.logic.simulator.CircuitProcessor.CircuitProcessorThread;
+import de.m_marvin.logicsim.logic.simulator.SimulationMonitor;
+import de.m_marvin.logicsim.logic.simulator.SimulationMonitor.CircuitProcessInfo;
 
-// TODO Rework with SimulationMonitor
 public class CircuitViewer {
 	
 	public static final String RUNNING_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABESURBVChTY2D4z/EfjHEARgxJxh+MUBYYYCqAAahC3AqgAKcC3vM/wDSGApjEZyOgHBDAFaBLwAHvOYb/IAzlogEGBgAn2R2n/6vpZQAAAABJRU5ErkJggg==";
@@ -88,8 +86,7 @@ public class CircuitViewer {
 		this.openInEditorButton = new Button(processGroup, SWT.PUSH);
 		this.openInEditorButton.setText(Translator.translate("circuit_viewer.process_group.open_in_editor"));
 		this.openInEditorButton.addListener(SWT.Selection, (e) -> openInEditor());
-
-
+		
 		updateView();
 		this.shell.pack();
 		this.shell.open();
@@ -99,35 +96,34 @@ public class CircuitViewer {
 		return shell;
 	}
 	
-	public CircuitProcess getSelectedProcess() {
+	public CircuitProcessInfo getSelectedProcess() {
 		TreeItem[] selection = this.treeView.getSelection();
 		if (selection.length >= 1) {
-			if (selection[0].getData() instanceof CircuitProcess process) return process;
+			if (selection[0].getData() instanceof CircuitProcessInfo process) return process;
 		}
 		return null;		
 	}
 	
 	protected void terminateProcess() {
-		CircuitProcess process = getSelectedProcess();
-		if (process != null) LogicSim.getInstance().getCircuitProcessor().removeProcess(process.circuit);
+		CircuitProcessInfo process = getSelectedProcess();
+		if (process != null) LogicSim.getInstance().getCircuitProcessor().removeProcess(process.circuit());
 	}
 	
 	protected void openInEditor() {
-		CircuitProcess process = getSelectedProcess();
-		if (process != null) LogicSim.getInstance().openEditor(process.circuit);
+		CircuitProcessInfo process = getSelectedProcess();
+		if (process != null) LogicSim.getInstance().openEditor(process.circuit());
 	}
 	
-	protected void updateProcessGroupInformations() {
+	protected void updateProcessGroupInformations(SimulationMonitor monitor) {
 		
-		CircuitProcess process = getSelectedProcess();
-		CircuitProcessorThread thread = LogicSim.getInstance().getCircuitProcessor().getProcessorThreadOf(process);
-		float processLoad = (process != null && thread != null) ? process.executionTime / Math.max(thread.executionTime, 1) : 0;
-		int executionTime = (int) (process != null ? process.executionTime : 0);
-		String parentProcess = process != null ? process.parentCircuit != null ? process.parentCircuit.getCircuitFile() != null ? process.parentCircuit.getCircuitFile().getName() : Translator.translate("circuit_viewer.process_group.parent_process.no_name") : Translator.translate("circuit_viewer.process_group.parent_process.main_process") : Translator.translate("circuit_viewer.process_group.parent_process.not_available");
+		CircuitProcessInfo process = getSelectedProcess();
+		double processLoad = monitor.getCPULoad();
+		int executionTime = (int) (process != null ? process.executionTime().get() : 0);
+		String parentProcess = process != null ? process.parentCircuit() != null ? process.parentCircuit().getCircuitFile() != null ? process.parentCircuit().getCircuitFile().getName() : Translator.translate("circuit_viewer.process_group.parent_process.no_name") : Translator.translate("circuit_viewer.process_group.parent_process.main_process") : Translator.translate("circuit_viewer.process_group.parent_process.not_available");
 		
 		this.processorLoadBar.setSelection((int) (processLoad * 100));
 		boolean criticalLoad = processLoad > 0.7F;
-		if (this.processorLoadBar.getState() == SWT.ERROR != criticalLoad) this.processorLoadBar.setState(processLoad > 0F ? SWT.ERROR : SWT.NORMAL);
+		if (this.processorLoadBar.getState() == SWT.ERROR != criticalLoad) this.processorLoadBar.setState(criticalLoad ? SWT.ERROR : SWT.NORMAL);
 		this.processorLoadLabel.setText(Translator.translate("circuit_viewer.process_group.process_load", (int) (processLoad * 100)));
 		this.processorLoadLabel.pack();
 		this.executionTimeLabel.setText(Translator.translate("circuit_viewer.process_group.execution_time", executionTime));
@@ -139,22 +135,24 @@ public class CircuitViewer {
 	
 	public void updateView() {
 		
-		updateProcessGroupInformations();
+		SimulationMonitor monitor = LogicSim.getInstance().getSimulationMonitor();
 		
-		CircuitProcessor processor = LogicSim.getInstance().getCircuitProcessor();
-
-		Optional<CircuitProcess> mainProcess = processor.getProcesses().stream().filter(process -> process.parentCircuit == null).findAny();
+		updateProcessGroupInformations(monitor);
 		
-		if (mainProcess.isPresent()) listSubProcesses(processor.getProcesses(), mainProcess.get());
-		listUnknownProcesses(processor.getProcesses());
+		Optional<CircuitProcessInfo> mainProcess = monitor.getRunningProcesses().stream().filter(process -> process.parentCircuit() == null).findAny();
+		
+		if (mainProcess.isPresent()) {
+			listSubProcesses(monitor, mainProcess.get());
+			listUnknownProcesses(monitor);
+		}
 		
 		List<Circuit> removed = new ArrayList<>();
 		this.viewItems.entrySet().forEach((entry) -> {
 			if (!entry.getValue().isDisposed()) {
-				if (!processor.holdsCircuit(((CircuitProcess) entry.getValue().getData()).circuit)) {
+				if (!((CircuitProcessInfo) entry.getValue().getData()).isActive()) {
 					removed.add(entry.getKey());
 				} else {
-					updateCircuitDescription(processor, entry.getValue());
+					updateCircuitDescription(monitor, entry.getValue());
 				}
 			}
 		});
@@ -162,46 +160,47 @@ public class CircuitViewer {
 			this.viewItems.get(circuit).dispose();
 			this.viewItems.remove(circuit);
 		});
+		
 	}
 
-	protected void listSubProcesses(Collection<CircuitProcess> processes, CircuitProcess process) {
+	protected void listSubProcesses(SimulationMonitor monitor, CircuitProcessInfo process) {
 		
-		if (!this.viewItems.containsKey(process.circuit)) {
-			Optional<TreeItem> parent = this.viewItems.values().stream().filter(item ->  !item.isDisposed() ? ((CircuitProcess) item.getData()).circuit == process.parentCircuit : false).findAny();
+		if (!this.viewItems.containsKey(process.circuit())) {
+			Optional<TreeItem> parent = this.viewItems.values().stream().filter(item ->  !item.isDisposed() ? ((CircuitProcessInfo) item.getData()).circuit() == process.parentCircuit() : false).findAny();
 			TreeItem item = parent.isPresent() ? new TreeItem(parent.get(), SWT.NONE) : new TreeItem(this.treeView, SWT.NONE);
 			item.setData(process);
 			item.setText("N/A");
-			this.viewItems.put(process.circuit, item);
+			this.viewItems.put(process.circuit(), item);
 		}
 		
-		processes.stream().filter(process1 -> process1.parentCircuit == process.circuit).forEach(subProcess -> {
-			listSubProcesses(processes, subProcess);
+		monitor.getRunningProcesses().stream().filter(process1 -> process1.parentCircuit() == process.circuit()).forEach(subProcess -> {
+			listSubProcesses(monitor, subProcess);
 		});
 		
 	}
-	
-	protected void listUnknownProcesses(Collection<CircuitProcess> processes) {
+
+	protected void listUnknownProcesses(SimulationMonitor monitor) {
 		
-		processes.forEach(process -> {
-			if (!this.viewItems.containsKey(process.circuit)) {
-				Optional<TreeItem> parent = this.viewItems.values().stream().filter(item ->  !item.isDisposed() ? ((CircuitProcess) item.getData()).circuit == process.parentCircuit : false).findAny();
+		monitor.getRunningProcesses().forEach(process -> {
+			if (!this.viewItems.containsKey(process.circuit())) {
+				Optional<TreeItem> parent = this.viewItems.values().stream().filter(item ->  !item.isDisposed() ? ((CircuitProcess) item.getData()).circuit == process.parentCircuit() : false).findAny();
 				TreeItem item = parent.isPresent() ? new TreeItem(parent.get(), SWT.NONE) : new TreeItem(this.treeView, SWT.NONE);
 				item.setData(process);
-				item.setText("Unknown");
-				this.viewItems.put(process.circuit, item);
+				item.setText("N/A");
+				this.viewItems.put(process.circuit(), item);
 			}
 		});
 		
 	}
 	
-	protected void updateCircuitDescription(CircuitProcessor processor, TreeItem item) {
-		CircuitProcess process = (CircuitProcess) item.getData();
+	protected void updateCircuitDescription(SimulationMonitor monitor, TreeItem item) {
+		CircuitProcessInfo process = (CircuitProcessInfo) item.getData();
 		
-		String name = process.circuit.getCircuitFile() != null ? process.circuit.getCircuitFile().getName() : "unknown";
-		String executionTime = Long.toString(process.executionTime);
+		String name = process.circuit().getCircuitFile() != null ? process.circuit().getCircuitFile().getName() : "unknown";
+		String executionTime = Long.toString(process.executionTime().get());
 		
-		boolean active = processor.holdsCircuit(process.circuit);
-		boolean running = processor.isExecuting(process.circuit);
+		boolean active = process.isActive();
+		boolean running = process.isExecuting();
 		
 		String activity = Translator.translate("circuit_viewer.tree_view.circuit_description." + (active ? (running ? "active" : "inactive") : ".error"));
 		

@@ -33,7 +33,7 @@
 "circuit_viewer.tree_view.circuit_description.inactive": "Inactive",
 "circuit_viewer.process_group": "Prozess informations",
 "circuit_viewer.process_group.process_load.title": "Processor load:",
-"circuit_viewer.process_group.process_load": "%0%",
+"circuit_viewer.process_group.process_load": "%0% ",
 "circuit_viewer.process_group.execution_time.title": "Execution time:",
 "circuit_viewer.process_group.execution_time": "Last frame %0ms",
 "circuit_viewer.process_group.parent_process.title": "Parent process:",
