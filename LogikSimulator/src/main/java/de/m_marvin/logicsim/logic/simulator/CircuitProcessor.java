@@ -84,18 +84,7 @@ public class CircuitProcessor {
 				while (!requestShutdown) {
 					try {
 						if (allowedToExecute) {
-<<<<<<< HEAD:LogikSimulator/src/main/java/de/m_marvin/logicsim/CircuitProcessor.java
-<<<<<<< Updated upstream:LogikSimulator/src/main/java/de/m_marvin/logicsim/CircuitProcessor.java
-							this.lastExecutionTime = 0;
-							synchronized (this) {
-								this.processes.forEach(process -> {
-									if (process.active) process.run();
-									CircuitProcessorThread.this.lastExecutionTime += process.executionTime;
-								});
-							}
-							if (this.processes.isEmpty()) {
-								Thread.sleep(1000);
-=======
+							
 							if (minFrameTime > 0) {
 								lastFrameTime = frameTime;
 								frameTime = getCurrentTime();
@@ -104,15 +93,6 @@ public class CircuitProcessor {
 							}
 							if (getCurrentTime() - secondTimer > 1000) {
 								secondTimer = getCurrentTime();
-=======
-							if (minFrameTime > 0) {
-								lastFrameTime = frameTime;
-								frameTime = getCurrentTime();
-								frameDelta += (frameTime - lastFrameTime) / minFrameTime;
-							}
-							if (getCurrentTime() - secondTimer > 1000) {
-								secondTimer += 1000;
->>>>>>> multi-lane:LogikSimulator/src/main/java/de/m_marvin/logicsim/logic/simulator/CircuitProcessor.java
 								tps = frameCount;
 								frameCount = 0;
 							}
@@ -131,10 +111,6 @@ public class CircuitProcessor {
 								}
 							} else {
 								Thread.sleep((long) (minFrameTime / 2));
-<<<<<<< HEAD:LogikSimulator/src/main/java/de/m_marvin/logicsim/CircuitProcessor.java
->>>>>>> Stashed changes:LogikSimulator/src/main/java/de/m_marvin/logicsim/logic/simulator/CircuitProcessor.java
-=======
->>>>>>> multi-lane:LogikSimulator/src/main/java/de/m_marvin/logicsim/logic/simulator/CircuitProcessor.java
 							}
 						} else {
 							Thread.sleep(1000);
@@ -171,10 +147,10 @@ public class CircuitProcessor {
 	public CircuitProcessor() {
 
 		try {
-			this.osBean = ManagementFactory.newPlatformMXBeanProxy(ManagementFactory.getPlatformMBeanServer(), ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
-			
+			this.osBean = ManagementFactory.newPlatformMXBeanProxy(ManagementFactory.getPlatformMBeanServer(), ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);	
 		} catch (IOException e) {
 			System.err.println("Failed to create mx os bean");
+			this.osBean = null;
 			e.printStackTrace();
 		}
 		
@@ -270,21 +246,10 @@ public class CircuitProcessor {
 			
 		}
 		
-<<<<<<< HEAD:LogikSimulator/src/main/java/de/m_marvin/logicsim/CircuitProcessor.java
-<<<<<<< Updated upstream:LogikSimulator/src/main/java/de/m_marvin/logicsim/CircuitProcessor.java
-=======
-=======
->>>>>>> multi-lane:LogikSimulator/src/main/java/de/m_marvin/logicsim/logic/simulator/CircuitProcessor.java
 		if (getCurrentTime() - cpuLoadTimer > 1000) {
-			cpuLoad = (float) osBean.getSystemCpuLoad();
+			cpuLoad = osBean == null ? -1 : (float) osBean.getSystemCpuLoad();;
 		}
 		
-<<<<<<< HEAD:LogikSimulator/src/main/java/de/m_marvin/logicsim/CircuitProcessor.java
->>>>>>> Stashed changes:LogikSimulator/src/main/java/de/m_marvin/logicsim/logic/simulator/CircuitProcessor.java
-=======
-		minFrameTime = 0;
-		
->>>>>>> multi-lane:LogikSimulator/src/main/java/de/m_marvin/logicsim/logic/simulator/CircuitProcessor.java
 	}
 	
 	public synchronized void removeProcess(Circuit circuit) {

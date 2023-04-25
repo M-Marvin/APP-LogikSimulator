@@ -9,15 +9,8 @@ import java.io.StringWriter;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
 import java.util.Optional;
 import java.util.function.Consumer;
->>>>>>> Stashed changes
-=======
-import java.util.function.Consumer;
->>>>>>> multi-lane
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
@@ -33,20 +26,11 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.layout.BorderData;
 import org.eclipse.swt.layout.BorderLayout;
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
->>>>>>> Stashed changes
-=======
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.Button;
->>>>>>> multi-lane
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
@@ -56,15 +40,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
->>>>>>> Stashed changes
-=======
-import org.eclipse.swt.widgets.Text;
->>>>>>> multi-lane
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
@@ -73,17 +50,10 @@ import org.eclipse.swt.widgets.TreeItem;
 import de.m_marvin.logicsim.LogicSim;
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.parts.SubCircuitComponent;
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
 import de.m_marvin.logicsim.logic.simulator.CircuitProcessor;
 import de.m_marvin.logicsim.logic.simulator.SimulationMonitor;
 import de.m_marvin.logicsim.logic.simulator.SimulationMonitor.CircuitProcessInfo;
 import de.m_marvin.logicsim.logic.simulator.SimulationMonitor.CircuitProcessorInfo;
->>>>>>> Stashed changes
-=======
-import de.m_marvin.logicsim.logic.simulator.CircuitProcessor;
->>>>>>> multi-lane
 import de.m_marvin.logicsim.util.CircuitSerializer;
 import de.m_marvin.logicsim.util.Registries;
 import de.m_marvin.logicsim.util.Registries.ComponentEntry;
@@ -387,22 +357,14 @@ public class Editor {
 					if (msg.open() == SWT.NO) return;
 				}
 				this.editorArea.getCircuit().setCircuitFile(filePath);
-<<<<<<< HEAD
-<<<<<<< Updated upstream
 				try {
 					CircuitSerializer.saveCircuit(getCurrentCurcit(), this.editorArea.getCircuit().getCircuitFile());
 				} catch (IOException ex) {
 					showErrorInfo(this.shell, "editor.window.error.save_file", ex);
 					ex.printStackTrace();
 				}
-				updateTitle();
 				LogicSim.getInstance().updateSubCircuitCache();
-=======
 				update();
->>>>>>> Stashed changes
-=======
-				updateTitle();
->>>>>>> multi-lane
 			}
 		}
 		try {

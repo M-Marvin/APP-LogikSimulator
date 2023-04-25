@@ -1,15 +1,11 @@
 package de.m_marvin.logicsim.logic.simulator;
 
-<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-=======
-import java.util.Collection;
->>>>>>> multi-lane
 import java.util.function.Supplier;
 
 import de.m_marvin.logicsim.logic.Circuit;
@@ -19,11 +15,7 @@ public class SimulationMonitor {
 	protected final CircuitProcessor processor;
 	protected long lastRefresh;
 	
-<<<<<<< HEAD
 	protected Map<Circuit, CircuitProcessInfo> cachedProcessInfo;
-=======
-	protected Collection<CircuitProcessInfo> cachedProcessInfo;
->>>>>>> multi-lane
 	protected Collection<CircuitProcessorInfo> cachedProcessorInfo;
 	
 	public SimulationMonitor(CircuitProcessor processor) {
@@ -35,19 +27,11 @@ public class SimulationMonitor {
 	}
 	
 	public void setTPSLimit(int tps) {
-<<<<<<< HEAD
 		this.processor.setMinFrameTime(tps > 0 ? (1F / tps) * 1000F : -1);
 	}
 	
 	public int getTPSLimit() {
 		return (int) ((1F / (this.processor.getMinFrameTime()) * 1000F));
-=======
-		this.processor.setMinFrameTime((1 / tps) * 1000F);
-	}
-	
-	public int getTPSLimit() {
-		return (int) (1 / (this.processor.getMinFrameTime() / 1000));
->>>>>>> multi-lane
 	}
 	
 	public int getCoreCount() {
@@ -74,18 +58,13 @@ public class SimulationMonitor {
 	public Collection<CircuitProcessInfo> getRunningProcesses() {
 		if (this.cachedProcessInfo == null) {
 			synchronized (this.processor) {
-<<<<<<< HEAD
 				this.cachedProcessInfo = new HashMap<>();
 				this.processor.getProcesses().stream().map(process -> 
-=======
-				this.cachedProcessInfo = this.processor.getProcesses().stream().map(process -> 
->>>>>>> multi-lane
 					new CircuitProcessInfo(process.circuit, process.parentCircuit, () -> (int) process.executionTime, () -> {
 						synchronized (this.processor) { return this.processor.holdsCircuit(process.circuit); }
 					}, () -> {
 						synchronized (this.processor) { return this.processor.isExecuting(process.circuit); }
 					})
-<<<<<<< HEAD
 				).forEach(process -> this.cachedProcessInfo.put(process.circuit, process));
 			}
 		}
@@ -96,12 +75,6 @@ public class SimulationMonitor {
 		if (this.cachedProcessInfo == null) getRunningProcesses();
 		if (circuit == null) return Optional.empty();
 		return Optional.ofNullable(this.cachedProcessInfo.get(circuit));
-=======
-				).toList();
-			}
-		}
-		return this.cachedProcessInfo;
->>>>>>> multi-lane
 	}
 	
 	public static record CircuitProcessorInfo(Supplier<Collection<Circuit>> circuits, Supplier<Integer> tps, Supplier<Integer> executionTime) {}
@@ -110,7 +83,6 @@ public class SimulationMonitor {
 		if (this.cachedProcessorInfo == null) {
 			synchronized (this.processor) {
 				this.cachedProcessorInfo = this.processor.getProcessors().stream().map(processor ->
-<<<<<<< HEAD
 					new CircuitProcessorInfo(() -> {
 						List<Circuit> circuits = new ArrayList<>();
 						for (int i = 0; i < processor.processes.size(); i++) {
@@ -118,9 +90,6 @@ public class SimulationMonitor {
 						}
 						return circuits;
 					}, () -> processor.tps, () -> (int) processor.executionTime)
-=======
-					new CircuitProcessorInfo(() -> processor.processes.stream().map(process -> process.circuit).toList(), () -> processor.tps, () -> (int) processor.executionTime)
->>>>>>> multi-lane
 				).toList();
 			}
 		}
@@ -139,8 +108,7 @@ public class SimulationMonitor {
 			refresh();
 		}
 	}
-<<<<<<< HEAD
-
+	
 	public Optional<CircuitProcessorInfo> getProcessorForCircuit(Circuit circuit) {
 		if (this.cachedProcessorInfo == null) getActiveProcessors();
 		if (circuit == null) return Optional.empty();
@@ -149,7 +117,5 @@ public class SimulationMonitor {
 		}
 		return Optional.empty();
 	}
-=======
->>>>>>> multi-lane
 	
 }

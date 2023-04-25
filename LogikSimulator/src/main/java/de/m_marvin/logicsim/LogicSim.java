@@ -29,24 +29,13 @@ import de.m_marvin.logicsim.util.Registries;
 import de.m_marvin.logicsim.util.Registries.ComponentFolder;
 
 public class LogicSim {
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> multi-lane
 	 
 	// TODO
 //	- TPS limits (UI)
 //	- TPS anzeige (UI)
 //	- Bezeichnung für Integrierte Schaltungen
 //	- Verschieben des Schaltplans in der Ansicht
-<<<<<<< HEAD
 //	- Multi-Auswahl
->>>>>>> Stashed changes
-=======
-//	- Prozess view
-//	- Multi-Auswahl
->>>>>>> multi-lane
 	
 	private static LogicSim INSTANCE;
 	
