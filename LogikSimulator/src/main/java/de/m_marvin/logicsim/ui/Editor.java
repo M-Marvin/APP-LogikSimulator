@@ -9,11 +9,15 @@ import java.io.StringWriter;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
 import java.util.Optional;
 import java.util.function.Consumer;
 >>>>>>> Stashed changes
+=======
+import java.util.function.Consumer;
+>>>>>>> multi-lane
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
@@ -29,6 +33,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.layout.BorderData;
 import org.eclipse.swt.layout.BorderLayout;
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
 import org.eclipse.swt.layout.GridData;
@@ -37,28 +42,38 @@ import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 >>>>>>> Stashed changes
+=======
+import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
+>>>>>>> multi-lane
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 >>>>>>> Stashed changes
+=======
+import org.eclipse.swt.widgets.Text;
+>>>>>>> multi-lane
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
-import de.m_marvin.logicsim.CircuitProcessor;
 import de.m_marvin.logicsim.LogicSim;
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.parts.SubCircuitComponent;
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
 import de.m_marvin.logicsim.logic.simulator.CircuitProcessor;
@@ -66,12 +81,20 @@ import de.m_marvin.logicsim.logic.simulator.SimulationMonitor;
 import de.m_marvin.logicsim.logic.simulator.SimulationMonitor.CircuitProcessInfo;
 import de.m_marvin.logicsim.logic.simulator.SimulationMonitor.CircuitProcessorInfo;
 >>>>>>> Stashed changes
+=======
+import de.m_marvin.logicsim.logic.simulator.CircuitProcessor;
+>>>>>>> multi-lane
 import de.m_marvin.logicsim.util.CircuitSerializer;
 import de.m_marvin.logicsim.util.Registries;
 import de.m_marvin.logicsim.util.Registries.ComponentEntry;
 import de.m_marvin.logicsim.util.Registries.ComponentFolder;
 import de.m_marvin.univec.impl.Vec2i;
 
+/**
+ * An editor represents one window in which a circuit can be displayed and modified.
+ * 
+ * @author Marvin K.
+ */
 public class Editor {
 	
 	public static final String SET_MAIN_CIRCUIT_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAA6SURBVChTY2Qo3/6fAR0ofWNgSA9mBDGZwBx0TAoAG2NhYYFhzdevXxkuX77MyATjoGOiAaVWMDAAAGWnNDjnjwLQAAAAAElFTkSuQmCC";
@@ -94,6 +117,50 @@ public class Editor {
 	
 	public static Image decodeImage(String imageString) {
 		return new Image(LogicSim.getInstance().getDisplay(), new ImageData(new ByteArrayInputStream(Base64.getDecoder().decode(imageString))));
+	}
+
+	public static void showErrorInfo(Shell shell, String messageKey, Throwable e) {
+		String message = null;
+		if (e instanceof FileNotFoundException) {
+			message = e.getMessage();
+		} else {
+			StringWriter writer = new StringWriter();
+			e.printStackTrace(new PrintWriter(writer));
+			message = writer.toString();
+		}
+		MessageBox msg = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+		msg.setText(Translator.translate("editor.window.error.title"));
+		msg.setMessage(Translator.translate(messageKey, message));
+		msg.open();
+	}
+
+	public static Shell showTextDialog(Shell shell, String messageKey, String initialText, Consumer<String> receiver) {
+		Shell dshell = new Shell(shell);
+		dshell.setText(Translator.translate("editor.window.input.title"));
+		dshell.setLayout(new RowLayout(SWT.VERTICAL));
+		Label label = new Label(dshell, SWT.WRAP);
+		label.setLayoutData(new RowData(200, SWT.DEFAULT));
+		label.setText(Translator.translate(messageKey));
+		Text input = new Text(dshell, SWT.BORDER);
+		input.setText(initialText);
+		input.setLayoutData(new RowData(200, SWT.DEFAULT));
+		Composite group = new Composite(dshell, SWT.NONE);
+		group.setLayoutData(new RowData(200, SWT.DEFAULT));
+		group.setLayout(new RowLayout(SWT.HORIZONTAL));
+		Button buttonOk = new Button(group, SWT.PUSH);
+		buttonOk.setText(Translator.translate("editor.menu.button.ok"));
+		buttonOk.addListener(SWT.Selection, (e) -> {
+			receiver.accept(input.getText());
+			dshell.close();
+		});
+		Button buttonAbbort = new Button(group, SWT.PUSH);
+		buttonAbbort.setText(Translator.translate("editor.menu.button.abbort"));
+		buttonAbbort.addListener(SWT.Selection, (e) -> {
+			dshell.close();
+		});
+		dshell.pack();
+		dshell.open();
+		return dshell;
 	}
 	
 	public Editor(Display display, Circuit circuit) {
@@ -320,6 +387,7 @@ public class Editor {
 					if (msg.open() == SWT.NO) return;
 				}
 				this.editorArea.getCircuit().setCircuitFile(filePath);
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 				try {
 					CircuitSerializer.saveCircuit(getCurrentCurcit(), this.editorArea.getCircuit().getCircuitFile());
@@ -332,8 +400,18 @@ public class Editor {
 =======
 				update();
 >>>>>>> Stashed changes
+=======
+				updateTitle();
+>>>>>>> multi-lane
 			}
 		}
+		try {
+			CircuitSerializer.saveCircuit(getCurrentCurcit(), this.editorArea.getCircuit().getCircuitFile());
+		} catch (IOException ex) {
+			showErrorInfo(this.shell, "editor.window.error.save_file", ex);
+			ex.printStackTrace();
+		}
+		LogicSim.getInstance().updateSubCircuitCache();
 	}
 	
 	public void loadCircuit() {
@@ -351,21 +429,6 @@ public class Editor {
 				ex.printStackTrace();
 			}
 		}
-	}
-
-	public static void showErrorInfo(Shell shell, String messageKey, Throwable e) {
-		String message = null;
-		if (e instanceof FileNotFoundException) {
-			message = e.getMessage();
-		} else {
-			StringWriter writer = new StringWriter();
-			e.printStackTrace(new PrintWriter(writer));
-			message = writer.toString();
-		}
-		MessageBox msg = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-		msg.setText(Translator.translate("editor.window.error.title"));
-		msg.setMessage(Translator.translate(messageKey, message));
-		msg.open();
 	}
 	
 	public Circuit getCurrentCurcit() {

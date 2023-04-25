@@ -17,6 +17,8 @@ import de.m_marvin.logicsim.logic.parts.LogicGateComponent.NandGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.NorGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.OrGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.XorGateComponent;
+import de.m_marvin.logicsim.logic.simulator.CircuitProcessor;
+import de.m_marvin.logicsim.logic.simulator.SimulationMonitor;
 import de.m_marvin.logicsim.logic.parts.NotGateComponent;
 import de.m_marvin.logicsim.logic.parts.SubCircuitComponent;
 import de.m_marvin.logicsim.logic.wires.ConnectorWire;
@@ -27,16 +29,24 @@ import de.m_marvin.logicsim.util.Registries;
 import de.m_marvin.logicsim.util.Registries.ComponentFolder;
 
 public class LogicSim {
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
+=======
+>>>>>>> multi-lane
 	 
 	// TODO
 //	- TPS limits (UI)
 //	- TPS anzeige (UI)
 //	- Bezeichnung für Integrierte Schaltungen
 //	- Verschieben des Schaltplans in der Ansicht
+<<<<<<< HEAD
 //	- Multi-Auswahl
 >>>>>>> Stashed changes
+=======
+//	- Prozess view
+//	- Multi-Auswahl
+>>>>>>> multi-lane
 	
 	private static LogicSim INSTANCE;
 	
@@ -45,6 +55,7 @@ public class LogicSim {
 	protected boolean shouldTerminate;
 	protected Display display;
 	protected CircuitProcessor processor;
+	protected SimulationMonitor simulationMonitor;
 	protected List<Editor> openEditors = new ArrayList<>();
 	protected CircuitViewer circuitWindow;
 	protected Editor lastInteractedEditor;
@@ -93,6 +104,10 @@ public class LogicSim {
 		return processor;
 	}
 	
+	public SimulationMonitor getSimulationMonitor() {
+		return simulationMonitor;
+	}
+	
 	private void start() {
 
 		registerIncludedParts();
@@ -102,6 +117,7 @@ public class LogicSim {
 		
 		this.display = new Display();
 		this.processor = new CircuitProcessor();
+		this.simulationMonitor = new SimulationMonitor(processor);
 		
 		openEditor(null);
 		
@@ -128,7 +144,7 @@ public class LogicSim {
 	public void triggerMenuUpdates() {
 		this.openEditors.forEach(Editor::updatePartSelector);
 	}
-
+	
 	public void setLastInteracted(Editor editor) {
 		this.lastInteractedEditor = editor;
 	}
@@ -138,6 +154,8 @@ public class LogicSim {
 	}
 	
 	private void update() {
+		
+		this.simulationMonitor.update();
 		
 		List<Editor> disposedEditors = new ArrayList<>();
 		this.openEditors.forEach(editor -> {
@@ -186,18 +204,18 @@ public class LogicSim {
 	
 	public void updateSubCircuitCache() {
 		Registries.clearSubCircuitCache();
-		fillSubCircuitCache(this.builtinIcFolder, this.subCircuitFolder);
+		_fillSubCircuitCache(this.builtinIcFolder, this.subCircuitFolder);
 		triggerMenuUpdates();
 	}
 	
-	protected void fillSubCircuitCache(ComponentFolder folder, File circuitFolder) {
+	protected void _fillSubCircuitCache(ComponentFolder folder, File circuitFolder) {
 		if (this.subCircuitFolder.list() == null) return;
 		for (String entry : this.subCircuitFolder.list()) {
 			File entryPath = new File(circuitFolder, entry);
 			if (entryPath.isFile()) {
 				Registries.cacheSubCircuit(circuitFolder, SubCircuitComponent.class, folder, Component::placeClick, (circuit, pos) -> SubCircuitComponent.coursorMove(circuit, pos, entryPath), Component::abbortPlacement, entry, SubCircuitComponent.ICON_B64);
 			} else {
-				fillSubCircuitCache(folder, entryPath);
+				_fillSubCircuitCache(folder, entryPath);
 			}
 		}
 	}

@@ -1,16 +1,33 @@
-package de.m_marvin.logicsim;
+package de.m_marvin.logicsim.logic.simulator;
 
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import com.sun.management.OperatingSystemMXBean;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.m_marvin.logicsim.LogicSim;
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.ui.Editor;
 
+/**
+ * This class handles the creation and load balancing of the multiple simulation threads.
+ * The objects returned by the getProcesses and getProcessors methods are <b>not thread safe</b> and should not be used directly.
+ * Informations about these can be obtained by the SimulationMonitor.
+ * 
+ * @author Marvin K.
+ */
 public class CircuitProcessor {
 	
+	/**
+	 * Represents an circuit that is executed on an thread
+	 * Contains execution-time data and a reference to the parent circuit (which is null if this is the main process).
+	 * 
+	 * @author Marvin K.
+	 */
 	public class CircuitProcess implements Runnable {
 		
 		public long executionStart;
@@ -28,18 +45,29 @@ public class CircuitProcessor {
 		
 		@Override
 		public void run() {
-			executionStart = getCurrentTime();
-			circuit.updateCircuit();
 			executionEnd = getCurrentTime();
 			executionTime = executionEnd - executionStart;
+			executionStart = getCurrentTime();
+			circuit.updateCircuit();
 		}
 		
 	}
 	
+	/**
+	 * Represents a thread that is running some circuit simulations.
+	 * Contains a list of circuit process that are executed and some execution time data.
+	 * Normally there should not be more simulation threads as CPU cores.
+	 * 
+	 * @author Marvin K.
+	 */
 	public class CircuitProcessorThread extends Thread {
 		
 		public final List<CircuitProcess> processes = new ArrayList<>();
-		public long lastExecutionTime;
+		
+		public long executionStart;
+		public long executionEnd;
+		public long executionTime;
+		public int tps;
 		
 		public CircuitProcessorThread(String name) {
 			super(name);
@@ -48,9 +76,15 @@ public class CircuitProcessor {
 		@Override
 		public void run() {
 			try {
+				float frameDelta = 0;
+				long lastFrameTime = 0;
+				long frameTime = 0;
+				int frameCount = 0;
+				long secondTimer = getCurrentTime();
 				while (!requestShutdown) {
 					try {
 						if (allowedToExecute) {
+<<<<<<< HEAD:LogikSimulator/src/main/java/de/m_marvin/logicsim/CircuitProcessor.java
 <<<<<<< Updated upstream:LogikSimulator/src/main/java/de/m_marvin/logicsim/CircuitProcessor.java
 							this.lastExecutionTime = 0;
 							synchronized (this) {
@@ -70,6 +104,15 @@ public class CircuitProcessor {
 							}
 							if (getCurrentTime() - secondTimer > 1000) {
 								secondTimer = getCurrentTime();
+=======
+							if (minFrameTime > 0) {
+								lastFrameTime = frameTime;
+								frameTime = getCurrentTime();
+								frameDelta += (frameTime - lastFrameTime) / minFrameTime;
+							}
+							if (getCurrentTime() - secondTimer > 1000) {
+								secondTimer += 1000;
+>>>>>>> multi-lane:LogikSimulator/src/main/java/de/m_marvin/logicsim/logic/simulator/CircuitProcessor.java
 								tps = frameCount;
 								frameCount = 0;
 							}
@@ -88,12 +131,19 @@ public class CircuitProcessor {
 								}
 							} else {
 								Thread.sleep((long) (minFrameTime / 2));
+<<<<<<< HEAD:LogikSimulator/src/main/java/de/m_marvin/logicsim/CircuitProcessor.java
 >>>>>>> Stashed changes:LogikSimulator/src/main/java/de/m_marvin/logicsim/logic/simulator/CircuitProcessor.java
+=======
+>>>>>>> multi-lane:LogikSimulator/src/main/java/de/m_marvin/logicsim/logic/simulator/CircuitProcessor.java
 							}
 						} else {
 							Thread.sleep(1000);
 						}
-					} catch (InterruptedException e) {}
+					} catch (InterruptedException e) {
+						frameDelta = 0;
+						frameTime = getCurrentTime();
+						secondTimer = getCurrentTime();
+					}
 				}
 			} catch (Throwable e) {
 				LogicSim.getInstance().getDisplay().asyncExec(() -> {
@@ -105,6 +155,7 @@ public class CircuitProcessor {
 		
 	}
 	
+	protected boolean resetCircuits = true;
 	protected boolean allowedToExecute = false;
 	protected boolean requestShutdown = false;
 	protected List<CircuitProcessorThread> threads = new ArrayList<>();
@@ -112,10 +163,22 @@ public class CircuitProcessor {
 	protected Map<Circuit, CircuitProcess> processes = new HashMap<>();
 	protected CircuitProcess mainProcess = null;
 	protected Thread processorMasterThread;
+	protected float minFrameTime = 50;
+	protected double cpuLoad = 0;
+	protected OperatingSystemMXBean osBean;
+	protected long cpuLoadTimer = 0;
 	
 	public CircuitProcessor() {
+
+		try {
+			this.osBean = ManagementFactory.newPlatformMXBeanProxy(ManagementFactory.getPlatformMBeanServer(), ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
+			
+		} catch (IOException e) {
+			System.err.println("Failed to create mx os bean");
+			e.printStackTrace();
+		}
 		
-		for (int i = 0; i < getAvailableCores(); i++) { // TODO
+		for (int i = 0; i < getAvailableCores(); i++) {
 			this.threads.add(new CircuitProcessorThread("processor-" + i));
 		}
 		this.threads.forEach(Thread::start);
@@ -148,21 +211,22 @@ public class CircuitProcessor {
 		return System.currentTimeMillis();
 	}
 	
-	public void update() {
+	@SuppressWarnings("deprecation")
+	protected void update() {
 		
-		// Find slowest and fastest thread and remove inactive processes
+		// Find least and most loaded thread and remove inactive processes
 		
-		long fastestExecution = -1;
-		long slowestExecution = 0;
+		long leastExecutions = -1;
+		long mostExecutions = 0;
 		CircuitProcessorThread slowest = null;
 		CircuitProcessorThread fastest = null;
 		for (CircuitProcessorThread thread : this.threads) {
-			if (slowestExecution < thread.lastExecutionTime) {
-				slowestExecution = thread.lastExecutionTime;
+			if (mostExecutions < thread.processes.size()) {
+				mostExecutions = thread.processes.size();
 				slowest = thread;
 			}
-			if (fastestExecution > thread.lastExecutionTime || fastestExecution == -1) {
-				fastestExecution = thread.lastExecutionTime;
+			if (leastExecutions > thread.processes.size() || leastExecutions == -1) {
+				leastExecutions = thread.processes.size();
 				fastest = thread;
 			}
 			synchronized (thread) { thread.processes.removeAll(inactives.values()); }
@@ -172,7 +236,7 @@ public class CircuitProcessor {
 		
 		this.inactives.clear();
 		
-		if (allowedToExecute) {
+		if (allowedToExecute || resetCircuits) {
 			
 			// Distribute processing load over active threads
 			
@@ -191,6 +255,7 @@ public class CircuitProcessor {
 			List<CircuitProcess> newProcesses = new ArrayList<>();
 			synchronized (this) {
 				for (CircuitProcess process : this.processes.values()) {
+					if (this.resetCircuits) process.circuit.resetNetworks();
 					if (!process.active) {
 						newProcesses.add(process);
 						process.active = true;
@@ -199,28 +264,41 @@ public class CircuitProcessor {
 						inactives.put(process.circuit, process);
 					}
 				}
+				this.resetCircuits = false;
 			}
 			synchronized (fastest) { fastest.processes.addAll(newProcesses); }
 			
 		}
 		
+<<<<<<< HEAD:LogikSimulator/src/main/java/de/m_marvin/logicsim/CircuitProcessor.java
 <<<<<<< Updated upstream:LogikSimulator/src/main/java/de/m_marvin/logicsim/CircuitProcessor.java
 =======
+=======
+>>>>>>> multi-lane:LogikSimulator/src/main/java/de/m_marvin/logicsim/logic/simulator/CircuitProcessor.java
 		if (getCurrentTime() - cpuLoadTimer > 1000) {
 			cpuLoad = (float) osBean.getSystemCpuLoad();
 		}
 		
+<<<<<<< HEAD:LogikSimulator/src/main/java/de/m_marvin/logicsim/CircuitProcessor.java
 >>>>>>> Stashed changes:LogikSimulator/src/main/java/de/m_marvin/logicsim/logic/simulator/CircuitProcessor.java
+=======
+		minFrameTime = 0;
+		
+>>>>>>> multi-lane:LogikSimulator/src/main/java/de/m_marvin/logicsim/logic/simulator/CircuitProcessor.java
 	}
 	
-	public void removeProcess(Circuit circuit) {
+	public synchronized void removeProcess(Circuit circuit) {
 		if (processes.containsKey(circuit)) this.processes.remove(circuit).active = false;		
 	}
 	
 	public synchronized void addProcess(Circuit ownerCircuit, Circuit circuit) {
 		CircuitProcess process = new CircuitProcess(ownerCircuit, circuit);
 		this.processes.put(circuit, process);
-		if (ownerCircuit == null) this.mainProcess = process;
+		circuit.resetNetworks();
+		if (ownerCircuit == null) {
+			this.mainProcess = process;
+			this.stop();
+		}
 	}
 	
 	public boolean isExecuting(Circuit circuit) {
@@ -238,9 +316,17 @@ public class CircuitProcessor {
 		return null;
 	}
 	
+	public void setMinFrameTime(float frameTime) {
+		minFrameTime = frameTime;
+	}
+	
+	public float getMinFrameTime() {
+		return minFrameTime;
+	}
+	
 	public void start() {
-		this.threads.forEach(Thread::interrupt);
 		this.allowedToExecute = true;
+		this.threads.forEach(Thread::interrupt);
 	}
 
 	public void pause() {
@@ -249,7 +335,7 @@ public class CircuitProcessor {
 
 	public void stop() {
 		this.allowedToExecute = false;
-		this.processes.keySet().forEach(circuit -> circuit.resetNetworks());
+		this.resetCircuits = true;
 	}
 	
 	public void terminate() {

@@ -16,8 +16,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import de.m_marvin.logicsim.LogicSim;
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Circuit.ShortCircuitType;
+import de.m_marvin.logicsim.ui.Editor;
 import de.m_marvin.logicsim.logic.Component;
 
 public class CircuitSerializer {
@@ -70,6 +72,8 @@ public class CircuitSerializer {
 				circuit.add(component);
 			} catch (Exception e) {
 				System.err.println("Failed to load component '" + componentJson.toString() + "'");
+				Editor parentWindow = LogicSim.getInstance().getLastInteractedEditor();
+				if (parentWindow != null) Editor.showErrorInfo(parentWindow.getShell(), "editor.window.error.parese_file", e);
 				e.printStackTrace();
 			}
 		});

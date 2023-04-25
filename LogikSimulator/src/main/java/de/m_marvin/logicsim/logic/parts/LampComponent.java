@@ -1,8 +1,10 @@
 package de.m_marvin.logicsim.logic.parts;
 
+import java.util.Map;
 import java.util.Optional;
 
 import de.m_marvin.logicsim.logic.Circuit;
+import de.m_marvin.logicsim.logic.Circuit.NetState;
 import de.m_marvin.logicsim.logic.Component;
 import de.m_marvin.logicsim.logic.nodes.InputNode;
 import de.m_marvin.logicsim.logic.nodes.Node;
@@ -25,6 +27,7 @@ public class LampComponent extends Component implements ISubCircuitIO {
 	/* End of factory methods */
 	
 	protected Optional<OutputNode> subCircuitOutput = Optional.empty();
+	protected Map<String, NetState> laneReferenceCache;
 	protected boolean state;
 	
 	public LampComponent(Circuit circuit) {
@@ -47,6 +50,7 @@ public class LampComponent extends Component implements ISubCircuitIO {
 	@Override
 	public void updateIO() {
 		this.state = this.inputs.get(0).getState();
+		if (this.subCircuitOutput.isPresent()) this.laneReferenceCache = this.inputs.get(0).getLaneReference();
 	}
 	
 	@Override
@@ -70,8 +74,16 @@ public class LampComponent extends Component implements ISubCircuitIO {
 	
 	@Override
 	public void queryIO() {
-		if (this.subCircuitOutput.isPresent()) {
-			this.subCircuitOutput.get().setState(this.state);
+		if (this.subCircuitOutput.isPresent() && this.laneReferenceCache != null) {
+			// If the node in the sub circuit only receives a one lane signal or has a lane label to filter out that specific
+			// lane then only read that one lane and write it as normal output from the parent-component (applying the lane tag of the node)
+			// If not, copy all received lanes one to one
+			String laneTag = this.inputs.get(0).getLaneTag();
+			if (laneReferenceCache.size() == 1 || !laneTag.equals(Circuit.DEFAULT_BUS_LANE)) {
+				this.subCircuitOutput.get().setState(laneReferenceCache.getOrDefault(laneTag, NetState.FLOATING).getLogicState());
+			} else {
+				this.subCircuitOutput.get().writeLanes(laneReferenceCache);
+			}
 		}
 	}
 	

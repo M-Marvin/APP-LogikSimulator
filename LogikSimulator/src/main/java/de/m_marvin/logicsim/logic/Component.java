@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import de.m_marvin.logicsim.logic.nodes.InputNode;
@@ -14,6 +15,15 @@ import de.m_marvin.logicsim.logic.nodes.PassivNode;
 import de.m_marvin.logicsim.ui.EditorArea;
 import de.m_marvin.univec.impl.Vec2i;
 
+/**
+ * A component is a part placed in the circuit.
+ * Every component can have multiple input, output and passive nodes.
+ * It contains the updateIO method which implements the logic behind the part and also some event-specific methods like create, dispose and reset.
+ * The nodes are most at the time constructed in the constructor of the component and do normally not change during the simulation.
+ * 
+ * @author Marvin K.
+ *
+ */
 public abstract class Component {
 
 	/* Factory methods */
@@ -23,6 +33,7 @@ public abstract class Component {
 	
 	public static void placeClick(Circuit circuit, Vec2i coursorPosition) {
 		if (currentComponent != null) circuit.reconnect(false, currentComponent);
+		currentComponent.reset();
 		currentComponent = null;
 	}
 	
@@ -46,8 +57,6 @@ public abstract class Component {
 	}
 	
 	/* End of factory methods */
-
-	public static final float VISUAL_LINE_WIDTH = 2.0F;
 	
 	protected Vec2i visualPosition = new Vec2i(0, 0);
 	protected String label = "unnamed";
@@ -115,24 +124,56 @@ public abstract class Component {
 	public abstract int getVisualHeight();
 	
 	public abstract void render();
-	
 	public abstract void updateIO();
 	
+	/**
+	 * Gets triggered when the component is clicked in the editor
+	 * @param clickPosition The position of the courser on the editor-area
+	 */
 	public void click(Vec2i clickPosition) {}
+	/**
+	 * Gets triggered aster the component got constructed the first time (when loading a file, or placing the component)
+	 */
 	public void created() {}
+	/**
+	 * Gets triggered directly before the component gets removed from the circuit.
+	 */
 	public void dispose() {}
+	/**
+	 * Gets triggered if the component should to reset its state or rebuild some internal structures.
+	 * For example, the button component resets its toggle-state to "false", the sub-circuit component checks if the process of its sub-circuit is still running, and if not, restarts it.
+	 */
 	public void reset() {}
 	
+	/**
+	 * Store additional component-specific data into the components JSON entry.
+	 * @param json
+	 */
 	public void serialize(JsonObject json) {
 		json.addProperty("label", this.label);
 		json.addProperty("x", this.visualPosition.x);
 		json.addProperty("y", this.visualPosition.y);
+		JsonObject laneTags = new JsonObject();
+		this.getAllNodes().forEach(node -> {
+			if (!node.getLaneTag().equals(Circuit.DEFAULT_BUS_LANE)) laneTags.addProperty(Integer.toString(node.getNodeNr()), node.getLaneTag());
+		});
+		if (json.size() > 0) json.add("laneTags", laneTags);
 	}
 	
+	/**
+	 * Read additional component-specific data from the components JSON entry.
+	 * @param json
+	 */
 	public void deserialize(JsonObject json) {
 		this.label = json.get("label").getAsString();
 		this.visualPosition.x = json.get("x").getAsInt();
 		this.visualPosition.y = json.get("y").getAsInt();
+		JsonElement laneTags = json.get("laneTags");
+		if (laneTags != null) {
+			this.getAllNodes().forEach(node -> {
+				if (laneTags.getAsJsonObject().has(Integer.toString(node.getNodeNr()))) node.setLaneTag(laneTags.getAsJsonObject().get(Integer.toString(node.getNodeNr())).getAsString());
+			});
+		}
 	}
 	
 	@Override
@@ -146,6 +187,11 @@ public abstract class Component {
 	@Override
 	public int hashCode() {
 		return Objects.hash(this.componentNr, this.visualPosition);
+	}
+	
+	@Override
+	public String toString() {
+		return "Component{ident=" + makeIdentifier() + ",pos=" + this.visualPosition + "}";
 	}
 	
 }

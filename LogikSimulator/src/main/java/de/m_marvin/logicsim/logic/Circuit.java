@@ -3,6 +3,8 @@ package de.m_marvin.logicsim.logic;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.Random;
@@ -14,7 +16,18 @@ import java.util.stream.Stream;
 import de.m_marvin.logicsim.logic.nodes.Node;
 import de.m_marvin.univec.impl.Vec4i;
 
+/**
+ * The class containing all information about an circuit and its current simulation state.
+ * The methods of this class are thread safe when calling them but the methods that return Lists, Maps or Sets do return the internal object.
+ * Modifications or calls to that object are <b>NOT guaranteed to be threads safe</b> and should be surrounded by an synchronized block with the circuit as lock-object!
+ * The returned objects are mainly intended to be used to directly read data from the simulation without querying the objects over and over.
+ * 
+ * @author Marvin K.
+ *
+ */
 public class Circuit {
+	
+	public static final String DEFAULT_BUS_LANE = "bus0";
 	
 	public static Random floatingValue = new Random();
 	public static boolean shortCircuitValue = false;
@@ -25,7 +38,7 @@ public class Circuit {
 	
 	public synchronized static boolean getShortCircuitValue() {
 		shortCircuitValue = !shortCircuitValue;
-		return shortCircuitValue;
+		return floatingValue.nextBoolean();
 	}
 	
 	public static NetState combineStates(NetState stateA, NetState stateB, ShortCircuitType type) {
@@ -34,29 +47,19 @@ public class Circuit {
 		switch (type) {
 		default:
 		case HIGH_LOW_SHORT:
-			if (stateA == NetState.SHORT_CIRCUIT) {
-				return NetState.SHORT_CIRCUIT;
-			}
-			if (stateB == NetState.SHORT_CIRCUIT) {
-				return NetState.SHORT_CIRCUIT;
-			}
-			if (stateA != stateB) {
-				return NetState.SHORT_CIRCUIT;
-			}
+			if (stateA == NetState.SHORT_CIRCUIT) return NetState.SHORT_CIRCUIT;
+			if (stateB == NetState.SHORT_CIRCUIT) return NetState.SHORT_CIRCUIT;
+			if (stateA != stateB) return NetState.SHORT_CIRCUIT;
 			return stateA;
 		case PREFER_HIGH:
 			if (stateA == NetState.SHORT_CIRCUIT) return NetState.HIGH;
 			if (stateB == NetState.SHORT_CIRCUIT) return NetState.HIGH;
-			if (stateA != stateB) {
-				return NetState.SHORT_CIRCUIT;
-			}
+			if (stateA != stateB) return NetState.SHORT_CIRCUIT;
 			return stateA == NetState.HIGH || stateB == NetState.HIGH ? NetState.HIGH : NetState.LOW;
 		case PREFER_LOW:
 			if (stateA == NetState.SHORT_CIRCUIT) return NetState.LOW;
 			if (stateB == NetState.SHORT_CIRCUIT) return NetState.LOW;
-			if (stateA != stateB) {
-				return NetState.SHORT_CIRCUIT;
-			}
+			if (stateA != stateB) return NetState.SHORT_CIRCUIT;
 			return stateA == NetState.LOW || stateB == NetState.LOW ? NetState.LOW : NetState.HIGH;
 		}
 	}
@@ -79,9 +82,12 @@ public class Circuit {
 		}
 	}
 	
+	
+	
+	
 	protected final List<Set<Node>> networks = new ArrayList<>();
-	protected final List<NetState> valueBuffer = new ArrayList<>();
-	protected final List<NetState> values = new ArrayList<>();
+	protected final List<Map<String, NetState>> valuesSec = new ArrayList<>();
+	protected final List<Map<String, NetState>> valuesPri = new ArrayList<>();
 	protected final List<Component> components = new ArrayList<>();
 	protected File circuitFile;
 	protected final boolean virtual;
@@ -156,8 +162,8 @@ public class Circuit {
 		network.addAll(nodeCache);
 		if (network.size() > 0) {
 			this.networks.add(network);
-			this.values.add(NetState.FLOATING);
-			this.valueBuffer.add(NetState.FLOATING);
+			this.valuesPri.add(new HashMap<>());
+			this.valuesSec.add(new HashMap<>());
 		}
 		return this.networks.size() - 1;
 	}
@@ -175,16 +181,18 @@ public class Circuit {
 		});
 		if (network.size() > 0) {
 			this.networks.add(network);
-			this.values.add(NetState.FLOATING);
+			this.valuesPri.add(new HashMap<>());
+			this.valuesSec.add(new HashMap<>());
 		}
 	}
 
 	protected synchronized Set<Node> removeNet(int netId) {
-		this.values.remove(netId);
+		this.valuesPri.remove(netId);
+		this.valuesSec.remove(netId);
 		return this.networks.remove(netId);
 	}
 	
-	protected synchronized OptionalInt findNet(Node node) {
+	protected OptionalInt findNet(Node node) {
 		for (int i = 0; i < this.networks.size(); i++) {
 			for (Node n : this.networks.get(i)) {
 				if (n.equals(node)) return OptionalInt.of(i);
@@ -198,45 +206,78 @@ public class Circuit {
 		reconnectNet(nodes, excludeComponents);
 	}
 	
-	protected synchronized NetState getNetValue(int netId) {
-		return this.valueBuffer.size() > netId ? this.valueBuffer.get(netId) : NetState.FLOATING;
+	protected NetState getNetValue(int netId, String lane) {
+		return this.valuesSec.size() > netId ? this.valuesSec.get(netId).getOrDefault(lane, NetState.FLOATING) : NetState.FLOATING;
 	}
 
-	protected synchronized void applyNetValue(int netId, NetState state) {
-		if (netId >= this.values.size()) return;
-		NetState resultingState = combineStates(this.values.get(netId), state, this.shortCircuitType);
-		this.values.set(netId, resultingState);
-		this.valueBuffer.set(netId, resultingState);
+	protected synchronized Map<String, NetState> getNetLanes(int netId) {
+		return this.valuesSec.size() > netId ? this.valuesSec.get(netId) : null;
+	}
+
+	protected synchronized void applyNetValue(int netId, NetState state, String lane) {
+		if (netId >= this.valuesPri.size()) return;
+		NetState resultingState = combineStates(this.valuesPri.get(netId).getOrDefault(lane, NetState.FLOATING), state, this.shortCircuitType);
+		this.valuesPri.get(netId).put(lane, resultingState);
+		this.valuesSec.get(netId).put(lane, resultingState);
+	}
+	
+	protected synchronized void applyNetLanes(int netId, Map<String, NetState> laneStates) {
+		if (netId >= this.valuesPri.size()) return;
+		Map<String, NetState> laneStatesPri = this.valuesPri.get(netId);
+		Map<String, NetState> laneStatesSec = this.valuesSec.get(netId);
+		laneStates.forEach((lane, state) -> {
+			NetState resultingState = combineStates(laneStatesPri.getOrDefault(lane, NetState.FLOATING), state, this.shortCircuitType);
+			laneStatesPri.put(lane, resultingState);
+			laneStatesSec.put(lane, resultingState);
+		});
 	}
 	
 	public NetState getNetState(Node node) {
+		return getNetState(node, DEFAULT_BUS_LANE);
+	}
+	
+	public NetState getNetState(Node node, String lane) {
 		OptionalInt netId = findNet(node);
 		if (netId.isEmpty()) return NetState.FLOATING;
-		return getNetValue(netId.getAsInt());
+		return getNetValue(netId.getAsInt(), lane);
+	}
+	
+	public Map<String, NetState> getLaneMapReference(Node node) {
+		OptionalInt netId = findNet(node);
+		if (netId.isEmpty()) return null;
+		return getNetLanes(netId.getAsInt());
 	}
 	
 	public void setNetState(Node node, NetState state) {
+		setNetState(node, state, DEFAULT_BUS_LANE);
+	}
+	
+	public void writeLanes(Node node, Map<String, NetState> laneStates) {
+		if (laneStates == null || laneStates.isEmpty()) return;
 		OptionalInt netId = findNet(node);
-		if (netId.isPresent()) applyNetValue(netId.getAsInt(), state);
+		if (netId.isPresent()) applyNetLanes(netId.getAsInt(), laneStates);
+	}
+	
+	public void setNetState(Node node, NetState state, String lane) {
+		OptionalInt netId = findNet(node);
+		if (netId.isPresent()) applyNetValue(netId.getAsInt(), state, lane);
 	}
 
 	public synchronized void resetNetworks() {
-		for (int i = 0; i < this.values.size(); i++) this.values.set(i, NetState.LOW);
-		for (int i = 0; i < this.valueBuffer.size(); i++) this.valueBuffer.set(i, NetState.LOW);
+		for (int i = 0; i < this.valuesPri.size(); i++) this.valuesPri.get(i).clear();
+		for (int i = 0; i < this.valuesSec.size(); i++) {
+			for (String lane : this.valuesSec.get(i).keySet()) {
+				this.valuesSec.get(i).put(lane, NetState.LOW);
+			}
+		}
 		this.components.forEach(Component::reset);
 	}
 	
-	protected synchronized void cloneNetBuffer() {
-//		this.valueBuffer.clear();
-//		this.valueBuffer.addAll(this.values);
-		this.values.clear();
-		this.valueBuffer.forEach((v) -> this.values.add(NetState.FLOATING));
-	}
-
 	public synchronized void updateCircuit() {
 		assert !this.virtual : "Can't simulate virtual circuit!";
+		this.valuesPri.forEach(holder -> holder.clear());
 		this.components.forEach(Component::updateIO);
-		cloneNetBuffer();
+		for (int i = 0; i < this.valuesPri.size(); i++) this.valuesSec.get(i).putAll(this.valuesPri.get(i)); //.put("", this.values.get(i).get(""));
 	}
 	
 	
@@ -255,14 +296,16 @@ public class Circuit {
 	public List<Component> getComponents() {
 		return this.components;
 	}
+
+	public List<Component> getComponents(Predicate<Component> componentPredicate) {
+		return this.components.stream().filter(componentPredicate).toList();
+	}
 	
 	public synchronized void clear() {
 		this.components.clear();
 		this.networks.clear();
-		this.values.clear();
-		this.valueBuffer.clear();
-		this.networks.forEach((net) -> this.values.add(NetState.FLOATING));
-		this.networks.forEach((net) -> this.valueBuffer.add(NetState.FLOATING));
+		this.valuesPri.clear();
+		this.valuesSec.clear();
 	}
 	
 	public int nextFreeId() {

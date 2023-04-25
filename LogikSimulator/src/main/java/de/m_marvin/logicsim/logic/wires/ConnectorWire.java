@@ -1,19 +1,19 @@
 package de.m_marvin.logicsim.logic.wires;
 
-import java.util.Optional;
-
 import com.google.gson.JsonObject;
 
-import de.m_marvin.univec.impl.Vec2i;
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Circuit.NetState;
-import de.m_marvin.logicsim.logic.nodes.PassivNode;
 import de.m_marvin.logicsim.logic.NetConnector;
+import de.m_marvin.logicsim.logic.nodes.PassivNode;
 import de.m_marvin.logicsim.ui.EditorArea;
+import de.m_marvin.univec.impl.Vec2i;
 
 public class ConnectorWire extends NetConnector {
 	
 	public static final String ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABLSURBVFhH7ZYxCgAwCAPT/v/PLQUprtpClrslmx5mUeBmRB5WZJU8o8yMtGEX6J4v10UFTyCAAAIIIIAAAgjYBX78hB3uXioAM9IG5AoDMvJCY58AAAAASUVORK5CYII=";
+
+	public static final float VISUAL_LINE_WIDTH = 2.0F;
 	
 	/* Factory methods */
 	
@@ -111,11 +111,6 @@ public class ConnectorWire extends NetConnector {
 		this.visualPosition = new Vec2i(Math.min(posB.x, otherNode.x), Math.min(posB.y, otherNode.y)).sub(3, 3);
 		this.posA.setI(otherNode.sub(visualPosition));
 		this.posB.setI(posB.sub(visualPosition));
-	}
-	
-	@Override
-	public Optional<String> getBusLabel() {
-		return Optional.empty();
 	}
 	
 	@Override

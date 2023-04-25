@@ -6,18 +6,40 @@ import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Component;
 import de.m_marvin.univec.impl.Vec2i;
 
-public class Node {
+/**
+ * Represents an IO node on an component in an circuit.
+ * This is the abstract base class of all types of node.
+ * Currently there exist three types of nodes
+ * <br>- passive nodes
+ * <br>- input node
+ * <br>- output nodes
+ * 
+ * @author Marvin K.
+ *
+ */
+public abstract class Node {
 	
 	protected final Component component;
 	protected final int nodeNr;
 	protected final String label;
 	protected final Vec2i visualOffset;
 	
+	protected String laneTag;
+	
 	public Node(Component component, int nodeNr, String label, Vec2i visualOffset) {
 		this.component = component;
 		this.nodeNr = nodeNr;
 		this.label = label;
 		this.visualOffset = visualOffset;
+		this.laneTag = Circuit.DEFAULT_BUS_LANE;
+	}
+	
+	public void setLaneTag(String laneTag) {
+		this.laneTag = laneTag;
+	}
+	
+	public String getLaneTag() {
+		return laneTag;
 	}
 	
 	public Component getComponent() {
@@ -43,14 +65,18 @@ public class Node {
 	public Circuit getCircuit() {
 		return this.component.getCircuit();
 	}
+
+	/**
+	 * Gets called when the user clicks on the node in the editor.
+	 * Used to open the lane tag window.
+	 * 
+	 * @param mousePosition The position of the courser on the screen.
+	 * @return true if the event got consumed and no other nodes on this position should be receive it (prevent multiple windows to pop up).
+	 */
+	public abstract boolean click(Vec2i mousePosition);
 	
 	public String makeIdentifier() {
 		return this.component.makeIdentifier() + "/" + this.nodeNr + "'" + this.label + "'";
-	}
-	
-	@Override
-	public String toString() {
-		return makeIdentifier();
 	}
 	
 	@Override
@@ -64,6 +90,11 @@ public class Node {
 	@Override
 	public int hashCode() {
 		return Objects.hash(this.component, this.nodeNr);
+	}
+
+	@Override
+	public String toString() {
+		return "Node{ident=" + makeIdentifier() + "}";
 	}
 	
 }
