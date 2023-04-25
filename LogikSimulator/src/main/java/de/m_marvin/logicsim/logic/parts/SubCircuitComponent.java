@@ -18,6 +18,7 @@ import de.m_marvin.logicsim.logic.nodes.PassivNode;
 import de.m_marvin.logicsim.logic.simulator.CircuitProcessor;
 import de.m_marvin.logicsim.ui.Editor;
 import de.m_marvin.logicsim.ui.EditorArea;
+import de.m_marvin.logicsim.ui.TextRenderer;
 import de.m_marvin.logicsim.util.CircuitSerializer;
 import de.m_marvin.univec.impl.Vec2f;
 import de.m_marvin.univec.impl.Vec2i;
@@ -161,11 +162,21 @@ public class SubCircuitComponent extends Component {
 	
 	public String getRelativeCircuitPath() {
 		File subCircuitFile = getSubCircuit().getCircuitFile();
+		if (subCircuitFile == null) return "";
 		if (subCircuitFile.toString().startsWith(LogicSim.getInstance().getSubCircuitFolder().toString())) {
 			return LogicSim.getInstance().getSubCircuitFolder().toURI().relativize(subCircuitFile.toURI()).toString();
 		} else {
 			return getCircuit().getCircuitFile().getParentFile().toURI().relativize(subCircuitFile.toURI()).toString();
 		}
+	}
+	
+	public String getComponentName() {
+		String name = this.getRelativeCircuitPath();
+		String[] fs = name.split("/");
+		String fn = fs[fs.length - 1];
+		String[] fes = fn.split("\\.");
+		String fe = fes[fes.length - 1];
+		return fn.substring(0, fn.length() - (fes.length == 1 ? 0 : fe.length() + 1));
 	}
 	
 	public void setRelativeCircuitPath(String relativeCircuitFile) {
@@ -191,8 +202,14 @@ public class SubCircuitComponent extends Component {
 	@Override
 	public void render() {
 		
-		EditorArea.swapColor(1, 1, 0, 0.4F);
+		EditorArea.swapColor(0, 1, 1, 0.4F);
 		EditorArea.drawComponentFrame(this.visualPosition.x, this.visualPosition.y, this.width, this.height);
+		
+		String name = getComponentName();
+		boolean overComponent = TextRenderer.getTextWidth(12, name, false) - 12 > this.width;
+		
+		EditorArea.swapColor(1, 1, 1, 1);
+		TextRenderer.drawText(visualPosition.x + getVisualWidth() / 2, overComponent ? (visualPosition.y - 10) : (visualPosition.y + getVisualHeight() / 2), 12, name);
 		
 	}
 

@@ -324,10 +324,19 @@ public class Editor {
 		
 		this.executionTimeLabel.setText(Translator.translate("editor.simulation_view.execution_time", executionTime));
 		this.tpsLabel.setText(Translator.translate("editor.simulation_view.update_rate", currentTps));
-		
+
+		int tpsLimit = monitor.getTPSLimit();
 		String input = this.tpsLimitField.getText();
-		int tpsLimit = input.isEmpty() ? 1 : Integer.parseInt(this.tpsLimitField.getText());
-		if (monitor.getTPSLimit() != tpsLimit) monitor.setTPSLimit(tpsLimit);
+		int enteredTpsLimit = input.isEmpty() ? 1 : Integer.parseInt(this.tpsLimitField.getText());
+		
+		if (tpsLimit != enteredTpsLimit) {
+			if (this.tpsLimitField.isFocusControl()) {
+				monitor.setTPSLimit(enteredTpsLimit);
+				tpsLimit = enteredTpsLimit;
+			} else {
+				this.tpsLimitField.setSelection(tpsLimit);
+			}
+		}
 		
 		float cpuLoad = (float) monitor.getCPULoad();
 		float tpsState = currentTps / (float) tpsLimit;
@@ -384,7 +393,6 @@ public class Editor {
 			File filePath = new File(path);
 			try {
 				changeCircuit(CircuitSerializer.loadCircuit(filePath));
-				this.editorArea.getCircuit().setCircuitFile(filePath);
 				update();
 			} catch (IOException ex) {
 				showErrorInfo(this.shell, "info.error.load_file", ex);

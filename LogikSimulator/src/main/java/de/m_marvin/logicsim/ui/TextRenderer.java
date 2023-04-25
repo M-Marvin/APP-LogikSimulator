@@ -162,14 +162,23 @@ public class TextRenderer {
 	}
 	
 	/*
-	 * Gets the width of the text in pixels
+	 * Gets the width of the text in pixels (default size of the texture map)
 	 */
 	public static int getTextWidth(String text, boolean resized) {
 		int width = 0;
 		for (int i = 0; i < text.length(); i++) width += getCharacterWidth(text.charAt(i), resized);
 		return width;
 	}
-	
+
+	/*
+	 * Gets the width of the text in pixels
+	 */
+	public static int getTextWidth(float size, String text, boolean resized) {
+		
+		return (int) ((getTextWidth(text, resized) / (float) CHARACTER_SIZE) * size);
+		
+	}
+		
 	public static final int RESIZED = 1 << 0;
 	public static final int ORIGIN_LEFT = 1 << 1;
 	public static final int ORIGIN_RIGHT = 1 << 2;

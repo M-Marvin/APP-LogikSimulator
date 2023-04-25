@@ -31,11 +31,9 @@ import de.m_marvin.logicsim.util.Registries.ComponentFolder;
 public class LogicSim {
 	 
 	// TODO
-//	- TPS limits (UI)
-//	- TPS anzeige (UI)
-//	- Bezeichnung für Integrierte Schaltungen
+//	- Bezeichnung für Ein/Ausgänge
 //	- Verschieben des Schaltplans in der Ansicht
-//	- Multi-Auswahl
+//	- Multi-Auswahl (Copy/Paste)
 	
 	private static LogicSim INSTANCE;
 	
@@ -187,7 +185,7 @@ public class LogicSim {
 		Registries.registerPart(partFolder, ButtonComponent.class, Component::placeClick, ButtonComponent::coursorMove, Component::abbortPlacement, "circuit.components.button", ButtonComponent.ICON_B64);
 		Registries.registerPart(partFolder, LampComponent.class, Component::placeClick, LampComponent::coursorMove, Component::abbortPlacement, "circuit.components.lamp", LampComponent.ICON_B64);
 		Registries.registerPart(wireFolder, ConnectorWire.class, ConnectorWire::placeClick, ConnectorWire::coursorMove, ConnectorWire::abbortPlacement, "circuit.components.wire", ConnectorWire.ICON_B64);
-		
+				
 		Registries.registerLangFolder("/lang");
 	}
 	
