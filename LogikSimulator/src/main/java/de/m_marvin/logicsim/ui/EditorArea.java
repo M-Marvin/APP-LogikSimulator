@@ -327,14 +327,14 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 			GL11.glVertex2f(i + renderOffset.x, renderOffset.y);
 			GL11.glVertex2f(i + renderOffset.x, renderOffset.y + this.getSize().y);
 		}
-		for (int j = 0; j < this.getSize().x; j += RASTER_SIZE * rasterSize1) {
+		for (int j = 0; j < this.getSize().y; j += RASTER_SIZE * rasterSize1) {
 			GL11.glVertex2f(renderOffset.x, j + renderOffset.y);
 			GL11.glVertex2f(renderOffset.x + this.getSize().x, j + renderOffset.y);
 		}
 		GL11.glEnd();
 		
 		for (int i = 0; i < this.getSize().x; i+= RASTER_SIZE * rasterSize1) {
-			for (int j = 0; j < this.getSize().x; j += RASTER_SIZE * rasterSize1) {
+			for (int j = 0; j < this.getSize().y; j += RASTER_SIZE * rasterSize1) {
 				drawRectangle(1, i + renderOffset.x - 5, j + renderOffset.y - 5, 10, 10);
 			}
 		}

@@ -51,6 +51,7 @@ public class CircuitProcessor {
 				while (!requestShutdown) {
 					try {
 						if (allowedToExecute) {
+<<<<<<< Updated upstream:LogikSimulator/src/main/java/de/m_marvin/logicsim/CircuitProcessor.java
 							this.lastExecutionTime = 0;
 							synchronized (this) {
 								this.processes.forEach(process -> {
@@ -60,6 +61,34 @@ public class CircuitProcessor {
 							}
 							if (this.processes.isEmpty()) {
 								Thread.sleep(1000);
+=======
+							if (minFrameTime > 0) {
+								lastFrameTime = frameTime;
+								frameTime = getCurrentTime();
+								frameDelta += (frameTime - lastFrameTime) / minFrameTime;
+								if (frameDelta > 20 || frameDelta < 0) frameDelta = 0;
+							}
+							if (getCurrentTime() - secondTimer > 1000) {
+								secondTimer = getCurrentTime();
+								tps = frameCount;
+								frameCount = 0;
+							}
+							if (minFrameTime <= 0 || frameDelta >= 1) {
+								frameDelta--;
+								frameCount += 1;
+								this.executionEnd = getCurrentTime();
+								this.executionTime = this.executionEnd - this.executionStart;
+								this.executionStart = getCurrentTime();
+								for (int i = 0; i < this.processes.size(); i++) {
+									CircuitProcess process = processes.size() > i ? processes.get(i) : null;
+									if (process != null ? process.active : false) process.run();
+								}
+								if (this.processes.isEmpty()) {
+									Thread.sleep(1000);
+								}
+							} else {
+								Thread.sleep((long) (minFrameTime / 2));
+>>>>>>> Stashed changes:LogikSimulator/src/main/java/de/m_marvin/logicsim/logic/simulator/CircuitProcessor.java
 							}
 						} else {
 							Thread.sleep(1000);
@@ -175,6 +204,13 @@ public class CircuitProcessor {
 			
 		}
 		
+<<<<<<< Updated upstream:LogikSimulator/src/main/java/de/m_marvin/logicsim/CircuitProcessor.java
+=======
+		if (getCurrentTime() - cpuLoadTimer > 1000) {
+			cpuLoad = (float) osBean.getSystemCpuLoad();
+		}
+		
+>>>>>>> Stashed changes:LogikSimulator/src/main/java/de/m_marvin/logicsim/logic/simulator/CircuitProcessor.java
 	}
 	
 	public void removeProcess(Circuit circuit) {

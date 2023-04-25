@@ -27,6 +27,16 @@ import de.m_marvin.logicsim.util.Registries;
 import de.m_marvin.logicsim.util.Registries.ComponentFolder;
 
 public class LogicSim {
+<<<<<<< Updated upstream
+=======
+	 
+	// TODO
+//	- TPS limits (UI)
+//	- TPS anzeige (UI)
+//	- Bezeichnung für Integrierte Schaltungen
+//	- Verschieben des Schaltplans in der Ansicht
+//	- Multi-Auswahl
+>>>>>>> Stashed changes
 	
 	private static LogicSim INSTANCE;
 	
@@ -135,7 +145,7 @@ public class LogicSim {
 		});
 		this.openEditors.removeAll(disposedEditors);
 		
-		this.openEditors.forEach(editor -> editor.updateTitle());
+		this.openEditors.forEach(editor -> editor.update());
 		if (this.circuitWindow != null && !this.circuitWindow.getShell().isDisposed()) this.circuitWindow.updateView();
 		
 		if (this.openEditors.isEmpty()) this.terminate();

@@ -9,6 +9,11 @@ import java.io.StringWriter;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+<<<<<<< Updated upstream
+=======
+import java.util.Optional;
+import java.util.function.Consumer;
+>>>>>>> Stashed changes
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
@@ -24,6 +29,14 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.layout.BorderData;
 import org.eclipse.swt.layout.BorderLayout;
+<<<<<<< Updated upstream
+=======
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
+>>>>>>> Stashed changes
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
@@ -32,6 +45,11 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+<<<<<<< Updated upstream
+=======
+import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.Text;
+>>>>>>> Stashed changes
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
@@ -41,6 +59,13 @@ import de.m_marvin.logicsim.CircuitProcessor;
 import de.m_marvin.logicsim.LogicSim;
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.parts.SubCircuitComponent;
+<<<<<<< Updated upstream
+=======
+import de.m_marvin.logicsim.logic.simulator.CircuitProcessor;
+import de.m_marvin.logicsim.logic.simulator.SimulationMonitor;
+import de.m_marvin.logicsim.logic.simulator.SimulationMonitor.CircuitProcessInfo;
+import de.m_marvin.logicsim.logic.simulator.SimulationMonitor.CircuitProcessorInfo;
+>>>>>>> Stashed changes
 import de.m_marvin.logicsim.util.CircuitSerializer;
 import de.m_marvin.logicsim.util.Registries;
 import de.m_marvin.logicsim.util.Registries.ComponentEntry;
@@ -61,6 +86,11 @@ public class Editor {
 	protected Tree partSelector;
 	protected EditorArea subCircuitView;
 	protected SubCircuitComponent viewComponent;
+	protected ValueHistoryGraph statusGraph;
+	protected long lastGrapghTime;
+	protected Label tpsLabel;
+	protected Label executionTimeLabel;
+	protected Spinner tpsLimitField;
 	
 	public static Image decodeImage(String imageString) {
 		return new Image(LogicSim.getInstance().getDisplay(), new ImageData(new ByteArrayInputStream(Base64.getDecoder().decode(imageString))));
@@ -160,10 +190,16 @@ public class Editor {
 		});
 		updatePartSelector();
 		
+		// Additional sub-groups
+		
+		Composite subGroups = new Composite(groupLeft, SWT.NONE);
+		subGroups.setLayoutData(new BorderData(SWT.BOTTOM));
+		subGroups.setLayout(new GridLayout(1, true));
+		
 		// Sub-circuit view
 		
-		Group groupIO = new Group(groupLeft, SWT.NONE);
-		groupIO.setLayoutData(new BorderData(SWT.BOTTOM));
+		Group groupIO = new Group(subGroups, SWT.NONE);
+		groupIO.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		groupIO.setLayout(new BorderLayout());
 		groupIO.setText(Translator.translate("editor.sub_circuit_view.title"));
 		
@@ -172,6 +208,44 @@ public class Editor {
 		this.subCircuitView.setCircuit(new Circuit(true));
 		this.subCircuitView.setAllowEditing(false);
 		
+		// Simulation control view
+		
+		Group groupSimulation = new Group(subGroups, SWT.NONE);
+		groupSimulation.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		groupSimulation.setLayout(new RowLayout());
+		groupSimulation.setText(Translator.translate("editor.simulation_view.title"));
+		
+		this.statusGraph = new ValueHistoryGraph(groupSimulation, 0F, 10F, 20);
+		this.statusGraph.setLayoutData(new RowData(200, 100));
+		this.statusGraph.addVariable("CPU", new Color(255, 0, 0));
+		this.statusGraph.addVariable("TPS", new Color(0, 255, 0));
+		
+		Composite tpsStatus = new Composite(groupSimulation, SWT.NONE);
+		tpsStatus.setLayout(new GridLayout());
+		
+		this.tpsLabel = new Label(tpsStatus, SWT.NONE);
+		this.tpsLabel.setLayoutData(new GridData(150, 20));
+		this.tpsLabel.setText("N/A tps (N/A ms)");
+
+		this.executionTimeLabel = new Label(tpsStatus, SWT.NONE);
+		this.executionTimeLabel.setLayoutData(new GridData(150, 20));
+		this.executionTimeLabel.setText("Execution time N/Ams");
+		
+		Composite tpsLimiter = new Composite(tpsStatus, SWT.NONE);
+		tpsLimiter.setLayoutData(new GridData(150, 30));
+		tpsLimiter.setLayout(new RowLayout(SWT.VERTICAL));
+		
+		Label tpsLimitLabel = new Label(tpsLimiter, SWT.NONE);
+		tpsLimitLabel.setLayoutData(new RowData(SWT.DEFAULT, 20));
+		tpsLimitLabel.setText(Translator.translate("editor.simulation_view.tps_limit"));
+		tpsLimitLabel.pack();
+		
+		this.tpsLimitField = new Spinner(tpsLimiter, 0);
+		this.tpsLimitField.setLayoutData(new RowData(40, 20));
+		this.tpsLimitField.setMaximum(10000);
+		this.tpsLimitField.setMinimum(0);
+		this.tpsLimitField.setSelection(LogicSim.getInstance().getSimulationMonitor().getTPSLimit());
+			
 		// Editor area
 		
 		this.editorArea = new EditorArea(shell);
@@ -196,12 +270,40 @@ public class Editor {
 		
 		this.shell.open();
 		changeCircuit(circuit);
-		updateTitle();
+		
 	}
 	
-	public void updateTitle() {
+	public void update() {
+		
 		boolean instanced = LogicSim.getInstance().getCircuitProcessor().holdsCircuit(this.editorArea.getCircuit());
 		this.shell.setText(Translator.translate("editor.title") + (this.editorArea.getCircuit().getCircuitFile() != null ? " - " + this.editorArea.getCircuit().getCircuitFile().toString() : "") + (instanced ? Translator.translate("editor.title.instanced") : ""));
+		
+		SimulationMonitor monitor = LogicSim.getInstance().getSimulationMonitor();
+		Optional<CircuitProcessInfo> processInfo = monitor.getProcessForCircuit(this.editorArea.getCircuit());
+		Optional<CircuitProcessorInfo> processorInfo = monitor.getProcessorForCircuit(this.editorArea.getCircuit());
+		
+		int executionTime = processInfo.isPresent() ? processInfo.get().executionTime().get() : 0;
+		int currentTps = processorInfo.isPresent() ? processorInfo.get().tps().get() : 0;
+		
+		this.executionTimeLabel.setText(Translator.translate("editor.simulation_view.execution_time", executionTime));
+		this.tpsLabel.setText(Translator.translate("editor.simulation_view.update_rate", currentTps));
+		
+		String input = this.tpsLimitField.getText();
+		int tpsLimit = input.isEmpty() ? 1 : Integer.parseInt(this.tpsLimitField.getText());
+		if (monitor.getTPSLimit() != tpsLimit) monitor.setTPSLimit(tpsLimit);
+		
+		float cpuLoad = (float) monitor.getCPULoad();
+		float tpsState = currentTps / (float) tpsLimit;
+		
+		if (System.currentTimeMillis() - lastGrapghTime >= 1000) {
+			
+			this.lastGrapghTime = System.currentTimeMillis();
+			this.statusGraph.nextColumn();
+			this.statusGraph.putData("CPU", Math.max(Math.min(cpuLoad, 1), 0) * 10F);
+			this.statusGraph.putData("TPS", Math.max(Math.min(tpsState, 1), 0) * 10F);
+			
+		}
+		
 	}
 	
 	public void saveCircuit(boolean saveAs) {
@@ -218,6 +320,7 @@ public class Editor {
 					if (msg.open() == SWT.NO) return;
 				}
 				this.editorArea.getCircuit().setCircuitFile(filePath);
+<<<<<<< Updated upstream
 				try {
 					CircuitSerializer.saveCircuit(getCurrentCurcit(), this.editorArea.getCircuit().getCircuitFile());
 				} catch (IOException ex) {
@@ -226,6 +329,9 @@ public class Editor {
 				}
 				updateTitle();
 				LogicSim.getInstance().updateSubCircuitCache();
+=======
+				update();
+>>>>>>> Stashed changes
 			}
 		}
 	}
@@ -239,7 +345,7 @@ public class Editor {
 			try {
 				changeCircuit(CircuitSerializer.loadCircuit(filePath));
 				this.editorArea.getCircuit().setCircuitFile(filePath);
-				updateTitle();
+				update();
 			} catch (IOException ex) {
 				showErrorInfo(this.shell, "info.error.load_file", ex);
 				ex.printStackTrace();
@@ -323,6 +429,7 @@ public class Editor {
 	public void render() {
 		this.editorArea.render();
 		this.subCircuitView.render();
+		this.statusGraph.render();
 	}
 	
 }

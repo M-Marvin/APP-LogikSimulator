@@ -14,6 +14,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.layout.BorderData;
 import org.eclipse.swt.layout.BorderLayout;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -73,16 +74,19 @@ public class CircuitViewer {
 		this.processorLoadBar.setMaximum(100);
 		this.processorLoadBar.setMinimum(0);
 		this.processorLoadLabel = new Label(processLoadComp, SWT.LEFT | SWT.HORIZONTAL);
+		this.processorLoadLabel.setLayoutData(new GridData(40, 20));
 		
 		Label executionTimeTitle = new Label(processGroup, SWT.LEFT | SWT.HORIZONTAL);
 		executionTimeTitle.setText(Translator.translate("circuit_viewer.process_group.execution_time.title"));
 		
 		this.executionTimeLabel = new Label(processGroup, SWT.LEFT | SWT.HORIZONTAL);
+		this.executionTimeLabel.setLayoutData(new GridData(100, 20));
 		
 		Label parentProcessTitle = new Label(processGroup, SWT.LEFT | SWT.HORIZONTAL);
 		parentProcessTitle.setText(Translator.translate("circuit_viewer.process_group.parent_process.title"));
 		
 		this.parentProcessLabel = new Label(processGroup, SWT.LEFT | SWT.HORIZONTAL);
+		this.parentProcessLabel.setLayoutData(new GridData(100, 20));
 		
 		this.openInEditorButton = new Button(processGroup, SWT.PUSH);
 		this.openInEditorButton.setText(Translator.translate("circuit_viewer.process_group.open_in_editor"));
