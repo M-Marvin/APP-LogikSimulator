@@ -1,4 +1,4 @@
-package de.m_marvin.logicsim.ui;
+package de.m_marvin.logicsim.ui.windows;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -22,6 +22,8 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.layout.BorderData;
@@ -54,6 +56,9 @@ import de.m_marvin.logicsim.logic.simulator.CircuitProcessor;
 import de.m_marvin.logicsim.logic.simulator.SimulationMonitor;
 import de.m_marvin.logicsim.logic.simulator.SimulationMonitor.CircuitProcessInfo;
 import de.m_marvin.logicsim.logic.simulator.SimulationMonitor.CircuitProcessorInfo;
+import de.m_marvin.logicsim.ui.Translator;
+import de.m_marvin.logicsim.ui.widgets.EditorArea;
+import de.m_marvin.logicsim.ui.widgets.ValueHistoryGraph;
 import de.m_marvin.logicsim.util.CircuitSerializer;
 import de.m_marvin.logicsim.util.Registries;
 import de.m_marvin.logicsim.util.Registries.ComponentEntry;
@@ -83,6 +88,8 @@ public class Editor {
 	protected long lastGrapghTime;
 	protected Label tpsLabel;
 	protected Label executionTimeLabel;
+	protected Label simulationStatusLabel;
+	protected boolean simulationStatus;
 	protected Spinner tpsLimitField;
 	
 	public static Image decodeImage(String imageString) {
@@ -240,7 +247,7 @@ public class Editor {
 		groupIO.setLayout(new BorderLayout());
 		groupIO.setText(Translator.translate("editor.sub_circuit_view.title"));
 		
-		this.subCircuitView = new EditorArea(groupIO);
+		this.subCircuitView = new EditorArea(groupIO, false);
 		this.subCircuitView.setLayoutData(new BorderData(SWT.CENTER, 200, 200));
 		this.subCircuitView.setCircuit(new Circuit(true));
 		this.subCircuitView.setAllowEditing(false);
@@ -258,37 +265,38 @@ public class Editor {
 		this.statusGraph.addVariable("TPS", new Color(0, 255, 0));
 		
 		Composite tpsStatus = new Composite(groupSimulation, SWT.NONE);
-		tpsStatus.setLayout(new GridLayout());
 		
 		this.tpsLabel = new Label(tpsStatus, SWT.NONE);
-		this.tpsLabel.setLayoutData(new GridData(150, 20));
+		this.tpsLabel.setBounds(5, 10, 150, 16);
 		this.tpsLabel.setText("N/A tps (N/A ms)");
 
 		this.executionTimeLabel = new Label(tpsStatus, SWT.NONE);
-		this.executionTimeLabel.setLayoutData(new GridData(150, 20));
+		this.executionTimeLabel.setBounds(5, 30, 150, 16);
 		this.executionTimeLabel.setText("Execution time N/Ams");
 		
-		Composite tpsLimiter = new Composite(tpsStatus, SWT.NONE);
-		tpsLimiter.setLayoutData(new GridData(150, 30));
-		tpsLimiter.setLayout(new RowLayout(SWT.VERTICAL));
-		
-		Label tpsLimitLabel = new Label(tpsLimiter, SWT.NONE);
-		tpsLimitLabel.setLayoutData(new RowData(SWT.DEFAULT, 20));
+		Label tpsLimitLabel = new Label(tpsStatus, SWT.NONE);
+		tpsLimitLabel.setBounds(5, 50, 150, 16);
 		tpsLimitLabel.setText(Translator.translate("editor.simulation_view.tps_limit"));
 		tpsLimitLabel.pack();
 		
-		this.tpsLimitField = new Spinner(tpsLimiter, 0);
-		this.tpsLimitField.setLayoutData(new RowData(40, 20));
+		this.tpsLimitField = new Spinner(tpsStatus, 0);
+		this.tpsLimitField.setBounds(100, 48, 40, 20);
 		this.tpsLimitField.setMaximum(10000);
 		this.tpsLimitField.setMinimum(0);
 		this.tpsLimitField.setSelection(LogicSim.getInstance().getSimulationMonitor().getTPSLimit());
-			
+		
+		this.simulationStatusLabel = new Label(tpsStatus, SWT.NONE);
+		this.simulationStatusLabel.setBounds(5, 70, 150, 30);
+		this.simulationStatusLabel.setText("N/A");
+		FontData font = this.simulationStatusLabel.getFont().getFontData()[0];
+		font.setHeight(12);
+		font.setStyle(SWT.BOLD);
+		this.simulationStatusLabel.setFont(new Font(display, font));
+		this.simulationStatus = true; // Will cause the update method to change the text
+		
 		// Editor area
 		
 		this.editorArea = new EditorArea(shell);
-		this.editorArea.setSize(300, 300);
-		this.editorArea.setLocation(50, 20);
-		this.editorArea.setBackground(new Color(128, 128, 0));
 		this.editorArea.getGlCanvas().addMouseListener(new MouseListener() {
 			public void mouseUp(MouseEvent e) {
 				updateComponentView();
@@ -306,11 +314,12 @@ public class Editor {
 		});
 		
 		this.shell.open();
+		this.editorArea.setAreaSize(new Vec2i(1000, 1000));
 		changeCircuit(circuit);
 		
 	}
 	
-	public void update() {
+	public void updateUI() {
 		
 		boolean instanced = LogicSim.getInstance().getCircuitProcessor().holdsCircuit(this.editorArea.getCircuit());
 		this.shell.setText(Translator.translate("editor.title") + (this.editorArea.getCircuit().getCircuitFile() != null ? " - " + this.editorArea.getCircuit().getCircuitFile().toString() : "") + (instanced ? Translator.translate("editor.title.instanced") : ""));
@@ -324,7 +333,7 @@ public class Editor {
 		
 		this.executionTimeLabel.setText(Translator.translate("editor.simulation_view.execution_time", executionTime));
 		this.tpsLabel.setText(Translator.translate("editor.simulation_view.update_rate", currentTps));
-
+		
 		int tpsLimit = monitor.getTPSLimit();
 		String input = this.tpsLimitField.getText();
 		int enteredTpsLimit = input.isEmpty() ? 1 : Integer.parseInt(this.tpsLimitField.getText());
@@ -338,6 +347,23 @@ public class Editor {
 			}
 		}
 		
+		boolean simulationActive = processInfo.isPresent() ? processInfo.get().executing().get() : false;
+		if (simulationActive != this.simulationStatus) {
+			this.simulationStatus = simulationActive;
+			this.simulationStatusLabel.setText(Translator.translate(simulationActive ? "ACTIVE" : "INACTIVE"));
+			this.simulationStatusLabel.setForeground(this.shell.getDisplay().getSystemColor(simulationActive ? SWT.COLOR_GREEN : SWT.COLOR_RED));
+		}
+		
+	}
+
+	public void updateGraphics() {
+		
+		SimulationMonitor monitor = LogicSim.getInstance().getSimulationMonitor();
+		Optional<CircuitProcessorInfo> processorInfo = monitor.getProcessorForCircuit(this.editorArea.getCircuit());
+		
+		int currentTps = processorInfo.isPresent() ? processorInfo.get().tps().get() : 0;
+		int tpsLimit = monitor.getTPSLimit();
+		
 		float cpuLoad = (float) monitor.getCPULoad();
 		float tpsState = currentTps / (float) tpsLimit;
 		
@@ -349,6 +375,10 @@ public class Editor {
 			this.statusGraph.putData("TPS", Math.max(Math.min(tpsState, 1), 0) * 10F);
 			
 		}
+				
+		this.editorArea.render();
+		this.subCircuitView.render();
+		this.statusGraph.render();
 		
 	}
 	
@@ -373,7 +403,7 @@ public class Editor {
 					ex.printStackTrace();
 				}
 				LogicSim.getInstance().updateSubCircuitCache();
-				update();
+				updateUI();
 			}
 		}
 		try {
@@ -393,7 +423,7 @@ public class Editor {
 			File filePath = new File(path);
 			try {
 				changeCircuit(CircuitSerializer.loadCircuit(filePath));
-				update();
+				updateUI();
 			} catch (IOException ex) {
 				showErrorInfo(this.shell, "info.error.load_file", ex);
 				ex.printStackTrace();
@@ -457,12 +487,6 @@ public class Editor {
 	
 	public Shell getShell() {
 		return shell;
-	}
-
-	public void render() {
-		this.editorArea.render();
-		this.subCircuitView.render();
-		this.statusGraph.render();
 	}
 	
 }

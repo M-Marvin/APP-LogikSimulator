@@ -12,7 +12,7 @@ import de.m_marvin.logicsim.logic.nodes.InputNode;
 import de.m_marvin.logicsim.logic.nodes.Node;
 import de.m_marvin.logicsim.logic.nodes.OutputNode;
 import de.m_marvin.logicsim.logic.nodes.PassivNode;
-import de.m_marvin.logicsim.ui.EditorArea;
+import de.m_marvin.logicsim.ui.widgets.EditorArea;
 import de.m_marvin.univec.impl.Vec2i;
 
 /**

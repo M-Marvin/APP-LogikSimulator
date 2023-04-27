@@ -6,8 +6,8 @@ import org.eclipse.swt.widgets.Shell;
 
 import de.m_marvin.logicsim.LogicSim;
 import de.m_marvin.logicsim.logic.Circuit.NetState;
+import de.m_marvin.logicsim.ui.windows.Editor;
 import de.m_marvin.logicsim.logic.Component;
-import de.m_marvin.logicsim.ui.Editor;
 import de.m_marvin.univec.impl.Vec2i;
 
 /**

@@ -19,7 +19,7 @@ import com.google.gson.JsonObject;
 import de.m_marvin.logicsim.LogicSim;
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Circuit.ShortCircuitType;
-import de.m_marvin.logicsim.ui.Editor;
+import de.m_marvin.logicsim.ui.windows.Editor;
 import de.m_marvin.logicsim.logic.Component;
 
 public class CircuitSerializer {

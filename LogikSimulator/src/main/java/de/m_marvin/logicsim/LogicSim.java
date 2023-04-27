@@ -22,9 +22,9 @@ import de.m_marvin.logicsim.logic.simulator.SimulationMonitor;
 import de.m_marvin.logicsim.logic.parts.NotGateComponent;
 import de.m_marvin.logicsim.logic.parts.SubCircuitComponent;
 import de.m_marvin.logicsim.logic.wires.ConnectorWire;
-import de.m_marvin.logicsim.ui.CircuitViewer;
-import de.m_marvin.logicsim.ui.Editor;
 import de.m_marvin.logicsim.ui.Translator;
+import de.m_marvin.logicsim.ui.windows.CircuitViewer;
+import de.m_marvin.logicsim.ui.windows.Editor;
 import de.m_marvin.logicsim.util.Registries;
 import de.m_marvin.logicsim.util.Registries.ComponentFolder;
 
@@ -43,6 +43,7 @@ public class LogicSim {
 	protected Display display;
 	protected CircuitProcessor processor;
 	protected SimulationMonitor simulationMonitor;
+	protected Thread uiLogicThread;
 	protected List<Editor> openEditors = new ArrayList<>();
 	protected CircuitViewer circuitWindow;
 	protected Editor lastInteractedEditor;
@@ -108,9 +109,15 @@ public class LogicSim {
 		
 		openEditor(null);
 		
+		this.uiLogicThread = new Thread(() -> {
+			while (!this.shouldTerminate()) {
+				updateGraphics();
+			}
+		}, "ui-logic");
+		this.uiLogicThread.start();
+		
 		while (!shouldTerminate()) {
-			update();
-			render();
+			updateUI();
 		}
 		
 		this.display.dispose();
@@ -140,18 +147,21 @@ public class LogicSim {
 		return lastInteractedEditor;
 	}
 	
-	private void update() {
-		
-		this.simulationMonitor.update();
+	private void updateUI() {
 		
 		List<Editor> disposedEditors = new ArrayList<>();
 		this.openEditors.forEach(editor -> {
 			if (editor.getShell().isDisposed()) disposedEditors.add(editor);
 		});
-		this.openEditors.removeAll(disposedEditors);
 		
-		this.openEditors.forEach(editor -> editor.update());
-		if (this.circuitWindow != null && !this.circuitWindow.getShell().isDisposed()) this.circuitWindow.updateView();
+		if (!disposedEditors.isEmpty()) {
+			synchronized (this.openEditors) { // Prevent iteration of graphic update thread while removing editors
+				this.openEditors.removeAll(disposedEditors);
+			}
+		}
+		
+		this.openEditors.forEach(Editor::updateUI);
+		if (this.circuitWindow != null && !this.circuitWindow.getShell().isDisposed()) this.circuitWindow.updateUI();
 		
 		if (this.openEditors.isEmpty()) this.terminate();
 		
@@ -159,9 +169,13 @@ public class LogicSim {
 		
 	}
 	
-	private void render() {
+	private void updateGraphics() {
 		
-		this.openEditors.forEach(Editor::render);
+		this.simulationMonitor.update();
+		
+		synchronized (this.openEditors) { // Prevent iteration of graphic update thread while removing editors
+			this.openEditors.forEach(Editor::updateGraphics);
+		}
 		
 	}
 	
@@ -200,11 +214,20 @@ public class LogicSim {
 		for (String entry : this.subCircuitFolder.list()) {
 			File entryPath = new File(circuitFolder, entry);
 			if (entryPath.isFile()) {
-				Registries.cacheSubCircuit(circuitFolder, SubCircuitComponent.class, folder, Component::placeClick, (circuit, pos) -> SubCircuitComponent.coursorMove(circuit, pos, entryPath), Component::abbortPlacement, entry, SubCircuitComponent.ICON_B64);
+				String name = Translator.translate(getFileName(entry));
+				Registries.cacheSubCircuit(circuitFolder, SubCircuitComponent.class, folder, Component::placeClick, (circuit, pos) -> SubCircuitComponent.coursorMove(circuit, pos, entryPath), Component::abbortPlacement, name, SubCircuitComponent.ICON_B64);
 			} else {
 				_fillSubCircuitCache(folder, entryPath);
 			}
 		}
+	}
+	
+	public static String getFileName(String path) {
+		String[] fs = path.split("/");
+		String fn = fs[fs.length - 1];
+		String[] fes = fn.split("\\.");
+		String fe = fes[fes.length - 1];
+		return fn.substring(0, fn.length() - (fes.length == 1 ? 0 : fe.length() + 1));
 	}
 	
 }

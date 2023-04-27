@@ -1,4 +1,4 @@
-package de.m_marvin.logicsim.ui;
+package de.m_marvin.logicsim.ui.windows;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
@@ -30,6 +30,7 @@ import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.simulator.CircuitProcessor.CircuitProcess;
 import de.m_marvin.logicsim.logic.simulator.SimulationMonitor;
 import de.m_marvin.logicsim.logic.simulator.SimulationMonitor.CircuitProcessInfo;
+import de.m_marvin.logicsim.ui.Translator;
 
 public class CircuitViewer {
 	
@@ -46,6 +47,7 @@ public class CircuitViewer {
 	protected Label executionTimeLabel;
 	protected Label parentProcessLabel;
 	protected Button openInEditorButton;
+	protected long lastViewUpdate;
 	
 	public static Image decodeImage(String imageString) {
 		return new Image(LogicSim.getInstance().getDisplay(), new ImageData(new ByteArrayInputStream(Base64.getDecoder().decode(imageString))));
@@ -137,6 +139,17 @@ public class CircuitViewer {
 		
 	}
 	
+	public void updateUI() {
+		
+		if (System.currentTimeMillis() - this.lastViewUpdate >= 1000) {
+			updateView();
+			lastViewUpdate = System.currentTimeMillis();
+		}
+		
+	}
+	
+	protected int lastUpdatedEntry = 0;
+	
 	public void updateView() {
 		
 		SimulationMonitor monitor = LogicSim.getInstance().getSimulationMonitor();
@@ -150,6 +163,7 @@ public class CircuitViewer {
 			listUnknownProcesses(monitor);
 		}
 		
+		// TODO Improve performance, only update one each frame
 		List<Circuit> removed = new ArrayList<>();
 		this.viewItems.entrySet().forEach((entry) -> {
 			if (!entry.getValue().isDisposed()) {
@@ -166,7 +180,7 @@ public class CircuitViewer {
 		});
 		
 	}
-
+		
 	protected void listSubProcesses(SimulationMonitor monitor, CircuitProcessInfo process) {
 		
 		if (!this.viewItems.containsKey(process.circuit())) {

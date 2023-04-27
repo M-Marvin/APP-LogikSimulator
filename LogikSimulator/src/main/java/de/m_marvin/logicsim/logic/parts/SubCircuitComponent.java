@@ -16,9 +16,10 @@ import de.m_marvin.logicsim.logic.nodes.Node;
 import de.m_marvin.logicsim.logic.nodes.OutputNode;
 import de.m_marvin.logicsim.logic.nodes.PassivNode;
 import de.m_marvin.logicsim.logic.simulator.CircuitProcessor;
-import de.m_marvin.logicsim.ui.Editor;
-import de.m_marvin.logicsim.ui.EditorArea;
 import de.m_marvin.logicsim.ui.TextRenderer;
+import de.m_marvin.logicsim.ui.Translator;
+import de.m_marvin.logicsim.ui.widgets.EditorArea;
+import de.m_marvin.logicsim.ui.windows.Editor;
 import de.m_marvin.logicsim.util.CircuitSerializer;
 import de.m_marvin.univec.impl.Vec2f;
 import de.m_marvin.univec.impl.Vec2i;
@@ -171,12 +172,7 @@ public class SubCircuitComponent extends Component {
 	}
 	
 	public String getComponentName() {
-		String name = this.getRelativeCircuitPath();
-		String[] fs = name.split("/");
-		String fn = fs[fs.length - 1];
-		String[] fes = fn.split("\\.");
-		String fe = fes[fes.length - 1];
-		return fn.substring(0, fn.length() - (fes.length == 1 ? 0 : fe.length() + 1));
+		return Translator.translate(LogicSim.getFileName(this.getRelativeCircuitPath()));
 	}
 	
 	public void setRelativeCircuitPath(String relativeCircuitFile) {

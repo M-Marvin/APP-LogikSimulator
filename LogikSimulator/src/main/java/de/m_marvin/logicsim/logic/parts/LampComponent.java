@@ -10,8 +10,8 @@ import de.m_marvin.logicsim.logic.nodes.InputNode;
 import de.m_marvin.logicsim.logic.nodes.Node;
 import de.m_marvin.logicsim.logic.nodes.OutputNode;
 import de.m_marvin.logicsim.logic.parts.SubCircuitComponent.ISubCircuitIO;
-import de.m_marvin.logicsim.ui.EditorArea;
 import de.m_marvin.logicsim.ui.TextRenderer;
+import de.m_marvin.logicsim.ui.widgets.EditorArea;
 import de.m_marvin.univec.impl.Vec2i;
 
 public class LampComponent extends Component implements ISubCircuitIO {

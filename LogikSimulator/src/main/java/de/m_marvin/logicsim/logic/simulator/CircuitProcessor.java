@@ -11,7 +11,7 @@ import java.util.Map;
 
 import de.m_marvin.logicsim.LogicSim;
 import de.m_marvin.logicsim.logic.Circuit;
-import de.m_marvin.logicsim.ui.Editor;
+import de.m_marvin.logicsim.ui.windows.Editor;
 
 /**
  * This class handles the creation and load balancing of the multiple simulation threads.

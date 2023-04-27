@@ -1,4 +1,4 @@
-package de.m_marvin.logicsim.ui;
+package de.m_marvin.logicsim.ui.widgets;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
@@ -6,11 +6,12 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.BorderData;
+import org.eclipse.swt.layout.BorderLayout;
 import org.eclipse.swt.opengl.GLCanvas;
 import org.eclipse.swt.opengl.GLData;
-import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Slider;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLCapabilities;
@@ -18,15 +19,18 @@ import org.lwjgl.opengl.GLCapabilities;
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Component;
 import de.m_marvin.logicsim.logic.nodes.Node;
+import de.m_marvin.logicsim.ui.TextRenderer;
 import de.m_marvin.logicsim.util.Registries.ComponentEntry;
 import de.m_marvin.univec.impl.Vec2i;
 
-public class EditorArea extends Canvas implements MouseListener, MouseMoveListener, KeyListener {
+public class EditorArea extends Composite implements MouseListener, MouseMoveListener, KeyListener {
 	
 	public static final int RASTER_SIZE = 10;
-	
+	public static final int VISUAL_BUNDING_BOX_OFFSET = 5;
+		
 	public Circuit circuit;
 	public Vec2i visualOffset = new Vec2i(0, 0);
+	public Vec2i areaSize = new Vec2i(0, 0);
 	
 	protected Component grabedComponent = null;
 	protected Vec2i grabOffset = new Vec2i(0, 0);
@@ -40,31 +44,61 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 	protected boolean resized;
 	protected boolean initialized = false;
 	
+	protected Slider sliderHorizontal;
+	protected Slider sliderVertical;
+	
 	public EditorArea(Composite parent) {
+		this(parent, true);
+	}
+	
+	public EditorArea(Composite parent, boolean sliders) {
 		super(parent, SWT.NONE);
-		this.setLayout(new FillLayout());
+		this.setLayout(new BorderLayout());
 		this.glData = new GLData();
 		this.glData.doubleBuffer = true;
-		this.glCanvas = new GLCanvas(this, SWT.None, glData);
+		this.glCanvas = new MTGLCanvas(this, SWT.None, glData);
+		this.glCanvas.setLayoutData(new BorderData(SWT.CENTER));
 		this.glCanvas.addListener(SWT.Resize, (event) -> this.resized = true);
 		this.glCanvas.addMouseListener(this);
 		this.glCanvas.addMouseMoveListener(this);
 		this.glCanvas.addKeyListener(this);
-		initOpenGL();
+		if (sliders) {
+			this.sliderHorizontal = new Slider(this, SWT.NONE);
+			this.sliderHorizontal.setLayoutData(new BorderData(SWT.BOTTOM));
+			this.sliderHorizontal.setMaximum(1);
+			this.sliderHorizontal.addListener(SWT.Selection, (e) -> {
+				this.visualOffset.setX(-this.sliderHorizontal.getSelection());
+			});
+			this.sliderVertical = new Slider(this, SWT.VERTICAL);
+			this.sliderVertical.setLayoutData(new BorderData(SWT.RIGHT));
+			this.sliderVertical.setMaximum(1);
+			this.sliderVertical.addListener(SWT.Selection, (e) -> {
+				this.visualOffset.setY(-this.sliderVertical.getSelection());
+			});
+		}
 	}
 	
-	protected void initOpenGL() {
-		this.glCanvas.setCurrent();
-		this.glCapabilities = GL.createCapabilities();
-        GL11.glLoadIdentity();
-        GL11.glMatrixMode(GL11.GL_PROJECTION);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
-        GL11.glDisable(GL11.GL_CULL_FACE);
-        this.glCanvas.addDisposeListener((e) -> TextRenderer.cleanUpOpenGL());
-	    this.resized = true;
-	    this.initialized = false;
+	@Override
+	public void setSize(int width, int height) {
+		super.setSize(width, height);
+		resizeArea();
+	}
+	
+	public void setAreaSize(Vec2i size) {
+		this.areaSize = size;
+		resizeArea();
+	}
+	
+	public Vec2i getVisibleArea() {
+		return this.glCanvas.isDisposed() ? new Vec2i() : Vec2i.fromVec(this.glCanvas.getSize());
+	}
+	
+	protected void resizeArea() {
+		Vec2i screenSize = getVisibleArea();
+		if (screenSize.x == 0 || screenSize.y == 0) return;
+		Vec2i scrollableArea = this.areaSize.sub(this.getVisibleArea()).max(1);
+		this.sliderVertical.setMaximum(scrollableArea.y);
+		this.sliderHorizontal.setMaximum(scrollableArea.x);
 	}
 	
 	public void setAllowEditing(boolean allowEditing) {
@@ -190,8 +224,10 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 
 		if (!this.isAllowedEditing()) return;
 		if (this.circuit == null) return;
+
+		Vec2i screenSize = getVisibleArea();
 		
-		this.mousePosition = new Vec2i(event.x, event.y).clamp(this.grabOffset, Vec2i.fromVec(this.getSize()));
+		this.mousePosition = new Vec2i(event.x, event.y).clamp(this.grabOffset, Vec2i.fromVec(screenSize));
 		Vec2i rasterOffset = this.mousePosition.add(RASTER_SIZE / 2, RASTER_SIZE / 2).module(RASTER_SIZE).sub(RASTER_SIZE / 2, RASTER_SIZE / 2);
 		this.mousePosition.subI(rasterOffset);
 		
@@ -243,26 +279,40 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 
 	@Override
 	public void keyReleased(KeyEvent event) {}
-
-	public static final int VISUAL_BUNDING_BOX_OFFSET = 5;
+	
+	protected void initOpenGL() {
+		if (this.glCanvas.isDisposed()) return;
+		if (!this.glCanvas.isDisposed()) this.glCanvas.setCurrent();
+		this.glCapabilities = GL.createCapabilities();
+        GL11.glLoadIdentity();
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GL11.glDisable(GL11.GL_CULL_FACE);
+        this.glCanvas.addDisposeListener((e) -> TextRenderer.cleanUpOpenGL());
+	    this.resized = true;
+	    this.initialized = true;
+	}
 	
 	public void render() {
 		
 		if (this.isDisposed() || this.glCanvas == null || this.circuit == null) return;
 		
-		this.glCanvas.setCurrent();
-		
-		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-		
 		if (!initialized) {
 			initOpenGL();
 		}
 		
+		if (!this.glCanvas.isDisposed()) this.glCanvas.setCurrent();
+		
+		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+		
 		if (resized) {
-			GL11.glViewport(0, 0, this.getSize().x, this.getSize().y);
-	        GL11.glLoadIdentity();
-		    GL11.glOrtho(0.0, this.getSize().x, this.getSize().y, 0.0, 0.0, 1.0);
+			GL11.glViewport(0, 0, getVisibleArea().x, getVisibleArea().y);
+			GL11.glLoadIdentity();
+			GL11.glOrtho(0.0, getVisibleArea().x, getVisibleArea().y, 0.0, 0.0, 1.0);
 			GL11.glClearColor(0, 0, 0, 1);
+			this.resized = false;
 		}
 		
 		drawRaster();
@@ -301,7 +351,7 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 			
 		}
 		
-		this.glCanvas.swapBuffers();
+		if (!this.glCanvas.isDisposed()) this.glCanvas.swapBuffers();
 		
 	}
 	
@@ -340,21 +390,23 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 		Vec2i rasterOffset = this.visualOffset.module(RASTER_SIZE);
 		Vec2i renderOffset = this.visualOffset.sub(rasterOffset);
 		
+		Vec2i screenSize = getVisibleArea();
+		
 		swapColor(1.0F, 0.5F, 0.0F, 0.4F);
 		
 		GL11.glBegin(GL11.GL_LINES);
-		for (int i = 0; i < this.getSize().x; i+= RASTER_SIZE * rasterSize1) {
+		for (int i = 0; i < screenSize.x; i+= RASTER_SIZE * rasterSize1) {
 			GL11.glVertex2f(i + renderOffset.x, renderOffset.y);
-			GL11.glVertex2f(i + renderOffset.x, renderOffset.y + this.getSize().y);
+			GL11.glVertex2f(i + renderOffset.x, renderOffset.y + screenSize.y);
 		}
-		for (int j = 0; j < this.getSize().y; j += RASTER_SIZE * rasterSize1) {
+		for (int j = 0; j < screenSize.y; j += RASTER_SIZE * rasterSize1) {
 			GL11.glVertex2f(renderOffset.x, j + renderOffset.y);
-			GL11.glVertex2f(renderOffset.x + this.getSize().x, j + renderOffset.y);
+			GL11.glVertex2f(renderOffset.x + screenSize.x, j + renderOffset.y);
 		}
 		GL11.glEnd();
 		
-		for (int i = 0; i < this.getSize().x; i+= RASTER_SIZE * rasterSize1) {
-			for (int j = 0; j < this.getSize().y; j += RASTER_SIZE * rasterSize1) {
+		for (int i = 0; i < screenSize.x; i+= RASTER_SIZE * rasterSize1) {
+			for (int j = 0; j < screenSize.y; j += RASTER_SIZE * rasterSize1) {
 				drawRectangle(1, i + renderOffset.x - 5, j + renderOffset.y - 5, 10, 10);
 			}
 		}
@@ -363,8 +415,8 @@ public class EditorArea extends Canvas implements MouseListener, MouseMoveListen
 		
 		GL11.glPointSize(1);
 		GL11.glBegin(GL11.GL_POINTS);
-		for (int i = 0; i < this.getSize().x; i += RASTER_SIZE) {
-			for (int j = 0; j < this.getSize().y; j += RASTER_SIZE) {
+		for (int i = 0; i < screenSize.x; i += RASTER_SIZE) {
+			for (int j = 0; j < screenSize.y; j += RASTER_SIZE) {
 				if (i % (rasterSize1 * RASTER_SIZE) != 0 && j % (rasterSize1 * RASTER_SIZE) != 0) GL11.glVertex2f(i + renderOffset.x, j + renderOffset.y);
 			}
 		}
