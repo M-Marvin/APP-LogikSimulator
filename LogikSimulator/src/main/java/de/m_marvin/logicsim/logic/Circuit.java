@@ -2,10 +2,10 @@ package de.m_marvin.logicsim.logic;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Random;
 import java.util.Set;
@@ -79,6 +79,14 @@ public class Circuit {
 		
 		public boolean getLogicState() {
 			return this.logicValue.get();
+		}
+		
+		public boolean isLogicalState() {
+			return this == HIGH || this == LOW;
+		}
+		
+		public boolean isErrorState() {
+			return !isLogicalState();
 		}
 	}
 	
@@ -207,7 +215,9 @@ public class Circuit {
 	}
 	
 	protected NetState getNetValue(int netId, String lane) {
-		return this.valuesSec.size() > netId ? this.valuesSec.get(netId).getOrDefault(lane, NetState.FLOATING) : NetState.FLOATING;
+		Map<String, NetState> laneData = valuesSec.get(netId);
+		if (!laneData.containsKey(lane)) laneData.put(lane, NetState.FLOATING);
+		return this.valuesSec.size() > netId ? laneData.get(lane) : NetState.FLOATING;
 	}
 
 	protected synchronized Map<String, NetState> getNetLanes(int netId) {
@@ -282,6 +292,17 @@ public class Circuit {
 	
 	
 	
+	
+	public boolean isNodeConnected(Node node) {
+		for (int i = 0; i < this.networks.size(); i++) {
+			for (Node n : this.networks.get(i)) {
+				if (n.equals(node)) {
+					return networks.get(i).size() > 1;
+				}
+			}
+		}
+		return false;
+	}
 	
 	public synchronized void add(Component component) {
 		component.created();

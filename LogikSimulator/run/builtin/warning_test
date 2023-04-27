@@ -1,0 +1,74 @@
+{
+  "shortCircuitType": "HIGH_LOW_SHORT",
+  "components": [
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 467,
+      "y": 167,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 153
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 397,
+      "y": 377,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 333,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 727,
+      "y": 377,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 143
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 277,
+      "y": 177,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 143
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 277,
+      "y": 317,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 193,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.ButtonComponent",
+      "label": "button",
+      "x": 230,
+      "y": 160,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.ButtonComponent",
+      "label": "button",
+      "x": 420,
+      "y": 150,
+      "laneTags": {}
+    }
+  ]
+}

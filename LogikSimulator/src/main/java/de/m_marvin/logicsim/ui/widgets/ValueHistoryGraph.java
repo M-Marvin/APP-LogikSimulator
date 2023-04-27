@@ -79,7 +79,6 @@ public class ValueHistoryGraph extends Composite {
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
         GL11.glDisable(GL11.GL_CULL_FACE);
-        this.glCanvas.addDisposeListener((e) -> TextRenderer.cleanUpOpenGL());
 	    this.resized = true;
 	    this.initialized = true;
 	}

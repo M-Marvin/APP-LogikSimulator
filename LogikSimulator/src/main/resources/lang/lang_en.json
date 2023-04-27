@@ -31,6 +31,9 @@
 "editor.window.error.processor_crash": "CRITICAL: On of the running circuit simulation threads crashed!\nThis should never happen and might result in malfunction of the simulation algorithms!\nThe load will be destributed to the other available threads if any!\n\n%0",
 "editor.window.input.title": "Input",
 
+"editor_area.warning.floating": "FLOATING",
+"editor_area.warning.short_circuit": "SHORT CIRCUIT",
+
 "circuit_viewer.tree_view.circuit_description": "[%2]  Name: %0  Execution-Time: %1ms",
 "circuit_viewer.title": "Hierarchical circuit view",
 "circuit_viewer.tree_view.circuit_description.active": "Active",

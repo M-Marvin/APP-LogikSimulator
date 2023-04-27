@@ -3,7 +3,7 @@
   "components": [
     {
       "id": "de.m_marvin.logicsim.logic.parts.ButtonComponent",
-      "label": "button",
+      "label": "trig",
       "x": 230,
       "y": 430,
       "laneTags": {}
@@ -90,7 +90,7 @@
     },
     {
       "id": "de.m_marvin.logicsim.logic.parts.LampComponent",
-      "label": "lamp",
+      "label": "bit_0",
       "x": 1030,
       "y": 330,
       "laneTags": {
@@ -99,7 +99,7 @@
     },
     {
       "id": "de.m_marvin.logicsim.logic.parts.LampComponent",
-      "label": "lamp",
+      "label": "bit_1",
       "x": 1030,
       "y": 380,
       "laneTags": {

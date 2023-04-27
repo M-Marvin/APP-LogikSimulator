@@ -65,6 +65,11 @@ public class LampComponent extends Component implements ISubCircuitIO {
 		EditorArea.swapColor(1, 1, 1, 1);
 		TextRenderer.drawText(visualPosition.x + getVisualWidth() / 2, visualPosition.y + getVisualHeight() / 2, 12, this.state ? "ON" : "OFF");
 		
+		int tw = TextRenderer.drawText(visualPosition.x + getVisualWidth() + 10, visualPosition.y + getVisualHeight() / 2 - 6, 12, this.label, TextRenderer.ORIGIN_LEFT | TextRenderer.RESIZED);
+		
+		EditorArea.swapColor(1F, 0.4F, 0, 1);
+		EditorArea.drawLine(1, visualPosition.x + getVisualWidth(), visualPosition.y + getVisualHeight() / 2, visualPosition.x + getVisualHeight() + tw / 2 + 10, visualPosition.y + getVisualHeight() / 2);
+		
 	}
 	
 	@Override

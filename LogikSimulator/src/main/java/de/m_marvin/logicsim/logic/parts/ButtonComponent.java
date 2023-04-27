@@ -66,8 +66,11 @@ public class ButtonComponent extends Component implements ISubCircuitIO {
 	}
 	
 	@Override
-	public void click(Vec2i clickPosition) {
-		if (this.subCircuitInput.isEmpty()) this.toggle = !this.toggle;
+	public void click(Vec2i clickPosition, boolean leftClick) {
+		super.click(clickPosition, leftClick);
+		if (!leftClick) {
+			if (this.subCircuitInput.isEmpty()) this.toggle = !this.toggle;
+		}
 	}
 	
 	@Override
@@ -86,6 +89,11 @@ public class ButtonComponent extends Component implements ISubCircuitIO {
 		EditorArea.drawComponentFrame(visualPosition.x, visualPosition.y, getVisualWidth(), getVisualHeight());
 		EditorArea.swapColor(1, 1, 1, 1);
 		TextRenderer.drawText(visualPosition.x + getVisualWidth() / 2, visualPosition.y + getVisualHeight() / 2, 12,  this.subCircuitInput.isPresent() ? "IN" : this.toggle ? "ON" : "OFF");
+		
+		int tw = TextRenderer.drawText(visualPosition.x - 10, visualPosition.y + getVisualHeight() / 2 - 7, 12, this.label, TextRenderer.ORIGIN_RIGHT | TextRenderer.RESIZED);
+		
+		EditorArea.swapColor(1F, 0.4F, 0, 1);
+		EditorArea.drawLine(1, visualPosition.x - tw / 2 - 10, visualPosition.y + getVisualHeight() / 2, visualPosition.x, visualPosition.y + getVisualHeight() / 2);
 		
 	}
 	

@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -293,7 +294,7 @@ public class Editor {
 		font.setHeight(12);
 		font.setStyle(SWT.BOLD);
 		this.simulationStatusLabel.setFont(new Font(display, font));
-		this.simulationStatus = true; // Will cause the update method to change the text
+		this.simulationStatus = !LogicSim.getInstance().getSimulationMonitor().isProcessorActive(); // Will cause the update method to change the text
 		
 		// Editor area
 		
@@ -316,6 +317,11 @@ public class Editor {
 		
 		this.shell.open();
 		this.editorArea.setAreaSize(new Vec2i(10000, 10000));
+		this.editorArea.setWarningSupplier(() -> {
+			Optional<CircuitProcessInfo> processInfo = LogicSim.getInstance().getSimulationMonitor().getProcessForCircuit(this.editorArea.getCircuit());
+			if (processInfo.isEmpty()) return new ArrayList<>();
+			return processInfo.get().warnings();
+		});
 		changeCircuit(circuit);
 		
 	}
@@ -412,6 +418,7 @@ public class Editor {
 				updateUI();
 			}
 		}
+		if (this.editorArea.getCircuit().getCircuitFile() == null) return;
 		try {
 			CircuitSerializer.saveCircuit(getCurrentCurcit(), this.editorArea.getCircuit().getCircuitFile());
 		} catch (IOException ex) {

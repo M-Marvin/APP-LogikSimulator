@@ -5,14 +5,18 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import org.eclipse.swt.widgets.Shell;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import de.m_marvin.logicsim.LogicSim;
 import de.m_marvin.logicsim.logic.nodes.InputNode;
 import de.m_marvin.logicsim.logic.nodes.Node;
 import de.m_marvin.logicsim.logic.nodes.OutputNode;
 import de.m_marvin.logicsim.logic.nodes.PassivNode;
 import de.m_marvin.logicsim.ui.widgets.EditorArea;
+import de.m_marvin.logicsim.ui.windows.Editor;
 import de.m_marvin.univec.impl.Vec2i;
 
 /**
@@ -129,8 +133,15 @@ public abstract class Component {
 	/**
 	 * Gets triggered when the component is clicked in the editor
 	 * @param clickPosition The position of the courser on the editor-area
+	 * @param clickPosition True if an double left click was performed instead of a single right click
 	 */
-	public void click(Vec2i clickPosition) {}
+	public void click(Vec2i clickPosition, boolean leftClick) {
+		if (leftClick) {
+			Editor editor = LogicSim.getInstance().getLastInteractedEditor();
+			Shell shell = Editor.showTextDialog(editor.getShell(), "editor.window.change_input_name", getLabel(), this::setLabel);
+			shell.setLocation(clickPosition.x, clickPosition.y);
+		}
+	}
 	/**
 	 * Gets triggered aster the component got constructed the first time (when loading a file, or placing the component)
 	 */

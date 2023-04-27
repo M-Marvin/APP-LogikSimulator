@@ -1,5 +1,10 @@
 package de.m_marvin.logicsim.ui.widgets;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Supplier;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -24,12 +29,17 @@ import de.m_marvin.logicsim.logic.nodes.Node;
 import de.m_marvin.logicsim.ui.TextRenderer;
 import de.m_marvin.logicsim.util.Registries.ComponentEntry;
 import de.m_marvin.univec.impl.Vec2i;
+import de.m_marvin.univec.impl.Vec3i;
 
 public class EditorArea extends Composite implements MouseListener, MouseMoveListener, KeyListener, MouseWheelListener {
 	
+	public static final String ERROR_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEEAAABACAYAAABFqxrgAAABZElEQVR4nO3ay27DMAxE0asi///LzqYEDLSBqQdJCZnZZSVldCw7jhqFua7run9urbWKefxUDLpbSpqHvwosFRokgSIJnxRYsjVIAgUSnhRYMjVIAskSvAosWRokgUQJvQosGRokgSQJowos0RokgQQJ3qfDyqdISSBYQu/qVmmQBAIljK5qhQZJIEjC7Gpma5AEAiSsWsVMDZLAYgk9q+d525ylQRJYWELEqs3eRbyRBBaVEHntZmiQBBaUkLGDR2uQBCZLyHyqi9QgCUyUUPG7P0qDJDBYQuWb4QgNksBACTucMlmtQRLoLGEHBd6xejRIAh0l7KTAO6ZXgyTgLGFHBd6xPRokAcfb5p0V3DMzT0ngQcIpCiyj833FTOc5Rxz1P00BjN8ptCfwoYQTFVhGNEgC/5RwsgJLr4ayu8NOZW5xjjAq3u+jPYGbhFX/9Z+W1lqTBH4lfKsCiySgEgCVAMAbcBDcc4s/x/EAAAAASUVORK5CYII=";
+	
 	public static final int RASTER_SIZE = 10;
 	public static final int VISUAL_BUNDING_BOX_OFFSET = 5;
-		
+	public static final int SHOW_HIDEN_TAG_RANGE = 100;
+	public static final int MIN_WARNING_DISTANCE = 100;
+			
 	public Circuit circuit;
 	public Vec2i visualOffset = new Vec2i(0, 0);
 	public Vec2i areaSize = new Vec2i(0, 0);
@@ -40,6 +50,8 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 	protected ComponentEntry activePlacement;
 	protected boolean grabbedBackground = false;
 	protected boolean allowEditing = true;
+	protected long animationTimer;
+	protected Supplier<Collection<SimulationWarning>> warningSupplier;
 	
 	protected GLData glData;
 	protected GLCanvas glCanvas;
@@ -49,7 +61,21 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 	
 	protected Slider sliderHorizontal;
 	protected Slider sliderVertical;
-	
+
+	public static class SimulationWarning {
+		public Component component;
+		public String message;
+		public Supplier<Boolean> stillValid; 
+		public long decayTime;
+		
+		public SimulationWarning(Component component, String message, Supplier<Boolean> stillValid, long decayTime) {
+			this.component = component;
+			this.message = message;
+			this.stillValid = stillValid;
+			this.decayTime = decayTime;
+		}
+	}
+
 	public EditorArea(Composite parent) {
 		this(parent, true);
 	}
@@ -92,6 +118,10 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 	public void setAreaSize(Vec2i size) {
 		this.areaSize = size;
 		resizeArea();
+	}
+	
+	public void setWarningSupplier(Supplier<Collection<SimulationWarning>> warningSupplier) {
+		this.warningSupplier = warningSupplier;
 	}
 	
 	public Vec2i getVisibleArea() {
@@ -224,9 +254,13 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 						visualPos.y + component.getVisualHeight() >= this.mousePosition.y) {
 						
 						if (event.button == 1) {
-							this.setGrabbedComponent(component);
+							if (event.count == 1) {
+								this.setGrabbedComponent(component);
+							} else {
+								component.click(mousePosition, true);
+							}
 						} else {
-							component.click(mousePosition);
+							component.click(mousePosition, false);
 						}
 						return;			
 					}
@@ -282,7 +316,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		int scroll = e.count;
 		boolean shiftDown = (e.stateMask & SWT.SHIFT) > 0;
 		Vec2i scrollVec = shiftDown ? new Vec2i(scroll, 0) : new Vec2i(0, scroll);
-		scrollView(scrollVec);
+		scrollView(scrollVec.mul(10));
 		
 	}
 	
@@ -332,7 +366,6 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
         GL11.glDisable(GL11.GL_CULL_FACE);
-        this.glCanvas.addDisposeListener((e) -> TextRenderer.cleanUpOpenGL());
 	    this.resized = true;
 	    this.initialized = true;
 	}
@@ -373,21 +406,53 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 				swapColor(1, 1, 1, 1);
 				
 				component.getInputs().forEach(inputNode -> {
+					boolean mouseNearBy = this.mousePosition.dist(inputNode.getVisualPosition().add(visualOffset)) < SHOW_HIDEN_TAG_RANGE;
+					boolean connected = circuit.isNodeConnected(inputNode);
 					Vec2i position = inputNode.getVisualOffset().add(component.getVisualPosition());
-					drawNode(position, 1, inputNode.getLaneTag());
+					drawNode(position, 1, inputNode.getLaneTag(), inputNode.getLabel(), connected, mouseNearBy);
 				});
 				component.getOutputs().forEach(outputNode -> {
+					boolean mouseNearBy = this.mousePosition.dist(outputNode.getVisualPosition().add(visualOffset)) < SHOW_HIDEN_TAG_RANGE;
+					boolean connected = circuit.isNodeConnected(outputNode);
 					Vec2i position = outputNode.getVisualOffset().add(component.getVisualPosition());
-					drawNode(position, 2, outputNode.getLaneTag());
+					drawNode(position, 2, outputNode.getLaneTag(), outputNode.getLabel(), connected, mouseNearBy);
 				});
 				component.getPassives().forEach(passivNode -> {
+					boolean mouseNearBy = this.mousePosition.dist(passivNode.getVisualPosition().add(visualOffset)) < SHOW_HIDEN_TAG_RANGE;
+					boolean connected = circuit.isNodeConnected(passivNode);
 					Vec2i position = passivNode.getVisualOffset().add(component.getVisualPosition());
-					drawNode(position, 3, passivNode.getLaneTag());
+					drawNode(position, 3, passivNode.getLaneTag(), "", connected, mouseNearBy);
 				});
 				
 			}
 			
 		});
+		
+		if (warningSupplier != null) {
+			
+			if (System.currentTimeMillis() - animationTimer > 1000) {
+				animationTimer = System.currentTimeMillis();
+			}
+			
+			if (System.currentTimeMillis() - animationTimer > 500) {
+				
+				List<Vec2i> drawnWarnings = new ArrayList<>();
+				warningSupplier.get().forEach(warning -> {
+					
+					Vec2i position = warning.component.getVisualPosition().add(new Vec2i(warning.component.getVisualWidth() / 2, warning.component.getVisualHeight() / 2));
+					
+					for (Vec2i dw : drawnWarnings) {
+						if (dw.dist(position) < MIN_WARNING_DISTANCE) return;
+					}
+					drawnWarnings.add(position);
+					
+					drawWarning(position, warning);
+					
+				});
+				
+			}
+			
+		}
 		
 		if (this.grabedComponent != null) {
 			
@@ -435,22 +500,81 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		
 	}
 	
-	public static void drawNode(Vec2i position, int type, String laneTag) {
+	public static void drawWarning(Vec2i position, SimulationWarning warning) {
+		
+		swapColor(1, 0, 0, 1);
+		drawWarningSign(position, 0.5F);
+		
+		TextRenderer.drawText(position.x, position.y + 35, 12, warning.message);
+		
+	}
+	
+	public static void drawWarningSign(Vec2i position, float size) {
+
+		GL11.glPushMatrix();
+		GL11.glTranslated(position.x, position.y, 0);
+		GL11.glScalef(size, size, 1);
+		GL11.glBegin(GL11.GL_QUADS);
+		
+		Vec2i cu = new Vec2i(0, -40);
+		Vec2i cl = new Vec2i(-40, 40);
+		Vec2i cr = new Vec2i(40, 40);
+		Vec3i w = new Vec3i(15, 9, 20);
+		
+		GL11.glVertex2d(cu.x, cu.y);
+		GL11.glVertex2d(cr.x, cr.y);
+		GL11.glVertex2d(cr.x - w.x, cr.y - w.y);
+		GL11.glVertex2d(cu.x, cu.y + w.z);
+		
+		GL11.glVertex2d(cu.x, cu.y);
+		GL11.glVertex2d(cl.x, cl.y);
+		GL11.glVertex2d(cl.x + w.x, cl.y - w.y);
+		GL11.glVertex2d(cu.x, cu.y + w.z);
+		
+		GL11.glVertex2d(cl.x + w.x, cl.y - w.y);
+		GL11.glVertex2d(cr.x - w.x, cr.y - w.y);
+		GL11.glVertex2d(cr.x, cr.y);
+		GL11.glVertex2d(cl.x, cl.y);
+		
+		int yo = -6;
+		int tw = 4;
+		int th1 = 17;
+		
+		GL11.glVertex2d(-tw, yo);
+		GL11.glVertex2d(tw, yo);
+		GL11.glVertex2d(tw, yo + th1);
+		GL11.glVertex2d(-tw, yo + th1);
+		
+		GL11.glVertex2d(-tw, yo + th1 + tw * 2);
+		GL11.glVertex2d(tw, yo + th1 + tw * 2);
+		GL11.glVertex2d(tw, yo + th1 + tw * 4);
+		GL11.glVertex2d(-tw, yo + th1 + tw * 4);
+		
+		GL11.glEnd();
+		
+		GL11.glPopMatrix();
+		
+	}
+	
+	public static void drawNode(Vec2i position, int type, String laneTag, String label, boolean connected, boolean mouseNearBy) {
 		swapColor(1, 1, 1, 1);
 		switch (type) {
 		case 1:
 			drawCircle(1, position.x, position.y, 5);
 			drawPoint(4, position.x, position.y);
+			if (!label.isEmpty() && (!connected || mouseNearBy)) TextRenderer.drawText(position.x - 10, position.y, 12, label, TextRenderer.ORIGIN_RIGHT | TextRenderer.RESIZED);
 			break;
 		case 2:
 			drawCircle(1, position.x, position.y, 5);
 			drawLine(1, position.x - 5, position.y - 5, position.x + 5, position.y + 5);
 			drawLine(1, position.x - 5, position.y + 5, position.x + 5, position.y - 5);
+			if (!label.isEmpty() && (!connected || mouseNearBy)) TextRenderer.drawText(position.x + 10, position.y, 12, label, TextRenderer.ORIGIN_LEFT | TextRenderer.RESIZED);
 			break;
 		case 3:
 			drawCircle(1, position.x, position.y, 5);
 			break;
 		}
+		
 		if (!laneTag.equals(Circuit.DEFAULT_BUS_LANE)) {
 			
 			int i1 = type == 1 ? -1 : 1;

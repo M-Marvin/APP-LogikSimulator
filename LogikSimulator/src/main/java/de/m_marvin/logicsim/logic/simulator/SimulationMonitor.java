@@ -9,14 +9,36 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import de.m_marvin.logicsim.logic.Circuit;
+import de.m_marvin.logicsim.logic.Circuit.NetState;
+import de.m_marvin.logicsim.logic.NetConnector;
+import de.m_marvin.logicsim.logic.nodes.Node;
+import de.m_marvin.logicsim.logic.nodes.PassivNode;
+import de.m_marvin.logicsim.ui.Translator;
+import de.m_marvin.logicsim.ui.widgets.EditorArea.SimulationWarning;
 
 public class SimulationMonitor {
+
+	public static final int WARNING_DECAY_TIME = 5000;
 	
 	protected final CircuitProcessor processor;
 	protected long lastRefresh;
 	
-	protected Map<Circuit, CircuitProcessInfo> cachedProcessInfo;
-	protected Collection<CircuitProcessorInfo> cachedProcessorInfo;
+	protected Map<Circuit, CircuitProcessInfo> cachedProcessInfo = new HashMap<>();
+	protected Collection<CircuitProcessorInfo> cachedProcessorInfo = new ArrayList<>();
+
+	public static record CircuitProcessInfo(Circuit circuit, Circuit parentCircuit, Supplier<Integer> executionTime, Supplier<Boolean> active, Supplier<Boolean> executing, List<SimulationWarning> warnings) {
+		public boolean isActive() {
+			return this.active.get();
+		}
+		public boolean isExecuting() {
+			return this.executing.get();
+		}
+		public boolean hasWarnings() {
+			return !this.warnings.isEmpty();
+		}
+	}
+
+	public static record CircuitProcessorInfo(Supplier<Collection<Circuit>> circuits, Supplier<Integer> tps, Supplier<Integer> executionTime) {}
 	
 	public SimulationMonitor(CircuitProcessor processor) {
 		this.processor = processor;
@@ -46,28 +68,71 @@ public class SimulationMonitor {
 		return this.processor.cpuLoad;
 	}
 	
-	public static record CircuitProcessInfo(Circuit circuit, Circuit parentCircuit, Supplier<Integer> executionTime, Supplier<Boolean> active, Supplier<Boolean> executing) {
-		public boolean isActive() {
-			return this.active.get();
-		}
-		public boolean isExecuting() {
-			return this.executing.get();
-		}
+	public Optional<NetState> queryWarningState(Circuit circuit, Node node) {
+
+		Map<String, NetState> laneData = circuit.getLaneMapReference(node);
+		if (laneData == null) return Optional.empty();
+		if (laneData.isEmpty()) return Optional.of(NetState.FLOATING);
+		if (laneData.get(Circuit.DEFAULT_BUS_LANE) == NetState.SHORT_CIRCUIT) return Optional.of(NetState.SHORT_CIRCUIT);
+		if (laneData.containsKey(Circuit.DEFAULT_BUS_LANE) && laneData.size() > 1) return laneData.keySet().stream().filter(v -> !v.equals(Circuit.DEFAULT_BUS_LANE)).map(v -> laneData.get(v)).filter(s -> s.isErrorState()).findAny();
+		return Optional.of(laneData.get(Circuit.DEFAULT_BUS_LANE));
+		
+	}
+	
+	public void queryWarnings() {
+		
+		if (this.cachedProcessInfo == null) return;
+		
+		this.cachedProcessInfo.forEach((circuit, processInfo) -> {
+			
+			boolean running = getProcessor().isExecuting(circuit);
+			
+			circuit.getComponents().forEach(component -> {
+				
+				if (component instanceof NetConnector connector && running) {
+					
+					if (connector.getPassives().size() == 0) return;
+					PassivNode node = connector.getPassives().get(0);
+					
+					Optional<NetState> state = queryWarningState(circuit, node);
+					
+					if (state.isPresent() && state.get().isErrorState()) {
+						
+						// TODO Optimize
+						for (SimulationWarning w : processInfo.warnings) {
+							if (w.component == component) return;
+						}
+						String message = Translator.translate("editor_area.warning." + (state.get() == NetState.FLOATING ? "floating" : "short_circuit"));
+						processInfo.warnings.add(new SimulationWarning(component, message, () -> {
+							Optional<NetState> state2 = queryWarningState(circuit, node);
+							return state2.isPresent() && state2.get() == state.get() && running;
+						}, System.currentTimeMillis() + WARNING_DECAY_TIME));
+						
+					}
+					
+				}
+				
+			});
+			
+			List<SimulationWarning> outdatedWarnings = new ArrayList<>();
+			processInfo.warnings.forEach(warning -> {
+				
+				if (warning.stillValid.get()) {
+					warning.decayTime = System.currentTimeMillis() + WARNING_DECAY_TIME;
+				}
+				if (warning.decayTime <= System.currentTimeMillis()) {
+					outdatedWarnings.add(warning);
+				}
+				if (!circuit.getComponents().contains(warning.component)) outdatedWarnings.add(warning);
+				
+			});
+			processInfo.warnings.removeAll(outdatedWarnings);
+			
+		});
+		
 	}
 	
 	public Collection<CircuitProcessInfo> getRunningProcesses() {
-		if (this.cachedProcessInfo == null) {
-			synchronized (this.processor) {
-				this.cachedProcessInfo = new HashMap<>();
-				this.processor.getProcesses().stream().map(process -> 
-					new CircuitProcessInfo(process.circuit, process.parentCircuit, () -> (int) process.executionTime, () -> {
-						synchronized (this.processor) { return this.processor.holdsCircuit(process.circuit); }
-					}, () -> {
-						synchronized (this.processor) { return this.processor.isExecuting(process.circuit); }
-					})
-				).forEach(process -> this.cachedProcessInfo.put(process.circuit, process));
-			}
-		}
 		return this.cachedProcessInfo.values();
 	}
 	
@@ -77,28 +142,44 @@ public class SimulationMonitor {
 		return Optional.ofNullable(this.cachedProcessInfo.get(circuit));
 	}
 	
-	public static record CircuitProcessorInfo(Supplier<Collection<Circuit>> circuits, Supplier<Integer> tps, Supplier<Integer> executionTime) {}
-	
 	public Collection<CircuitProcessorInfo> getActiveProcessors() {
-		if (this.cachedProcessorInfo == null) {
-			synchronized (this.processor) {
-				this.cachedProcessorInfo = this.processor.getProcessors().stream().map(processor ->
-					new CircuitProcessorInfo(() -> {
-						List<Circuit> circuits = new ArrayList<>();
-						for (int i = 0; i < processor.processes.size(); i++) {
-							circuits.add(processor.processes.get(i).circuit);
-						}
-						return circuits;
-					}, () -> processor.tps, () -> (int) processor.executionTime)
-				).toList();
-			}
-		}
 		return this.cachedProcessorInfo;
 	}
 	
 	public void refresh() {
-		this.cachedProcessInfo = null;
-		this.cachedProcessorInfo = null;
+		
+		synchronized (this.processor) {
+			
+			this.cachedProcessInfo.keySet().stream().filter(circuit -> !this.processor.isExecuting(circuit)).toList().forEach(circuit -> this.cachedProcessInfo.remove(circuit));
+			
+			this.processor.getProcesses().forEach(process -> {
+				
+				if (!this.cachedProcessInfo.containsKey(process.circuit)) 
+					this.cachedProcessInfo.put(process.circuit, 
+						new CircuitProcessInfo(process.circuit, process.parentCircuit, () -> (int) process.executionTime, () -> {
+							synchronized (this.processor) { return this.processor.holdsCircuit(process.circuit); }
+						}, () -> {
+							synchronized (this.processor) { return this.processor.isExecuting(process.circuit); }
+						}, new ArrayList<>())
+					);
+				
+			});
+			
+			queryWarnings();
+			
+			// TODO Optimize
+			this.cachedProcessorInfo = this.processor.getProcessors().stream().map(processor ->
+				new CircuitProcessorInfo(() -> {
+					List<Circuit> circuits = new ArrayList<>();
+					for (int i = 0; i < processor.processes.size(); i++) {
+						circuits.add(processor.processes.get(i).circuit);
+					}
+					return circuits;
+				}, () -> processor.tps, () -> (int) processor.executionTime)
+			).toList();
+			
+		}
+		
 	}
 
 	public void update() {
@@ -116,6 +197,10 @@ public class SimulationMonitor {
 			if (processorInfo.circuits().get().contains(circuit)) return Optional.ofNullable(processorInfo);
 		}
 		return Optional.empty();
+	}
+
+	public boolean isProcessorActive() {
+		return this.getProcessor().allowedToExecute;
 	}
 	
 }

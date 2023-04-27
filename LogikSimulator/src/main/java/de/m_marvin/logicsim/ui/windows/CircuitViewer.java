@@ -163,7 +163,6 @@ public class CircuitViewer {
 			listUnknownProcesses(monitor);
 		}
 		
-		// TODO Improve performance, only update one each frame
 		List<Circuit> removed = new ArrayList<>();
 		this.viewItems.entrySet().forEach((entry) -> {
 			if (!entry.getValue().isDisposed()) {
@@ -219,12 +218,13 @@ public class CircuitViewer {
 		
 		boolean active = process.isActive();
 		boolean running = process.isExecuting();
+		boolean warnings = process.hasWarnings();
 		
 		String activity = Translator.translate("circuit_viewer.tree_view.circuit_description." + (active ? (running ? "active" : "inactive") : ".error"));
 		
 		item.setText(Translator.translate("circuit_viewer.tree_view.circuit_description", name, executionTime, activity));
 		if (item.getImage() != null) item.getImage().dispose();
-		item.setImage(decodeImage(active ? (running ? RUNNING_ICON_B64 : SUSPENDED_ICON_B64) : ERROR_ICON_B64));
+		item.setImage(decodeImage(warnings ? ERROR_ICON_B64 : (running ? RUNNING_ICON_B64 : SUSPENDED_ICON_B64)));
 	}
 	
 }

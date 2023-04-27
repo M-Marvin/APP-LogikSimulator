@@ -22,6 +22,7 @@ import de.m_marvin.logicsim.logic.simulator.SimulationMonitor;
 import de.m_marvin.logicsim.logic.parts.NotGateComponent;
 import de.m_marvin.logicsim.logic.parts.SubCircuitComponent;
 import de.m_marvin.logicsim.logic.wires.ConnectorWire;
+import de.m_marvin.logicsim.ui.TextRenderer;
 import de.m_marvin.logicsim.ui.Translator;
 import de.m_marvin.logicsim.ui.windows.CircuitViewer;
 import de.m_marvin.logicsim.ui.windows.Editor;
@@ -31,7 +32,7 @@ import de.m_marvin.logicsim.util.Registries.ComponentFolder;
 public class LogicSim {
 	 
 	// TODO
-//	- Bezeichnung für Ein/Ausgänge
+//	- Debug-Anzeige für Daten-Buse
 //	- Multi-Auswahl (Copy/Paste)
 // 	- Algemein Funktionen (Strg+s, New File, File Extension, Undo/Redo)
 //	- Komponenten zur interaktion mit Dateien, Grphischer Darstellung, Tastatureingabe etc
@@ -48,7 +49,7 @@ public class LogicSim {
 	protected List<Editor> openEditors = new ArrayList<>();
 	protected CircuitViewer circuitWindow;
 	protected Editor lastInteractedEditor;
-	
+	 
 	public static void main(String... args) {
 		
 		LogicSim logicSim = new LogicSim();
@@ -130,6 +131,7 @@ public class LogicSim {
 					}
 				} catch (InterruptedException e) {}
 			}
+			TextRenderer.cleanUpOpenGL();
 			System.out.println("ui-logic thread terminated!");
 		}, "ui-logic");
 		this.uiLogicThread.start();
