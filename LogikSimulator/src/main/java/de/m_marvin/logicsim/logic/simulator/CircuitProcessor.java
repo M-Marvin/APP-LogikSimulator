@@ -145,7 +145,9 @@ public class CircuitProcessor {
 	protected long cpuLoadTimer = 0;
 	
 	public CircuitProcessor() {
-
+		
+		System.out.println("Create new circuit processor ...");
+		
 		try {
 			this.osBean = ManagementFactory.newPlatformMXBeanProxy(ManagementFactory.getPlatformMBeanServer(), ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);	
 		} catch (IOException e) {
@@ -153,12 +155,14 @@ public class CircuitProcessor {
 			this.osBean = null;
 			e.printStackTrace();
 		}
-		
+
+		System.out.println("Start processor threads for " + getAvailableCores() + " cores ...");
 		for (int i = 0; i < getAvailableCores(); i++) {
 			this.threads.add(new CircuitProcessorThread("processor-" + i));
 		}
 		this.threads.forEach(Thread::start);
-		
+
+		System.out.println("Start processor master thread");
 		this.processorMasterThread = new Thread(() -> {
 			while (!requestShutdown) {
 				try {
@@ -166,6 +170,7 @@ public class CircuitProcessor {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {}
 			}
+			System.out.println("Processor master thread terminated!");
 		}, "processor-master");
 		this.processorMasterThread.start();
 		
@@ -304,6 +309,7 @@ public class CircuitProcessor {
 	}
 	
 	public void terminate() {
+		System.out.println("Shutdown circuit processor ...");
 		stop();
 		this.requestShutdown = true;
 	}

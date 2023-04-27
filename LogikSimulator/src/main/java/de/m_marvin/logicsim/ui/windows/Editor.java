@@ -251,6 +251,7 @@ public class Editor {
 		this.subCircuitView.setLayoutData(new BorderData(SWT.CENTER, 200, 200));
 		this.subCircuitView.setCircuit(new Circuit(true));
 		this.subCircuitView.setAllowEditing(false);
+		this.subCircuitView.setAreaSize(new Vec2i(200, 200));
 		
 		// Simulation control view
 		
@@ -280,7 +281,7 @@ public class Editor {
 		tpsLimitLabel.pack();
 		
 		this.tpsLimitField = new Spinner(tpsStatus, 0);
-		this.tpsLimitField.setBounds(100, 48, 40, 20);
+		this.tpsLimitField.setBounds(80, 48, 80, 20);
 		this.tpsLimitField.setMaximum(10000);
 		this.tpsLimitField.setMinimum(0);
 		this.tpsLimitField.setSelection(LogicSim.getInstance().getSimulationMonitor().getTPSLimit());
@@ -314,7 +315,7 @@ public class Editor {
 		});
 		
 		this.shell.open();
-		this.editorArea.setAreaSize(new Vec2i(1000, 1000));
+		this.editorArea.setAreaSize(new Vec2i(10000, 10000));
 		changeCircuit(circuit);
 		
 	}
@@ -336,7 +337,12 @@ public class Editor {
 		
 		int tpsLimit = monitor.getTPSLimit();
 		String input = this.tpsLimitField.getText();
-		int enteredTpsLimit = input.isEmpty() ? 1 : Integer.parseInt(this.tpsLimitField.getText());
+		int enteredTpsLimit;
+		try {
+			enteredTpsLimit = input.isEmpty() ? 1 : Integer.parseInt(this.tpsLimitField.getText());
+		} catch (NumberFormatException e) {
+			enteredTpsLimit = 0;
+		}
 		
 		if (tpsLimit != enteredTpsLimit) {
 			if (this.tpsLimitField.isFocusControl()) {

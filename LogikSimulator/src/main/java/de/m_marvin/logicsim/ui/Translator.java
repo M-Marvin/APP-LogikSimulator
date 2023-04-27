@@ -26,6 +26,7 @@ public class Translator {
 			JsonObject json = GSON.fromJson(new InputStreamReader(stream), JsonObject.class);
 			json.entrySet().forEach(entry -> translations.put(entry.getKey(), entry.getValue().getAsString()));
 		});
+		System.out.println("Changed language to '" + language + "'");
 	}
 	
 	public static String translate(String key, Object... args) {

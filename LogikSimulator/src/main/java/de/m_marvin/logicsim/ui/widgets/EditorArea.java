@@ -6,11 +6,13 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.layout.BorderData;
 import org.eclipse.swt.layout.BorderLayout;
 import org.eclipse.swt.opengl.GLCanvas;
 import org.eclipse.swt.opengl.GLData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Slider;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
@@ -23,7 +25,7 @@ import de.m_marvin.logicsim.ui.TextRenderer;
 import de.m_marvin.logicsim.util.Registries.ComponentEntry;
 import de.m_marvin.univec.impl.Vec2i;
 
-public class EditorArea extends Composite implements MouseListener, MouseMoveListener, KeyListener {
+public class EditorArea extends Composite implements MouseListener, MouseMoveListener, KeyListener, MouseWheelListener {
 	
 	public static final int RASTER_SIZE = 10;
 	public static final int VISUAL_BUNDING_BOX_OFFSET = 5;
@@ -36,6 +38,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 	protected Vec2i grabOffset = new Vec2i(0, 0);
 	protected Vec2i mousePosition = new Vec2i(0, 0);
 	protected ComponentEntry activePlacement;
+	protected boolean grabbedBackground = false;
 	protected boolean allowEditing = true;
 	
 	protected GLData glData;
@@ -61,6 +64,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		this.glCanvas.addListener(SWT.Resize, (event) -> this.resized = true);
 		this.glCanvas.addMouseListener(this);
 		this.glCanvas.addMouseMoveListener(this);
+		this.glCanvas.addMouseWheelListener(this);
 		this.glCanvas.addKeyListener(this);
 		if (sliders) {
 			this.sliderHorizontal = new Slider(this, SWT.NONE);
@@ -75,6 +79,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 			this.sliderVertical.addListener(SWT.Selection, (e) -> {
 				this.visualOffset.setY(-this.sliderVertical.getSelection());
 			});
+			this.glCanvas.addListener(SWT.Resize, (event) -> Display.getDefault().asyncExec(() -> resizeArea()));
 		}
 	}
 	
@@ -91,14 +96,6 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 	
 	public Vec2i getVisibleArea() {
 		return this.glCanvas.isDisposed() ? new Vec2i() : Vec2i.fromVec(this.glCanvas.getSize());
-	}
-	
-	protected void resizeArea() {
-		Vec2i screenSize = getVisibleArea();
-		if (screenSize.x == 0 || screenSize.y == 0) return;
-		Vec2i scrollableArea = this.areaSize.sub(this.getVisibleArea()).max(1);
-		this.sliderVertical.setMaximum(scrollableArea.y);
-		this.sliderHorizontal.setMaximum(scrollableArea.x);
 	}
 	
 	public void setAllowEditing(boolean allowEditing) {
@@ -166,6 +163,24 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		this.grabedComponent = null;
 		this.redraw();
 	}
+
+	protected void resizeArea() {
+		Vec2i screenSize = getVisibleArea();
+		if (screenSize.x == 0 || screenSize.y == 0) return;
+		Vec2i scrollableArea = this.areaSize.sub(this.getVisibleArea()).max(1);
+		this.sliderVertical.setMaximum(scrollableArea.y);
+		this.sliderHorizontal.setMaximum(scrollableArea.x);
+		this.visualOffset.clampI(scrollableArea.mul(-1).add(1, 1), new Vec2i(0, 0));
+		if (scrollableArea.x > 1) this.sliderHorizontal.setSelection(-this.visualOffset.x);
+		if (scrollableArea.y > 1) this.sliderVertical.setSelection(-this.visualOffset.y);
+	}
+	
+	public void scrollView(Vec2i scrollVec) {
+		Vec2i scrollableArea = this.areaSize.sub(this.getVisibleArea()).max(1);
+		this.visualOffset = this.visualOffset.add(scrollVec).clamp(scrollableArea.mul(-1).add(1, 1), new Vec2i(0, 0));
+		if (scrollableArea.x > 1 && this.sliderHorizontal != null) this.sliderHorizontal.setSelection(-this.visualOffset.x);
+		if (scrollableArea.y > 1 && this.sliderVertical != null) this.sliderVertical.setSelection(-this.visualOffset.y);
+	}
 	
 	@Override
 	public void mouseUp(MouseEvent event) {
@@ -178,6 +193,9 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 				this.releaseGrabbedComponent();
 			}
 		}
+		
+		this.grabOffset = new Vec2i();
+		this.grabbedBackground = false;
 		
 	}
 	
@@ -192,17 +210,18 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 			if (this.grabedComponent == null) {
 				for (Component component : this.circuit.getComponents()) {
 					for (Node node : component.getAllNodes()) {
-						if (node.getVisualPosition().equals(mousePosition)) {
+						if (node.getVisualPosition().add(this.visualOffset).equals(mousePosition)) {
 							Vec2i location = Vec2i.fromVec(event.display.getCursorLocation());
 							if (node.click(location)) return;
 						}
 					}
 				}
 				for (Component component : this.circuit.getComponents()) {
-					if (component.getVisualPosition().x <= this.mousePosition.x &&
-						component.getVisualPosition().x + component.getVisualWidth() >= this.mousePosition.x &&
-						component.getVisualPosition().y <= this.mousePosition.y &&
-						component.getVisualPosition().y + component.getVisualHeight() >= this.mousePosition.y) {
+					Vec2i visualPos = component.getVisualPosition().add(this.visualOffset);
+					if (visualPos.x <= this.mousePosition.x &&
+						visualPos.x + component.getVisualWidth() >= this.mousePosition.x &&
+						visualPos.y <= this.mousePosition.y &&
+						visualPos.y + component.getVisualHeight() >= this.mousePosition.y) {
 						
 						if (event.button == 1) {
 							this.setGrabbedComponent(component);
@@ -213,6 +232,10 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 					}
 				}
 			}
+
+			this.grabOffset = this.mousePosition;
+			this.grabbedBackground = true;
+			
 		} else if (event.button == 1) {
 			this.activePlacement.placementClickMethod().accept(circuit, this.mousePosition);
 		}
@@ -227,7 +250,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 
 		Vec2i screenSize = getVisibleArea();
 		
-		this.mousePosition = new Vec2i(event.x, event.y).clamp(this.grabOffset, Vec2i.fromVec(screenSize));
+		this.mousePosition = new Vec2i(event.x, event.y).clamp(new Vec2i(0, 0), Vec2i.fromVec(screenSize));
 		Vec2i rasterOffset = this.mousePosition.add(RASTER_SIZE / 2, RASTER_SIZE / 2).module(RASTER_SIZE).sub(RASTER_SIZE / 2, RASTER_SIZE / 2);
 		this.mousePosition.subI(rasterOffset);
 		
@@ -240,10 +263,28 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 			this.redraw();
 		}
 		
+		if (this.grabbedBackground) {
+			
+			Vec2i scrollVec = this.mousePosition.sub(this.grabOffset);
+			this.grabOffset = this.mousePosition;
+			scrollView(scrollVec);
+			
+		}
+		
 	}
 	
 	@Override
 	public void mouseDoubleClick(MouseEvent event) {}
+
+	@Override
+	public void mouseScrolled(MouseEvent e) {
+		
+		int scroll = e.count;
+		boolean shiftDown = (e.stateMask & SWT.SHIFT) > 0;
+		Vec2i scrollVec = shiftDown ? new Vec2i(scroll, 0) : new Vec2i(0, scroll);
+		scrollView(scrollVec);
+		
+	}
 	
 	@Override
 	public void keyPressed(KeyEvent event) {
@@ -256,10 +297,11 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 				this.removeUnplacedComponent();
 			} else {
 				for (Component component : this.circuit.getComponents()) {
-					if (component.getVisualPosition().x <= this.mousePosition.x &&
-						component.getVisualPosition().x + component.getVisualWidth() >= this.mousePosition.x &&
-						component.getVisualPosition().y <= this.mousePosition.y &&
-						component.getVisualPosition().y + component.getVisualHeight() >= this.mousePosition.y) {
+					Vec2i visualPos = component.getVisualPosition().add(this.visualOffset);
+					if (visualPos.x <= this.mousePosition.x &&
+						visualPos.x + component.getVisualWidth() >= this.mousePosition.x &&
+						visualPos.y <= this.mousePosition.y &&
+						visualPos.y + component.getVisualHeight() >= this.mousePosition.y) {
 						
 						this.circuit.remove(component);
 						this.circuit.reconnect(true, component);
@@ -319,24 +361,31 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 
 		swapColor(1, 1, 1, 1);
 		
+		GL11.glPushMatrix();
+		GL11.glTranslatef(this.visualOffset.x, this.visualOffset.y, 0);
+		
 		circuit.getComponents().forEach(component -> {
 			
-			component.render();
-			
-			swapColor(1, 1, 1, 1);
-			
-			component.getInputs().forEach(inputNode -> {
-				Vec2i position = inputNode.getVisualOffset().add(component.getVisualPosition());
-				drawNode(position, 1, inputNode.getLaneTag());
-			});
-			component.getOutputs().forEach(outputNode -> {
-				Vec2i position = outputNode.getVisualOffset().add(component.getVisualPosition());
-				drawNode(position, 2, outputNode.getLaneTag());
-			});
-			component.getPassives().forEach(passivNode -> {
-				Vec2i position = passivNode.getVisualOffset().add(component.getVisualPosition());
-				drawNode(position, 3, passivNode.getLaneTag());
-			});
+			if (isComponentVisible(component)) {
+				
+				component.render();
+				
+				swapColor(1, 1, 1, 1);
+				
+				component.getInputs().forEach(inputNode -> {
+					Vec2i position = inputNode.getVisualOffset().add(component.getVisualPosition());
+					drawNode(position, 1, inputNode.getLaneTag());
+				});
+				component.getOutputs().forEach(outputNode -> {
+					Vec2i position = outputNode.getVisualOffset().add(component.getVisualPosition());
+					drawNode(position, 2, outputNode.getLaneTag());
+				});
+				component.getPassives().forEach(passivNode -> {
+					Vec2i position = passivNode.getVisualOffset().add(component.getVisualPosition());
+					drawNode(position, 3, passivNode.getLaneTag());
+				});
+				
+			}
 			
 		});
 		
@@ -350,8 +399,39 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 			drawRectangle(1, topLeft.x , topLeft.y, width, height);
 			
 		}
+
+		GL11.glPopMatrix();
 		
 		if (!this.glCanvas.isDisposed()) this.glCanvas.swapBuffers();
+		
+	}
+	
+	public boolean isComponentVisible(Component component) {
+		
+		Vec2i position = component.getVisualPosition();		
+		Vec2i size = new Vec2i(component.getVisualWidth(), component.getVisualHeight());
+		Vec2i position2 = position.add(size).add(VISUAL_BUNDING_BOX_OFFSET, VISUAL_BUNDING_BOX_OFFSET);
+		Vec2i position1 = position.sub(VISUAL_BUNDING_BOX_OFFSET, VISUAL_BUNDING_BOX_OFFSET);
+		
+		Vec2i area1 = this.visualOffset.mul(-1);
+		Vec2i area2 = area1.add(this.getVisibleArea());
+		
+		return
+				(
+					(position1.x >= area1.x && position1.x <= area2.x)
+					||
+					(position2.x >= area1.x && position2.x <= area2.x)
+					||
+					(position1.x < area1.x && position2.x > area2.x)
+				)
+				&&
+				(
+					(position1.y >= area1.y && position1.y <= area2.y)
+					||
+					(position2.y >= area1.y && position2.y <= area2.y)
+					||
+					(position1.y < area1.y && position2.y > area2.y)
+				);
 		
 	}
 	
@@ -386,41 +466,40 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 	public void drawRaster() {
 		
 		int rasterSize1 = 10;
-		
-		Vec2i rasterOffset = this.visualOffset.module(RASTER_SIZE);
-		Vec2i renderOffset = this.visualOffset.sub(rasterOffset);
-		
+		int rasterSizePixels = RASTER_SIZE * rasterSize1;
+		Vec2i rasterOffset = this.visualOffset.module(rasterSizePixels).add(rasterSizePixels, rasterSizePixels);
 		Vec2i screenSize = getVisibleArea();
 		
 		swapColor(1.0F, 0.5F, 0.0F, 0.4F);
 		
 		GL11.glBegin(GL11.GL_LINES);
-		for (int i = 0; i < screenSize.x; i+= RASTER_SIZE * rasterSize1) {
-			GL11.glVertex2f(i + renderOffset.x, renderOffset.y);
-			GL11.glVertex2f(i + renderOffset.x, renderOffset.y + screenSize.y);
+		for (int i = 0; i < screenSize.x; i+= rasterSizePixels) {
+			GL11.glVertex2f(i + rasterOffset.x, 0);
+			GL11.glVertex2f(i + rasterOffset.x, screenSize.y);
 		}
-		for (int j = 0; j < screenSize.y; j += RASTER_SIZE * rasterSize1) {
-			GL11.glVertex2f(renderOffset.x, j + renderOffset.y);
-			GL11.glVertex2f(renderOffset.x + screenSize.x, j + renderOffset.y);
+		for (int j = 0; j < screenSize.y; j += rasterSizePixels) {
+			GL11.glVertex2f(0, j + rasterOffset.y);
+			GL11.glVertex2f(screenSize.x, j + rasterOffset.y);
 		}
 		GL11.glEnd();
 		
-		for (int i = 0; i < screenSize.x; i+= RASTER_SIZE * rasterSize1) {
-			for (int j = 0; j < screenSize.y; j += RASTER_SIZE * rasterSize1) {
-				drawRectangle(1, i + renderOffset.x - 5, j + renderOffset.y - 5, 10, 10);
+		for (int i = 0; i < screenSize.x; i+= rasterSizePixels) {
+			for (int j = 0; j < screenSize.y; j += rasterSizePixels) {
+				drawRectangle(1, i + rasterOffset.x - 5, j + rasterOffset.y - 5, 10, 10);
 			}
 		}
 		
-		swapColor(1, 1, 1, 0.3F);
+		swapColor(1, 1, 1, 0.5F);
 		
 		GL11.glPointSize(1);
 		GL11.glBegin(GL11.GL_POINTS);
-		for (int i = 0; i < screenSize.x; i += RASTER_SIZE) {
-			for (int j = 0; j < screenSize.y; j += RASTER_SIZE) {
-				if (i % (rasterSize1 * RASTER_SIZE) != 0 && j % (rasterSize1 * RASTER_SIZE) != 0) GL11.glVertex2f(i + renderOffset.x, j + renderOffset.y);
+		for (int i = -rasterSizePixels; i < screenSize.x; i += RASTER_SIZE) {
+			for (int j = -rasterSizePixels; j < screenSize.y; j += RASTER_SIZE) {
+				if (i % rasterSizePixels != 0 && j % rasterSizePixels != 0) GL11.glVertex2f(i + rasterOffset.x, j + rasterOffset.y);
 			}
 		}
 		GL11.glEnd();
+		
 	}
 	
 	public static void swapColor(float r, float g, float b, float a) {

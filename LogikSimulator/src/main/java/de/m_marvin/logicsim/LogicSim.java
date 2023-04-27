@@ -32,8 +32,9 @@ public class LogicSim {
 	 
 	// TODO
 //	- Bezeichnung für Ein/Ausgänge
-//	- Verschieben des Schaltplans in der Ansicht
 //	- Multi-Auswahl (Copy/Paste)
+// 	- Algemein Funktionen (Strg+s, New File, File Extension, Undo/Redo)
+//	- Komponenten zur interaktion mit Dateien, Grphischer Darstellung, Tastatureingabe etc
 	
 	private static LogicSim INSTANCE;
 	
@@ -107,21 +108,56 @@ public class LogicSim {
 		this.processor = new CircuitProcessor();
 		this.simulationMonitor = new SimulationMonitor(processor);
 		
+		System.out.println("Open default editor window");
 		openEditor(null);
-		
+
+		System.out.println("Start ui-logic thread");
 		this.uiLogicThread = new Thread(() -> {
+			long lastTickTime = 0;
+			long tickTime = 0;
+			float tickRateDelta = 0;
 			while (!this.shouldTerminate()) {
-				updateGraphics();
+				try {
+					lastTickTime = tickTime;
+					tickTime = System.currentTimeMillis();
+					tickRateDelta += (tickTime - lastTickTime) / 50F;
+					if (tickRateDelta > 20 || tickRateDelta < 0) tickRateDelta = 0;
+					if (tickRateDelta > 1) {
+						tickRateDelta -= 1;
+						updateGraphics();
+					} else {
+						Thread.sleep(25);
+					}
+				} catch (InterruptedException e) {}
 			}
+			System.out.println("ui-logic thread terminated!");
 		}, "ui-logic");
 		this.uiLogicThread.start();
 		
+		System.out.println("Enter ui main loop");
+		long lastTickTime = 0;
+		long tickTime = 0;
+		float tickRateDelta = 0;
 		while (!shouldTerminate()) {
-			updateUI();
+			try {
+				lastTickTime = tickTime;
+				tickTime = System.currentTimeMillis();
+				tickRateDelta += (tickTime - lastTickTime) / 10F;
+				if (tickRateDelta > 20 || tickRateDelta < 0) tickRateDelta = 0;
+				if (tickRateDelta > 1) {
+					tickRateDelta -= 1;
+					updateUI();
+				} else {
+					Thread.sleep(5);
+				}
+			} catch (InterruptedException e) {}
 		}
+		System.out.println("Exit ui main loop!");
 		
 		this.display.dispose();
 		this.processor.terminate();
+		
+		System.out.println("Main thread terminated!");
 		
 	}
 	
@@ -186,6 +222,9 @@ public class LogicSim {
 	protected ComponentFolder builtinIcFolder;
 	
 	public void registerIncludedParts() {
+		
+		System.out.println("Register components ...");
+		
 		ComponentFolder wireFolder = Registries.registerFolder("circuit.folders.wires", ICON_WIRE_GROUP);
 		ComponentFolder partFolder = Registries.registerFolder("circuit.folders.basic", ICON_PART_GROUP);
 		this.builtinIcFolder = Registries.registerFolder("circuit.folders.ics", ICON_IC_GROUP);
@@ -204,6 +243,9 @@ public class LogicSim {
 	}
 	
 	public void updateSubCircuitCache() {
+
+		System.out.println("Load integrated circuits from file ...");
+		
 		Registries.clearSubCircuitCache();
 		_fillSubCircuitCache(this.builtinIcFolder, this.subCircuitFolder);
 		triggerMenuUpdates();
