@@ -204,5 +204,12 @@ public abstract class Component {
 	public String toString() {
 		return "Component{ident=" + makeIdentifier() + ",pos=" + this.visualPosition + "}";
 	}
+
+	public boolean isInBounds(Vec2i pos) {
+		return	getVisualPosition().x <= pos.x &&
+				getVisualPosition().x + getVisualWidth() >= pos.x &&
+				getVisualPosition().y <= pos.y &&
+				getVisualPosition().y + getVisualHeight() >= pos.y;
+	}
 	
 }

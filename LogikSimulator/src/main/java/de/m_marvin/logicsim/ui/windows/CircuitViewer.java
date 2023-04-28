@@ -102,7 +102,7 @@ public class CircuitViewer {
 		return shell;
 	}
 	
-	public CircuitProcessInfo getSelectedProcess() {
+	protected CircuitProcessInfo getSelectedProcess() {
 		TreeItem[] selection = this.treeView.getSelection();
 		if (selection.length >= 1) {
 			if (selection[0].getData() instanceof CircuitProcessInfo process) return process;
@@ -148,9 +148,7 @@ public class CircuitViewer {
 		
 	}
 	
-	protected int lastUpdatedEntry = 0;
-	
-	public void updateView() {
+	protected void updateView() {
 		
 		SimulationMonitor monitor = LogicSim.getInstance().getSimulationMonitor();
 		

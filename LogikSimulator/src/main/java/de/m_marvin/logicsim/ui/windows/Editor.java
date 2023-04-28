@@ -170,15 +170,27 @@ public class Editor {
 		saveOpt.addListener(SWT.Selection, (e) -> saveCircuit(false));
 		MenuItem loadOpt = new MenuItem(fileMenu, SWT.PUSH);
 		loadOpt.setText(Translator.translate("editor.menu.file.load"));
-		loadOpt.addListener(SWT.Selection, (e) -> loadCircuit());
-
+		loadOpt.addListener(SWT.Selection, (e) -> loadCircuit(false));
+		MenuItem loadInEditorOpt = new MenuItem(fileMenu, SWT.PUSH);
+		loadInEditorOpt.setText(Translator.translate("editor.menu.file.load_in_editor"));
+		loadInEditorOpt.addListener(SWT.Selection, (e) -> loadCircuit(true));
+		MenuItem refreshComponents = new MenuItem(fileMenu, SWT.PUSH);
+		refreshComponents.setText(Translator.translate("editor.menu.file.refresh_components"));
+		refreshComponents.addListener(SWT.Selection, (e) -> updatePartSelector());
+		
 		MenuItem viewsTab = new MenuItem (titleBar, SWT.CASCADE);
 		viewsTab.setText (Translator.translate("editor.menu.views"));
 		Menu viewsMenu = new Menu(shell, SWT.DROP_DOWN);
 		viewsTab.setMenu(viewsMenu);
-		MenuItem circuitsOpt = new MenuItem(viewsMenu, SWT.PUSH);
-		circuitsOpt.setText(Translator.translate("editor.menu.views.circuit_viewer"));
-		circuitsOpt.addListener(SWT.Selection, (e) -> LogicSim.getInstance().openCircuitViewer());
+		MenuItem circuitsView = new MenuItem(viewsMenu, SWT.PUSH);
+		circuitsView.setText(Translator.translate("editor.menu.views.circuit_viewer"));
+		circuitsView.addListener(SWT.Selection, (e) -> LogicSim.getInstance().openCircuitViewer());
+		MenuItem circuitOpt = new MenuItem(viewsMenu, SWT.PUSH);
+		circuitOpt.setText(Translator.translate("editor.menu.views.circuit_options"));
+		circuitOpt.addListener(SWT.Selection, (e) -> LogicSim.getInstance().openCircuitOptions(this.editorArea.getCircuit()));
+		MenuItem editorWindow = new MenuItem(viewsMenu, SWT.PUSH);
+		editorWindow.setText(Translator.translate("editor.menu.views.circuit_editor"));
+		editorWindow.addListener(SWT.Selection, (e) -> LogicSim.getInstance().openEditor(null));
 		
 		// Left tool group
 		
@@ -428,15 +440,19 @@ public class Editor {
 		LogicSim.getInstance().updateSubCircuitCache();
 	}
 	
-	public void loadCircuit() {
+	public void loadCircuit(boolean newWindow) {
 		FileDialog fileDialog = new FileDialog(shell, SWT.OPEN);
 		// TODO File-type specific dialog
 		String path = fileDialog.open();
 		if (path != null) {
 			File filePath = new File(path);
 			try {
-				changeCircuit(CircuitSerializer.loadCircuit(filePath));
-				updateUI();
+				if (newWindow) {
+					LogicSim.getInstance().openEditor(CircuitSerializer.loadCircuit(filePath));
+				} else {
+					changeCircuit(CircuitSerializer.loadCircuit(filePath));
+					updateUI();
+				}
 			} catch (IOException ex) {
 				showErrorInfo(this.shell, "info.error.load_file", ex);
 				ex.printStackTrace();

@@ -1,5 +1,7 @@
 package de.m_marvin.logicsim.logic.wires;
 
+import java.util.Map;
+
 import com.google.gson.JsonObject;
 
 import de.m_marvin.logicsim.logic.Circuit;
@@ -159,6 +161,11 @@ public class ConnectorWire extends NetConnector {
 		this.posA.y = json.get("y1").getAsInt();
 		this.posB.x = json.get("x2").getAsInt();
 		this.posB.y = json.get("y2").getAsInt();
+	}
+
+	@Override
+	public Map<String, NetState> getLaneData() {
+		return this.circuit.getLaneMapReference(this.passives.get(0));
 	}
 	
 }

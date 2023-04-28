@@ -54,12 +54,10 @@ public class Circuit {
 		case PREFER_HIGH:
 			if (stateA == NetState.SHORT_CIRCUIT) return NetState.HIGH;
 			if (stateB == NetState.SHORT_CIRCUIT) return NetState.HIGH;
-			if (stateA != stateB) return NetState.SHORT_CIRCUIT;
 			return stateA == NetState.HIGH || stateB == NetState.HIGH ? NetState.HIGH : NetState.LOW;
 		case PREFER_LOW:
 			if (stateA == NetState.SHORT_CIRCUIT) return NetState.LOW;
 			if (stateB == NetState.SHORT_CIRCUIT) return NetState.LOW;
-			if (stateA != stateB) return NetState.SHORT_CIRCUIT;
 			return stateA == NetState.LOW || stateB == NetState.LOW ? NetState.LOW : NetState.HIGH;
 		}
 	}
@@ -88,6 +86,38 @@ public class Circuit {
 		public boolean isErrorState() {
 			return !isLogicalState();
 		}
+	}
+	
+	protected static Number castToBits(Long value, int bitCount) {
+		if (bitCount > 32) return value.longValue();
+		if (bitCount > 16) return value.intValue();
+		if (bitCount > 8) return value.shortValue();
+		return value.byteValue();
+	}
+	
+	public static Map<String, Long> getLaneData(Map<String, NetState> laneData) {
+		
+		Map<String, Long> busData = new HashMap<>();
+		Map<String, Integer> bitCounts = new HashMap<>();
+		for (String lane : laneData.keySet()) {
+			String[] laneParts = lane.split("(?<=\\D)(?=\\d)");
+			try {
+				String bus = laneParts[0];
+				int bit = Integer.parseInt(laneParts[1]);
+				boolean value = laneData.get(lane).getLogicState();
+				int bitCount = bitCounts.getOrDefault(bus, 0);
+				if (bit + 1 > bitCount) {
+					bitCount = bit + 1;
+					bitCounts.put(bus, bitCount);
+				}
+				
+				Long dataValue = busData.getOrDefault(bus, 0L);
+				if (value) dataValue += (1L << bit);
+				busData.put(bus, dataValue);
+			} catch (NumberFormatException e) {}
+		}
+		return busData;
+		
 	}
 	
 	

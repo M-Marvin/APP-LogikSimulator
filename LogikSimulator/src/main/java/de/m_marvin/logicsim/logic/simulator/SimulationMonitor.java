@@ -11,8 +11,6 @@ import java.util.function.Supplier;
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Circuit.NetState;
 import de.m_marvin.logicsim.logic.NetConnector;
-import de.m_marvin.logicsim.logic.nodes.Node;
-import de.m_marvin.logicsim.logic.nodes.PassivNode;
 import de.m_marvin.logicsim.ui.Translator;
 import de.m_marvin.logicsim.ui.widgets.EditorArea.SimulationWarning;
 
@@ -68,14 +66,13 @@ public class SimulationMonitor {
 		return this.processor.cpuLoad;
 	}
 	
-	public Optional<NetState> queryWarningState(Circuit circuit, Node node) {
-
-		Map<String, NetState> laneData = circuit.getLaneMapReference(node);
+	public Optional<NetState> queryWarningState(Circuit circuit, Map<String, NetState> laneData) {
+		
 		if (laneData == null) return Optional.empty();
 		if (laneData.isEmpty()) return Optional.of(NetState.FLOATING);
 		if (laneData.get(Circuit.DEFAULT_BUS_LANE) == NetState.SHORT_CIRCUIT) return Optional.of(NetState.SHORT_CIRCUIT);
 		if (laneData.containsKey(Circuit.DEFAULT_BUS_LANE) && laneData.size() > 1) return laneData.keySet().stream().filter(v -> !v.equals(Circuit.DEFAULT_BUS_LANE)).map(v -> laneData.get(v)).filter(s -> s.isErrorState()).findAny();
-		return Optional.of(laneData.get(Circuit.DEFAULT_BUS_LANE));
+		return Optional.ofNullable(laneData.get(Circuit.DEFAULT_BUS_LANE));
 		
 	}
 	
@@ -92,9 +89,8 @@ public class SimulationMonitor {
 				if (component instanceof NetConnector connector && running) {
 					
 					if (connector.getPassives().size() == 0) return;
-					PassivNode node = connector.getPassives().get(0);
 					
-					Optional<NetState> state = queryWarningState(circuit, node);
+					Optional<NetState> state = queryWarningState(circuit, connector.getLaneData());
 					
 					if (state.isPresent() && state.get().isErrorState()) {
 						
@@ -104,7 +100,7 @@ public class SimulationMonitor {
 						}
 						String message = Translator.translate("editor_area.warning." + (state.get() == NetState.FLOATING ? "floating" : "short_circuit"));
 						processInfo.warnings.add(new SimulationWarning(component, message, () -> {
-							Optional<NetState> state2 = queryWarningState(circuit, node);
+							Optional<NetState> state2 = queryWarningState(circuit, connector.getLaneData());
 							return state2.isPresent() && state2.get() == state.get() && running;
 						}, System.currentTimeMillis() + WARNING_DECAY_TIME));
 						
@@ -171,8 +167,10 @@ public class SimulationMonitor {
 			this.cachedProcessorInfo = this.processor.getProcessors().stream().map(processor ->
 				new CircuitProcessorInfo(() -> {
 					List<Circuit> circuits = new ArrayList<>();
-					for (int i = 0; i < processor.processes.size(); i++) {
-						circuits.add(processor.processes.get(i).circuit);
+					synchronized (processor) {
+						for (int i = 0; i < processor.processes.size(); i++) {
+							circuits.add(processor.processes.get(i).circuit);
+						}
 					}
 					return circuits;
 				}, () -> processor.tps, () -> (int) processor.executionTime)

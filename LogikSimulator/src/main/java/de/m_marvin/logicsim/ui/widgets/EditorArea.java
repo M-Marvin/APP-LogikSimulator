@@ -3,6 +3,9 @@ package de.m_marvin.logicsim.ui.widgets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.function.Supplier;
 
 import org.eclipse.swt.SWT;
@@ -24,8 +27,13 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLCapabilities;
 
 import de.m_marvin.logicsim.logic.Circuit;
+import de.m_marvin.logicsim.logic.Circuit.NetState;
 import de.m_marvin.logicsim.logic.Component;
+import de.m_marvin.logicsim.logic.NetConnector;
+import de.m_marvin.logicsim.logic.nodes.InputNode;
 import de.m_marvin.logicsim.logic.nodes.Node;
+import de.m_marvin.logicsim.logic.nodes.OutputNode;
+import de.m_marvin.logicsim.logic.nodes.PassivNode;
 import de.m_marvin.logicsim.ui.TextRenderer;
 import de.m_marvin.logicsim.util.Registries.ComponentEntry;
 import de.m_marvin.univec.impl.Vec2i;
@@ -44,6 +52,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 	public Vec2i visualOffset = new Vec2i(0, 0);
 	public Vec2i areaSize = new Vec2i(0, 0);
 	
+	protected Component hoveredComponent = null;
 	protected Component grabedComponent = null;
 	protected Vec2i grabOffset = new Vec2i(0, 0);
 	protected Vec2i mousePosition = new Vec2i(0, 0);
@@ -246,24 +255,17 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 						}
 					}
 				}
-				for (Component component : this.circuit.getComponents()) {
-					Vec2i visualPos = component.getVisualPosition().add(this.visualOffset);
-					if (visualPos.x <= this.mousePosition.x &&
-						visualPos.x + component.getVisualWidth() >= this.mousePosition.x &&
-						visualPos.y <= this.mousePosition.y &&
-						visualPos.y + component.getVisualHeight() >= this.mousePosition.y) {
-						
-						if (event.button == 1) {
-							if (event.count == 1) {
-								this.setGrabbedComponent(component);
-							} else {
-								component.click(mousePosition, true);
-							}
+				if (this.hoveredComponent != null) {
+					if (event.button == 1) {
+						if (event.count == 1) {
+							this.setGrabbedComponent(this.hoveredComponent);
 						} else {
-							component.click(mousePosition, false);
+							this.hoveredComponent.click(mousePosition, true);
 						}
-						return;			
+					} else {
+						this.hoveredComponent.click(mousePosition, false);
 					}
+					return;
 				}
 			}
 
@@ -271,7 +273,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 			this.grabbedBackground = true;
 			
 		} else if (event.button == 1) {
-			this.activePlacement.placementClickMethod().accept(circuit, this.mousePosition);
+			this.activePlacement.placementClickMethod().accept(circuit, this.mousePosition.sub(this.visualOffset));
 		}
 		
 	}
@@ -289,7 +291,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		this.mousePosition.subI(rasterOffset);
 		
 		if (this.activePlacement != null) {
-			boolean redraw = this.activePlacement.placementMoveMethod().apply(circuit, mousePosition);
+			boolean redraw = this.activePlacement.placementMoveMethod().apply(circuit, mousePosition.sub(this.visualOffset));
 			if (redraw) this.redraw();
 		}
 		
@@ -303,6 +305,15 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 			this.grabOffset = this.mousePosition;
 			scrollView(scrollVec);
 			
+		}
+
+		this.hoveredComponent = null;
+		for (Component component : this.circuit.getComponents()) {
+			Vec2i pos = this.mousePosition.sub(this.visualOffset);
+			if (component.isInBounds(pos)) {
+				this.hoveredComponent = component;
+				break;
+			}
 		}
 		
 	}
@@ -330,18 +341,10 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 			if (this.grabedComponent != null) {
 				this.removeUnplacedComponent();
 			} else {
-				for (Component component : this.circuit.getComponents()) {
-					Vec2i visualPos = component.getVisualPosition().add(this.visualOffset);
-					if (visualPos.x <= this.mousePosition.x &&
-						visualPos.x + component.getVisualWidth() >= this.mousePosition.x &&
-						visualPos.y <= this.mousePosition.y &&
-						visualPos.y + component.getVisualHeight() >= this.mousePosition.y) {
-						
-						this.circuit.remove(component);
-						this.circuit.reconnect(true, component);
-						this.redraw();
-						break;			
-					}
+				if (this.hoveredComponent != null) {
+					this.circuit.remove(this.hoveredComponent);
+					this.circuit.reconnect(true, this.hoveredComponent);
+					this.hoveredComponent = null;
 				}
 			}
 		} else if (event.keyCode == SWT.ESC) {
@@ -404,25 +407,25 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 				component.render();
 				
 				swapColor(1, 1, 1, 1);
-				
-				component.getInputs().forEach(inputNode -> {
+
+				for (InputNode inputNode : component.getInputs()) {
 					boolean mouseNearBy = this.mousePosition.dist(inputNode.getVisualPosition().add(visualOffset)) < SHOW_HIDEN_TAG_RANGE;
 					boolean connected = circuit.isNodeConnected(inputNode);
 					Vec2i position = inputNode.getVisualOffset().add(component.getVisualPosition());
 					drawNode(position, 1, inputNode.getLaneTag(), inputNode.getLabel(), connected, mouseNearBy);
-				});
-				component.getOutputs().forEach(outputNode -> {
+				}
+				for (OutputNode outputNode : component.getOutputs()) {
 					boolean mouseNearBy = this.mousePosition.dist(outputNode.getVisualPosition().add(visualOffset)) < SHOW_HIDEN_TAG_RANGE;
 					boolean connected = circuit.isNodeConnected(outputNode);
 					Vec2i position = outputNode.getVisualOffset().add(component.getVisualPosition());
 					drawNode(position, 2, outputNode.getLaneTag(), outputNode.getLabel(), connected, mouseNearBy);
-				});
-				component.getPassives().forEach(passivNode -> {
+				}
+				for (PassivNode passivNode : component.getPassives()) {
 					boolean mouseNearBy = this.mousePosition.dist(passivNode.getVisualPosition().add(visualOffset)) < SHOW_HIDEN_TAG_RANGE;
 					boolean connected = circuit.isNodeConnected(passivNode);
 					Vec2i position = passivNode.getVisualOffset().add(component.getVisualPosition());
 					drawNode(position, 3, passivNode.getLaneTag(), "", connected, mouseNearBy);
-				});
+				}
 				
 			}
 			
@@ -459,13 +462,19 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 			Vec2i topLeft = this.mousePosition.sub(grabOffset).sub(VISUAL_BUNDING_BOX_OFFSET, VISUAL_BUNDING_BOX_OFFSET);
 			int width = this.grabedComponent.getVisualWidth() + VISUAL_BUNDING_BOX_OFFSET * 2;
 			int height = this.grabedComponent.getVisualHeight() + VISUAL_BUNDING_BOX_OFFSET * 2;
-			
 			swapColor(0, 1, 0, 0.4F);
 			drawRectangle(1, topLeft.x , topLeft.y, width, height);
 			
 		}
-
+		
 		GL11.glPopMatrix();
+
+		if (this.hoveredComponent instanceof NetConnector connector) {
+			
+			Map<String, NetState> laneData = connector.getLaneData();
+			if (laneData != null) drawLaneInfo(this.mousePosition, laneData);
+			
+		}
 		
 		if (!this.glCanvas.isDisposed()) this.glCanvas.swapBuffers();
 		
@@ -497,6 +506,57 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 					||
 					(position1.y < area1.y && position2.y > area2.y)
 				);
+		
+	}
+	
+	public static void drawLaneInfo(Vec2i position, Map<String, NetState> laneData) {
+		
+		int x = 0;
+		int y = 0;
+		
+		Map<String, Long> busData = Circuit.getLaneData(laneData);
+		SortedSet<String> buses = new TreeSet<>(busData.keySet());
+		SortedSet<String> lanes = new TreeSet<>(laneData.keySet());
+
+		swapColor(0, 0, 0, 1);
+		drawFilledRectangle(position.x + 50, position.y - 50, 320, laneData.size() * 20);
+		swapColor(1, 1, 1, 1);
+		drawLine(2, position.x, position.y, position.x + 50, position.y - 50);
+		drawRectangle(1, position.x + 50, position.y - 50, 320, laneData.size() * 20);
+		
+		boolean b = false;
+		for (String lane : lanes) {
+			NetState state = laneData.get(lane);
+			if (state.getLogicState()) {
+				swapColor(0, 0, 1, 1);
+			} else {
+				swapColor(0, 1, 1, 1);
+			}
+			TextRenderer.drawText(position.x + 55 + x, position.y - 40 + y, 14, lane, TextRenderer.ORIGIN_LEFT | TextRenderer.RESIZED);
+			//TextRenderer.drawText(position.x + 50 + x + 60, position.y + 50 + y, 14, state.toString(), TextRenderer.ORIGIN_LEFT | TextRenderer.RESIZED);
+			y += 20;
+		}
+		
+		x = 60;
+		int y1 = 0;
+		
+		for (String bus : buses) {
+			long value = busData.get(bus);
+			
+			swapColor(1F, 0.4F, 0, 1);
+			TextRenderer.drawText(position.x + 55 + x, position.y - 40 + y1, 14, bus, TextRenderer.ORIGIN_LEFT | TextRenderer.RESIZED);
+			if (Long.toUnsignedString(value).length() > 4) {
+				TextRenderer.drawText(position.x + 75 + x + 70, position.y - 40 + y1, 14, Long.toUnsignedString(value, 16), TextRenderer.ORIGIN_LEFT | TextRenderer.RESIZED);
+			} else {
+				TextRenderer.drawText(position.x + 75 + x + 40, position.y - 40 + y1, 14, Long.toUnsignedString(value, 16), TextRenderer.ORIGIN_LEFT | TextRenderer.RESIZED);
+				TextRenderer.drawText(position.x + 75 + x + 130, position.y - 40 + y1, 14, Long.toUnsignedString(value), TextRenderer.ORIGIN_LEFT | TextRenderer.RESIZED);
+			}
+			b = !b;
+			swapColor(1F, 0.4F, 0, 0.6F);
+			drawLine(1, position.x + 45 + x, position.y - 35 + y1, position.x + 275 + x, position.y - 35 + y1);
+			
+			y1 += 20;
+		}
 		
 	}
 	
@@ -633,6 +693,16 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 	public static void drawRectangle(float width, float x, float y, float w, float h) {
 		GL11.glLineWidth(width);
 		GL11.glBegin(GL11.GL_LINE_STRIP);
+		GL11.glVertex2f(x, y);
+		GL11.glVertex2f(x + w, y);
+		GL11.glVertex2f(x + w, y + h);
+		GL11.glVertex2f(x, y + h);
+		GL11.glVertex2f(x, y);
+		GL11.glEnd();
+	}
+
+	public static void drawFilledRectangle(float x, float y, float w, float h) {
+		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2f(x, y);
 		GL11.glVertex2f(x + w, y);
 		GL11.glVertex2f(x + w, y + h);

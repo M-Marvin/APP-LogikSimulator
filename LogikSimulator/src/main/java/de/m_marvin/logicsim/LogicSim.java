@@ -24,6 +24,7 @@ import de.m_marvin.logicsim.logic.parts.SubCircuitComponent;
 import de.m_marvin.logicsim.logic.wires.ConnectorWire;
 import de.m_marvin.logicsim.ui.TextRenderer;
 import de.m_marvin.logicsim.ui.Translator;
+import de.m_marvin.logicsim.ui.windows.CircuitOptions;
 import de.m_marvin.logicsim.ui.windows.CircuitViewer;
 import de.m_marvin.logicsim.ui.windows.Editor;
 import de.m_marvin.logicsim.util.Registries;
@@ -32,7 +33,6 @@ import de.m_marvin.logicsim.util.Registries.ComponentFolder;
 public class LogicSim {
 	 
 	// TODO
-//	- Debug-Anzeige für Daten-Buse
 //	- Multi-Auswahl (Copy/Paste)
 // 	- Algemein Funktionen (Strg+s, New File, File Extension, Undo/Redo)
 //	- Komponenten zur interaktion mit Dateien, Grphischer Darstellung, Tastatureingabe etc
@@ -46,8 +46,8 @@ public class LogicSim {
 	protected CircuitProcessor processor;
 	protected SimulationMonitor simulationMonitor;
 	protected Thread uiLogicThread;
-	protected List<Editor> openEditors = new ArrayList<>();
-	protected CircuitViewer circuitWindow;
+	protected List<Editor> openEditorWindows = new ArrayList<>();
+	protected CircuitViewer circuitViewWindow;
 	protected Editor lastInteractedEditor;
 	 
 	public static void main(String... args) {
@@ -79,7 +79,7 @@ public class LogicSim {
 	}
 	
 	public List<Editor> getOpenEditors() {
-		return openEditors;
+		return openEditorWindows;
 	}
 	
 	public boolean shouldTerminate() {
@@ -164,17 +164,25 @@ public class LogicSim {
 	}
 	
 	public void openEditor(Circuit circuit) {
-		this.openEditors.add(new Editor(display, circuit));
-	}
-	
-	public void openCircuitViewer() {
-		if (this.circuitWindow == null || this.circuitWindow.getShell().isDisposed()) {
-			this.circuitWindow = new CircuitViewer(display);
+		synchronized (this.openEditorWindows) {
+			this.openEditorWindows.add(new Editor(display, circuit));
 		}
 	}
 	
+	public void openCircuitViewer() {
+		if (this.circuitViewWindow == null || this.circuitViewWindow.getShell().isDisposed()) {
+			this.circuitViewWindow = new CircuitViewer(display);
+		}
+	}
+	
+	public void openCircuitOptions(Circuit circuit) {
+		new CircuitOptions(display, circuit);
+	}
+	
 	public void triggerMenuUpdates() {
-		this.openEditors.forEach(Editor::updatePartSelector);
+		synchronized (this.openEditorWindows) {
+			this.openEditorWindows.forEach(Editor::updatePartSelector);
+		}
 	}
 	
 	public void setLastInteracted(Editor editor) {
@@ -187,21 +195,21 @@ public class LogicSim {
 	
 	private void updateUI() {
 		
-		List<Editor> disposedEditors = new ArrayList<>();
-		this.openEditors.forEach(editor -> {
-			if (editor.getShell().isDisposed()) disposedEditors.add(editor);
-		});
-		
-		if (!disposedEditors.isEmpty()) {
-			synchronized (this.openEditors) { // Prevent iteration of graphic update thread while removing editors
-				this.openEditors.removeAll(disposedEditors);
+		synchronized (this.openEditorWindows) { // Prevent iteration of graphic update thread while removing editors
+			List<Editor> disposedEditors = new ArrayList<>();
+			this.openEditorWindows.forEach(editor -> {
+				if (editor.getShell().isDisposed()) disposedEditors.add(editor);
+			});
+			
+			if (!disposedEditors.isEmpty()) {
+				this.openEditorWindows.removeAll(disposedEditors);
 			}
 		}
 		
-		this.openEditors.forEach(Editor::updateUI);
-		if (this.circuitWindow != null && !this.circuitWindow.getShell().isDisposed()) this.circuitWindow.updateUI();
+		this.openEditorWindows.forEach(Editor::updateUI);
+		if (this.circuitViewWindow != null && !this.circuitViewWindow.getShell().isDisposed()) this.circuitViewWindow.updateUI();
 		
-		if (this.openEditors.isEmpty()) this.terminate();
+		if (this.openEditorWindows.isEmpty()) this.terminate();
 		
 		this.display.readAndDispatch();
 		
@@ -211,8 +219,8 @@ public class LogicSim {
 		
 		this.simulationMonitor.update();
 		
-		synchronized (this.openEditors) { // Prevent iteration of graphic update thread while removing editors
-			this.openEditors.forEach(Editor::updateGraphics);
+		synchronized (this.openEditorWindows) { // Prevent iteration of graphic update thread while removing editors
+			this.openEditorWindows.forEach(Editor::updateGraphics);
 		}
 		
 	}
