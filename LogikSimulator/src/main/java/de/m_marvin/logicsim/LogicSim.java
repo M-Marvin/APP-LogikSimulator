@@ -3,6 +3,7 @@ package de.m_marvin.logicsim;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.eclipse.swt.widgets.Display;
 
@@ -34,8 +35,8 @@ public class LogicSim {
 	 
 	// TODO
 //	- Zooming
-//	- Multi-Auswahl (Copy/Paste)
-// 	- Algemein Funktionen (Strg+s, New File, File Extension, Undo/Redo)
+//	- Multi-Auswahl (Copy/Paste), Undo/Redo
+// 	- Algemein Funktionen (File Extension)
 //	- Komponenten zur interaktion mit Dateien, Grphischer Darstellung, Tastatureingabe etc
 	
 	private static LogicSim INSTANCE;
@@ -231,7 +232,8 @@ public class LogicSim {
 	public static final String ICON_WIRE_GROUP = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAGUExURQAAAAAAAKVnuc8AAAACdFJOU/8A5bcwSgAAAAlwSFlzAAAOwwAADsMBx2+oZAAAAFpJREFUOE/djsESgCAIROX/f1qUxchwKGM69C7q7lMpFJApeCpnRvCY70lmN+kCF5cNVvCtgDm3hcFDAc9a+Nx/O0Ch3BEMoRAO+RvhREukUFAoLZFizVuBqALkLQNcVg88CgAAAABJRU5ErkJggg==";
 	public static final String ICON_IC_GROUP = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAGzSURBVFhHxZeNcoMgEIRD07R5/6dtJ20Je7rOegEBJek3syOKnsvxI4YY4zWE8HWaeE+KU9HQMtiqO6VYH+nwNp214Q38JYWp2E2r8XPSJekHJ97trxwhGFIhEOWBcQpxVXgptQYZmIvglpQLPgrGR1cbzAAu0P0zYfylkTQAZ0jxY4qeDA2w7wn7uSSSq4OaoYHe1OuL2HXUFqxfTNIApoRNixkflBoODXwmYW5iHLSghpgNzUozNLAXnxl/XsUb6Hp4B4y/GgOtaX8JXG5LlPq5dN3zEP+/ugALH/TwQrorGWlpZQ/h6Cw4TG8GSrQ+5zO4ygAfHp1movHx9cXCd3gh8iC4qgQ+ftkd0csZ3QWIURoH2fg0gD5ZtkkH0RdUGwMDEBaFb1wYxFYmwGohggHdEWG51K7pAfHQ6my6ZzS+TUPvtJq2gyzx0478TCe42LIjqikH63Jj7ML042gLwyDQoK1MZhciOuSD2KKjXlVrLdB79D7uOxB/WYj0BhiwkbkTbbFvvTYKL7bW238pCjM0oDNC64Ge+7pWYMYybwbcv6FyS3/NaqbGljlfZ+mPMV7ve+GNTka+RrwAAAAASUVORK5CYII=";
 	
-	protected ComponentFolder builtinIcFolder;
+	public ComponentFolder builtinIcFolder;
+	public ComponentFolder userIcFolder;
 	
 	public void registerIncludedParts() {
 		
@@ -240,6 +242,7 @@ public class LogicSim {
 		ComponentFolder wireFolder = Registries.registerFolder("circuit.folders.wires", ICON_WIRE_GROUP);
 		ComponentFolder partFolder = Registries.registerFolder("circuit.folders.basic", ICON_PART_GROUP);
 		this.builtinIcFolder = Registries.registerFolder("circuit.folders.ics", ICON_IC_GROUP);
+		this.userIcFolder = Registries.registerFolder("circuit.folders.user", ICON_IC_GROUP);
 		
 		Registries.registerPart(partFolder, AndGateComponent.class, Component::placeClick, AndGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.and_gate", LogicGateComponent.ICON_AND_B64 );
 		Registries.registerPart(partFolder, OrGateComponent.class, Component::placeClick, OrGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.or_gate",LogicGateComponent.ICON_OR_B64);
@@ -259,19 +262,22 @@ public class LogicSim {
 		System.out.println("Load integrated circuits from file ...");
 		
 		Registries.clearSubCircuitCache();
-		_fillSubCircuitCache(this.builtinIcFolder, this.subCircuitFolder);
+		scanForFiles(this.subCircuitFolder, file -> {
+			if (!isCircuitFile(file)) return;
+			String name = Translator.translate(getFileName(file.getName()));
+			Registries.cacheSubCircuit(this.subCircuitFolder, SubCircuitComponent.class, this.builtinIcFolder, Component::placeClick, (circuit, pos) -> SubCircuitComponent.coursorMove(circuit, pos, file), Component::abbortPlacement, name, SubCircuitComponent.ICON_B64);
+		});
 		triggerMenuUpdates();
 	}
 	
-	protected void _fillSubCircuitCache(ComponentFolder folder, File circuitFolder) {
-		if (this.subCircuitFolder.list() == null) return;
-		for (String entry : this.subCircuitFolder.list()) {
+	public static void scanForFiles(File circuitFolder, Consumer<File> consumer) {
+		if (circuitFolder.list() == null) return;
+		for (String entry : circuitFolder.list()) {
 			File entryPath = new File(circuitFolder, entry);
 			if (entryPath.isFile()) {
-				String name = Translator.translate(getFileName(entry));
-				Registries.cacheSubCircuit(circuitFolder, SubCircuitComponent.class, folder, Component::placeClick, (circuit, pos) -> SubCircuitComponent.coursorMove(circuit, pos, entryPath), Component::abbortPlacement, name, SubCircuitComponent.ICON_B64);
+				consumer.accept(entryPath);
 			} else {
-				_fillSubCircuitCache(folder, entryPath);
+				scanForFiles(entryPath, consumer);
 			}
 		}
 	}
@@ -282,6 +288,11 @@ public class LogicSim {
 		String[] fes = fn.split("\\.");
 		String fe = fes[fes.length - 1];
 		return fn.substring(0, fn.length() - (fes.length == 1 ? 0 : fe.length() + 1));
+	}
+	
+	public static boolean isCircuitFile(File file) {
+		// TODO File extension check
+		return true;
 	}
 	
 }

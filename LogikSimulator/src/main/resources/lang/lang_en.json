@@ -31,6 +31,7 @@
 "editor.window.warning.title": "Warning",
 "editor.window.error.title": "An exception was thrown!",
 "editor.window.error.load_sub_circuit": "Failed to load sub-circuit from file! An IOException was thrown: %0",
+"editor.window.error.failed_load_circuit": "Failed to load circuit from file! An IOException was thrown: %0",
 "editor.window.error.save_file": "Failed to save file! An IOException was thrown: %0",
 "editor.window.error.load_file": "Failed to load file! An IOException was thrown: %0",
 "editor.window.error.parese_file": "An error occured loding the circuit:\n%0",
@@ -66,6 +67,7 @@
 "circuit.folders.basic": "Basics",
 "circuit.folders.wires": "Wires",
 "circuit.folders.ics": "Integrated circuits",
+"circuit.folders.user": "User Circuits",
 
 "circuit.components.wire": "Logik wire",
 "circuit.components.and_gate": "And gate",

@@ -8,7 +8,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -52,6 +54,7 @@ import org.eclipse.swt.widgets.TreeItem;
 
 import de.m_marvin.logicsim.LogicSim;
 import de.m_marvin.logicsim.logic.Circuit;
+import de.m_marvin.logicsim.logic.Component;
 import de.m_marvin.logicsim.logic.parts.SubCircuitComponent;
 import de.m_marvin.logicsim.logic.simulator.CircuitProcessor;
 import de.m_marvin.logicsim.logic.simulator.SimulationMonitor;
@@ -248,7 +251,6 @@ public class Editor {
 				}
 			}
 		});
-		updatePartSelector();
 		
 		// Additional sub-groups
 		
@@ -338,6 +340,7 @@ public class Editor {
 			return processInfo.get().warnings();
 		});
 		changeCircuit(circuit);
+		updatePartSelector();
 		
 	}
 	
@@ -469,6 +472,7 @@ public class Editor {
 				ex.printStackTrace();
 			}
 		}
+		updatePartSelector();
 	}
 	
 	public Circuit getCurrentCurcit() {
@@ -481,6 +485,7 @@ public class Editor {
 		this.viewComponent = new SubCircuitComponent(this.subCircuitView.getCircuit());
 		this.viewComponent.setSubCircuit(circuit);
 		this.subCircuitView.getCircuit().add(this.viewComponent);
+		this.subCircuitView.getCircuit().setCircuitFile(circuit.getCircuitFile());
 		updateComponentView();
 	}
 	
@@ -488,6 +493,27 @@ public class Editor {
 		this.viewComponent.updatePinout();
 		Vec2i position = new Vec2i(-this.viewComponent.getVisualWidth(), -this.viewComponent.getVisualHeight()).div(2).add(Vec2i.fromVec(this.subCircuitView.getSize()).div(2));
 		this.viewComponent.setVisualPosition(position);
+	}
+
+	public Optional<File> getCircuitFolder() {
+		File circuitPath = this.getCurrentCurcit().getCircuitFile();
+		if (circuitPath != null) {
+			return Optional.of(circuitPath.getParentFile());
+		}
+		return Optional.empty();
+	}
+	
+	public Collection<ComponentEntry> loadUserCircuits() {
+		Optional<File> circuitFolder = getCircuitFolder();
+		List<ComponentEntry> userIcs = new ArrayList<>();
+		if (circuitFolder.isPresent()) {
+			LogicSim.scanForFiles(getCircuitFolder().get(), file -> {
+				if (!LogicSim.isCircuitFile(file)) return;
+				String name = Translator.translate(LogicSim.getFileName(file.getName()));
+				userIcs.add(new ComponentEntry(LogicSim.getInstance().userIcFolder, SubCircuitComponent.class, Component::placeClick, (circuit, pos) -> SubCircuitComponent.coursorMove(circuit, pos, file), Component::abbortPlacement, name, SubCircuitComponent.ICON_B64));
+			});
+		}
+		return userIcs;
 	}
 	
 	public void updatePartSelector() {
@@ -510,6 +536,15 @@ public class Editor {
 			}
 		}
 		for (ComponentEntry entry : Registries.getCachedSubCircuitParts()) {
+			TreeItem folderItem = partFolders.get(entry.folder());
+			if (folderItem != null) {
+				TreeItem item = new TreeItem(folderItem, SWT.NONE);
+				item.setImage(decodeImage(entry.icon()));
+				item.setText(Translator.translate(entry.name()));
+				item.setData(entry);
+			}
+		}
+		for (ComponentEntry entry : loadUserCircuits()) {
 			TreeItem folderItem = partFolders.get(entry.folder());
 			if (folderItem != null) {
 				TreeItem item = new TreeItem(folderItem, SWT.NONE);

@@ -34,7 +34,13 @@ public class CircuitSerializer {
 	public static Circuit loadCircuit(File file) throws IOException {
 		Circuit circuit = new Circuit();
 		circuit.setCircuitFile(file);
-		deserializeCircuit(circuit, new FileInputStream(file));
+		try {
+			deserializeCircuit(circuit, new FileInputStream(file));
+		} catch (Exception e) {
+			Editor.showErrorInfo(LogicSim.getInstance().getLastInteractedEditor().getShell(), "editor.window.error.failed_load_circuit", e);
+			System.err.println("Failed to load circuit from file '" + file + "'!");
+			e.printStackTrace();
+		}
 		return circuit;
 	}
 	
