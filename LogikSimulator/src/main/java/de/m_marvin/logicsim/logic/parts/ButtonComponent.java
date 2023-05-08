@@ -55,7 +55,7 @@ public class ButtonComponent extends Component implements ISubCircuitIO {
 			// If not, copy all received lanes one to one
 			String laneTag = this.subCircuitInput.get().getLaneTag();
 			if (laneReferenceCache.size() == 1 || !laneTag.equals(Circuit.DEFAULT_BUS_LANE)) {
-				this.toggle = laneReferenceCache.getOrDefault(laneTag, NetState.FLOATING).getLogicState();
+				this.toggle = Circuit.safeLaneRead(laneReferenceCache, laneTag).getLogicState();
 				this.outputs.get(0).setState(this.toggle);
 			} else {
 				this.outputs.get(0).writeLanes(laneReferenceCache);

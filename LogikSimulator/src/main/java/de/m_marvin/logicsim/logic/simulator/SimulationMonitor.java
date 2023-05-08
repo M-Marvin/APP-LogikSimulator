@@ -70,9 +70,7 @@ public class SimulationMonitor {
 		
 		if (laneData == null) return Optional.empty();
 		if (laneData.isEmpty()) return Optional.of(NetState.FLOATING);
-		if (laneData.get(Circuit.DEFAULT_BUS_LANE) == NetState.SHORT_CIRCUIT) return Optional.of(NetState.SHORT_CIRCUIT);
-		if (laneData.containsKey(Circuit.DEFAULT_BUS_LANE) && laneData.size() > 1) return laneData.keySet().stream().filter(v -> !v.equals(Circuit.DEFAULT_BUS_LANE)).map(v -> laneData.get(v)).filter(s -> s.isErrorState()).findAny();
-		return Optional.ofNullable(laneData.get(Circuit.DEFAULT_BUS_LANE));
+		return laneData.keySet().stream().map(v -> laneData.get(v)).filter(s -> s.isErrorState()).findAny();
 		
 	}
 	
@@ -83,10 +81,12 @@ public class SimulationMonitor {
 		this.cachedProcessInfo.forEach((circuit, processInfo) -> {
 			
 			boolean running = getProcessor().isExecuting(circuit);
+
+			if (!running) return;
 			
 			circuit.getComponents().forEach(component -> {
 				
-				if (component instanceof NetConnector connector && running) {
+				if (component instanceof NetConnector connector) {
 					
 					if (connector.getPassives().size() == 0) return;
 					
@@ -99,12 +99,34 @@ public class SimulationMonitor {
 							if (w.component == component) return;
 						}
 						String message = Translator.translate("editor_area.warning." + (state.get() == NetState.FLOATING ? "floating" : "short_circuit"));
-						processInfo.warnings.add(new SimulationWarning(component, message, () -> {
+						processInfo.warnings.add(new SimulationWarning(component, null, message, () -> {
 							Optional<NetState> state2 = queryWarningState(circuit, connector.getLaneData());
 							return state2.isPresent() && state2.get() == state.get() && running;
 						}, System.currentTimeMillis() + WARNING_DECAY_TIME));
 						
 					}
+					
+				} else {
+					
+					component.getInputs().forEach(inputNode -> {
+						
+						NetState state = circuit.getNetState(inputNode, inputNode.getLaneTag());
+						
+						if (state.isErrorState()) {
+							
+							// TODO Optimize
+							for (SimulationWarning w : processInfo.warnings) {
+								if (w.component == component && w.node == inputNode) return;
+							}
+							String message = Translator.translate("editor_area.warning." + (state == NetState.FLOATING ? "floating" : "short_circuit"));
+							processInfo.warnings.add(new SimulationWarning(component, inputNode, message, () -> {
+								Optional<NetState> state2 = queryWarningState(circuit, circuit.getLaneMapReference(inputNode));
+								return state2.isPresent() && state2.get() == state && running;
+							}, System.currentTimeMillis() + WARNING_DECAY_TIME));
+							
+						}
+						
+					});
 					
 				}
 				

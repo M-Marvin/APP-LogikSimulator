@@ -33,6 +33,7 @@ import de.m_marvin.logicsim.util.Registries.ComponentFolder;
 public class LogicSim {
 	 
 	// TODO
+//	- Zooming
 //	- Multi-Auswahl (Copy/Paste)
 // 	- Algemein Funktionen (Strg+s, New File, File Extension, Undo/Redo)
 //	- Komponenten zur interaktion mit Dateien, Grphischer Darstellung, Tastatureingabe etc
@@ -204,9 +205,10 @@ public class LogicSim {
 			if (!disposedEditors.isEmpty()) {
 				this.openEditorWindows.removeAll(disposedEditors);
 			}
+
+			this.openEditorWindows.forEach(Editor::updateUI);
 		}
 		
-		this.openEditorWindows.forEach(Editor::updateUI);
 		if (this.circuitViewWindow != null && !this.circuitViewWindow.getShell().isDisposed()) this.circuitViewWindow.updateUI();
 		
 		if (this.openEditorWindows.isEmpty()) this.terminate();

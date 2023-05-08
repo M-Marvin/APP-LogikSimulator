@@ -41,44 +41,43 @@ import de.m_marvin.univec.impl.Vec3i;
 
 public class EditorArea extends Composite implements MouseListener, MouseMoveListener, KeyListener, MouseWheelListener {
 	
-	public static final String ERROR_ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEEAAABACAYAAABFqxrgAAABZElEQVR4nO3ay27DMAxE0asi///LzqYEDLSBqQdJCZnZZSVldCw7jhqFua7run9urbWKefxUDLpbSpqHvwosFRokgSIJnxRYsjVIAgUSnhRYMjVIAskSvAosWRokgUQJvQosGRokgSQJowos0RokgQQJ3qfDyqdISSBYQu/qVmmQBAIljK5qhQZJIEjC7Gpma5AEAiSsWsVMDZLAYgk9q+d525ylQRJYWELEqs3eRbyRBBaVEHntZmiQBBaUkLGDR2uQBCZLyHyqi9QgCUyUUPG7P0qDJDBYQuWb4QgNksBACTucMlmtQRLoLGEHBd6xejRIAh0l7KTAO6ZXgyTgLGFHBd6xPRokAcfb5p0V3DMzT0ngQcIpCiyj833FTOc5Rxz1P00BjN8ptCfwoYQTFVhGNEgC/5RwsgJLr4ayu8NOZW5xjjAq3u+jPYGbhFX/9Z+W1lqTBH4lfKsCiySgEgCVAMAbcBDcc4s/x/EAAAAASUVORK5CYII=";
-	
 	public static final int RASTER_SIZE = 10;
 	public static final int VISUAL_BUNDING_BOX_OFFSET = 5;
 	public static final int SHOW_HIDEN_TAG_RANGE = 100;
 	public static final int MIN_WARNING_DISTANCE = 100;
 			
-	public Circuit circuit;
-	public Vec2i visualOffset = new Vec2i(0, 0);
-	public Vec2i areaSize = new Vec2i(0, 0);
+	protected Circuit circuit;
+	protected Vec2i visualOffset = new Vec2i(0, 0);
+	protected Vec2i areaSize = new Vec2i(0, 0);
+	protected boolean allowEditing = true;
+	protected Supplier<Collection<SimulationWarning>> warningSupplier;
 	
 	protected Component hoveredComponent = null;
 	protected Component grabedComponent = null;
 	protected Vec2i grabOffset = new Vec2i(0, 0);
 	protected Vec2i mousePosition = new Vec2i(0, 0);
-	protected ComponentEntry activePlacement;
+	protected ComponentEntry activePlacement = null;
 	protected boolean grabbedBackground = false;
-	protected boolean allowEditing = true;
-	protected long animationTimer;
-	protected Supplier<Collection<SimulationWarning>> warningSupplier;
-	
+
+	protected Slider sliderHorizontal;
+	protected Slider sliderVertical;
 	protected GLData glData;
 	protected GLCanvas glCanvas;
 	protected GLCapabilities glCapabilities;
 	protected boolean resized;
 	protected boolean initialized = false;
+	protected long animationTimer;
 	
-	protected Slider sliderHorizontal;
-	protected Slider sliderVertical;
-
 	public static class SimulationWarning {
 		public Component component;
+		public Node node;
 		public String message;
 		public Supplier<Boolean> stillValid; 
 		public long decayTime;
 		
-		public SimulationWarning(Component component, String message, Supplier<Boolean> stillValid, long decayTime) {
+		public SimulationWarning(Component component, Node node, String message, Supplier<Boolean> stillValid, long decayTime) {
 			this.component = component;
+			this.node = node;
 			this.message = message;
 			this.stillValid = stillValid;
 			this.decayTime = decayTime;
@@ -294,7 +293,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 			boolean redraw = this.activePlacement.placementMoveMethod().apply(circuit, mousePosition.sub(this.visualOffset));
 			if (redraw) this.redraw();
 		}
-		
+		// TODO redraw() should now be obsolete
 		if (this.grabedComponent != null) {
 			this.redraw();
 		}
@@ -443,6 +442,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 				warningSupplier.get().forEach(warning -> {
 					
 					Vec2i position = warning.component.getVisualPosition().add(new Vec2i(warning.component.getVisualWidth() / 2, warning.component.getVisualHeight() / 2));
+					if (warning.node != null) position.addI(warning.node.getVisualOffset().sub(20, 25));
 					
 					for (Vec2i dw : drawnWarnings) {
 						if (dw.dist(position) < MIN_WARNING_DISTANCE) return;
@@ -527,6 +527,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		boolean b = false;
 		for (String lane : lanes) {
 			NetState state = laneData.get(lane);
+			if (state == null) state = NetState.FLOATING;
 			if (state.getLogicState()) {
 				swapColor(0, 0, 1, 1);
 			} else {

@@ -85,7 +85,7 @@ public class LampComponent extends Component implements ISubCircuitIO {
 			// If not, copy all received lanes one to one
 			String laneTag = this.inputs.get(0).getLaneTag();
 			if (laneReferenceCache.size() == 1 || !laneTag.equals(Circuit.DEFAULT_BUS_LANE)) {
-				this.subCircuitOutput.get().setState(laneReferenceCache.getOrDefault(laneTag, NetState.FLOATING).getLogicState());
+				this.subCircuitOutput.get().setState(Circuit.safeLaneRead(laneReferenceCache, laneTag).getLogicState());
 			} else {
 				this.subCircuitOutput.get().writeLanes(laneReferenceCache);
 			}

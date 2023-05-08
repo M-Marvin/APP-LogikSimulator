@@ -162,6 +162,9 @@ public class Editor {
 		fileTab.setText (Translator.translate("editor.menu.file"));
 		Menu fileMenu = new Menu(shell, SWT.DROP_DOWN);
 		fileTab.setMenu(fileMenu);
+		MenuItem newOpt = new MenuItem(fileMenu, SWT.PUSH);
+		newOpt.setText(Translator.translate("editor.menu.file.new_file"));
+		newOpt.addListener(SWT.Selection, (e) -> newCircuit());
 		MenuItem saveAsOpt = new MenuItem(fileMenu, SWT.PUSH);
 		saveAsOpt.setText(Translator.translate("editor.menu.file.save_as"));
 		saveAsOpt.addListener(SWT.Selection, (e) -> saveCircuit(true));
@@ -404,6 +407,14 @@ public class Editor {
 		this.subCircuitView.render();
 		this.statusGraph.render();
 		
+	}
+	
+	public void newCircuit() {
+		MessageBox msg = new MessageBox(shell, SWT.YES | SWT.NO | SWT.ICON_QUESTION);
+		msg.setMessage(Translator.translate("editor.window.info.clear_circuit_request"));
+		msg.setText(Translator.translate("editor.window.info"));
+		if (msg.open() == SWT.NO) return;
+		this.changeCircuit(new Circuit());
 	}
 	
 	public void saveCircuit(boolean saveAs) {

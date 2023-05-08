@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import de.m_marvin.logicsim.logic.nodes.Node;
+import de.m_marvin.logicsim.logic.simulator.FastAsyncMap;
 import de.m_marvin.univec.impl.Vec4i;
 
 /**
@@ -62,6 +63,12 @@ public class Circuit {
 		}
 	}
 	
+	public static NetState safeLaneRead(Map<String, NetState> laneData, String lane) {
+		NetState state = laneData.get(lane);
+		if (state == null) return NetState.FLOATING;
+		return state;
+	}
+	
 	public static enum ShortCircuitType {
 		HIGH_LOW_SHORT,PREFER_HIGH,PREFER_LOW;
 	}
@@ -104,7 +111,7 @@ public class Circuit {
 			try {
 				String bus = laneParts[0];
 				int bit = Integer.parseInt(laneParts[1]);
-				boolean value = laneData.get(lane).getLogicState();
+				boolean value = safeLaneRead(laneData, lane).getLogicState();
 				int bitCount = bitCounts.getOrDefault(bus, 0);
 				if (bit + 1 > bitCount) {
 					bitCount = bit + 1;
@@ -200,8 +207,8 @@ public class Circuit {
 		network.addAll(nodeCache);
 		if (network.size() > 0) {
 			this.networks.add(network);
-			this.valuesPri.add(new HashMap<>());
-			this.valuesSec.add(new HashMap<>());
+			this.valuesPri.add(new FastAsyncMap<>());
+			this.valuesSec.add(new FastAsyncMap<>());
 		}
 		return this.networks.size() - 1;
 	}
@@ -219,8 +226,8 @@ public class Circuit {
 		});
 		if (network.size() > 0) {
 			this.networks.add(network);
-			this.valuesPri.add(new HashMap<>());
-			this.valuesSec.add(new HashMap<>());
+			this.valuesPri.add(new FastAsyncMap<>());
+			this.valuesSec.add(new FastAsyncMap<>());
 		}
 	}
 
@@ -245,9 +252,7 @@ public class Circuit {
 	}
 	
 	protected NetState getNetValue(int netId, String lane) {
-		Map<String, NetState> laneData = valuesSec.get(netId);
-		if (!laneData.containsKey(lane)) laneData.put(lane, NetState.FLOATING);
-		return this.valuesSec.size() > netId ? laneData.get(lane) : NetState.FLOATING;
+		return this.valuesSec.size() > netId ? safeLaneRead(valuesSec.get(netId), lane) : NetState.FLOATING;
 	}
 
 	protected synchronized Map<String, NetState> getNetLanes(int netId) {
@@ -256,7 +261,7 @@ public class Circuit {
 
 	protected synchronized void applyNetValue(int netId, NetState state, String lane) {
 		if (netId >= this.valuesPri.size()) return;
-		NetState resultingState = combineStates(this.valuesPri.get(netId).getOrDefault(lane, NetState.FLOATING), state, this.shortCircuitType);
+		NetState resultingState = combineStates(safeLaneRead(this.valuesPri.get(netId), lane), state, this.shortCircuitType);
 		this.valuesPri.get(netId).put(lane, resultingState);
 		this.valuesSec.get(netId).put(lane, resultingState);
 	}
@@ -265,11 +270,13 @@ public class Circuit {
 		if (netId >= this.valuesPri.size()) return;
 		Map<String, NetState> laneStatesPri = this.valuesPri.get(netId);
 		Map<String, NetState> laneStatesSec = this.valuesSec.get(netId);
-		laneStates.forEach((lane, state) -> {
-			NetState resultingState = combineStates(laneStatesPri.getOrDefault(lane, NetState.FLOATING), state, this.shortCircuitType);
-			laneStatesPri.put(lane, resultingState);
-			laneStatesSec.put(lane, resultingState);
-		});
+		for (String lane : laneStates.keySet()) {
+			NetState resultingState = combineStates(safeLaneRead(laneStatesPri, lane), laneStates.get(lane), this.shortCircuitType);
+			if (lane != null && resultingState != null) {
+				laneStatesPri.put(lane, resultingState);
+				laneStatesSec.put(lane, resultingState);
+			}
+		}
 	}
 	
 	public NetState getNetState(Node node) {
@@ -317,7 +324,12 @@ public class Circuit {
 		assert !this.virtual : "Can't simulate virtual circuit!";
 		this.valuesPri.forEach(holder -> holder.clear());
 		this.components.forEach(Component::updateIO);
-		for (int i = 0; i < this.valuesPri.size(); i++) this.valuesSec.get(i).putAll(this.valuesPri.get(i)); //.put("", this.values.get(i).get(""));
+		for (int i = 0; i < this.valuesPri.size(); i++) {
+			Map<String, NetState> laneDataSec = this.valuesSec.get(i);
+			Map<String, NetState> laneDataPri = this.valuesPri.get(i);
+			laneDataSec.putAll(laneDataPri);
+			laneDataSec.keySet().stream().filter(lane -> !laneDataPri.containsKey(lane)).toList().forEach(laneDataSec::remove);
+		}
 	}
 	
 	

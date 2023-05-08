@@ -93,7 +93,16 @@
       "label": "unnamed",
       "x": 610,
       "y": 430,
-      "laneTags": {},
+      "laneTags": {
+        "1": "b01",
+        "2": "b02",
+        "3": "b03",
+        "4": "b04",
+        "5": "b05",
+        "6": "b06",
+        "7": "b07",
+        "8": "b00"
+      },
       "subCircuitFile": "counter"
     },
     {
@@ -102,14 +111,15 @@
       "x": 810,
       "y": 430,
       "laneTags": {
-        "1": "b1",
-        "2": "b2",
-        "3": "b3",
-        "4": "b4",
-        "5": "b5",
-        "6": "b6",
-        "7": "b7",
-        "8": "b0"
+        "9": "b07",
+        "1": "b09",
+        "2": "b10",
+        "3": "b11",
+        "4": "b12",
+        "5": "b13",
+        "6": "b14",
+        "7": "b15",
+        "8": "b08"
       },
       "subCircuitFile": "counter"
     },
@@ -119,7 +129,7 @@
       "x": 1030,
       "y": 330,
       "laneTags": {
-        "0": "b0"
+        "0": "b00"
       }
     },
     {
@@ -128,7 +138,7 @@
       "x": 1030,
       "y": 380,
       "laneTags": {
-        "0": "b1"
+        "0": "b01"
       }
     },
     {
@@ -137,7 +147,7 @@
       "x": 1030,
       "y": 430,
       "laneTags": {
-        "0": "b2"
+        "0": "b02"
       }
     },
     {
@@ -146,7 +156,7 @@
       "x": 1030,
       "y": 480,
       "laneTags": {
-        "0": "b3"
+        "0": "b03"
       }
     },
     {
@@ -155,7 +165,7 @@
       "x": 1030,
       "y": 530,
       "laneTags": {
-        "0": "b4"
+        "0": "b04"
       }
     },
     {
@@ -164,7 +174,7 @@
       "x": 1030,
       "y": 580,
       "laneTags": {
-        "0": "b5"
+        "0": "b05"
       }
     },
     {
@@ -173,7 +183,7 @@
       "x": 1030,
       "y": 630,
       "laneTags": {
-        "0": "b6"
+        "0": "b06"
       }
     },
     {
@@ -182,7 +192,7 @@
       "x": 1030,
       "y": 680,
       "laneTags": {
-        "0": "b7"
+        "0": "b07"
       }
     },
     {
@@ -576,6 +586,116 @@
       "y1": 3,
       "x2": 53,
       "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 697,
+      "y": 437,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 23
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 697,
+      "y": 457,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 23
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 697,
+      "y": 477,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 23
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 697,
+      "y": 497,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 23
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 697,
+      "y": 517,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 23
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 697,
+      "y": 537,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 23
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 697,
+      "y": 557,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 23
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 697,
+      "y": 337,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 103,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 697,
+      "y": 337,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 203,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 897,
+      "y": 337,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 103
     }
   ]
 }

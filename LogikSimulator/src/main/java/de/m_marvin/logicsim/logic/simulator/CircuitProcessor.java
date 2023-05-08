@@ -122,6 +122,7 @@ public class CircuitProcessor {
 					}
 				}
 			} catch (Throwable e) {
+				e.printStackTrace();
 				LogicSim.getInstance().getDisplay().asyncExec(() -> {
 					if (!LogicSim.getInstance().getLastInteractedEditor().getShell().isDisposed()) Editor.showErrorInfo(LogicSim.getInstance().getLastInteractedEditor().getShell(), "editor.window.error.processor_crash", e);
 				});
