@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import org.eclipse.swt.widgets.Shell;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -16,6 +14,7 @@ import de.m_marvin.logicsim.logic.nodes.Node;
 import de.m_marvin.logicsim.logic.nodes.OutputNode;
 import de.m_marvin.logicsim.logic.nodes.PassivNode;
 import de.m_marvin.logicsim.ui.widgets.EditorArea;
+import de.m_marvin.logicsim.ui.widgets.InputDialog;
 import de.m_marvin.logicsim.ui.windows.Editor;
 import de.m_marvin.univec.impl.Vec2i;
 
@@ -138,8 +137,9 @@ public abstract class Component {
 	public void click(Vec2i clickPosition, boolean leftClick) {
 		if (leftClick) {
 			Editor editor = LogicSim.getInstance().getLastInteractedEditor();
-			Shell shell = Editor.showTextDialog(editor.getShell(), "editor.window.change_input_name", getLabel(), this::setLabel);
-			shell.setLocation(clickPosition.x, clickPosition.y);
+			InputDialog configDialog = new InputDialog(editor.getShell(), "editor.config.change_component_name", getLabel(), this::setLabel);
+			configDialog.setLocation(clickPosition.x, clickPosition.y);
+			configDialog.open();
 		}
 	}
 	/**

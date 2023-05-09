@@ -2,12 +2,11 @@ package de.m_marvin.logicsim.logic.nodes;
 
 import java.util.Map;
 
-import org.eclipse.swt.widgets.Shell;
-
 import de.m_marvin.logicsim.LogicSim;
 import de.m_marvin.logicsim.logic.Circuit.NetState;
-import de.m_marvin.logicsim.ui.windows.Editor;
 import de.m_marvin.logicsim.logic.Component;
+import de.m_marvin.logicsim.ui.widgets.InputDialog;
+import de.m_marvin.logicsim.ui.windows.Editor;
 import de.m_marvin.univec.impl.Vec2i;
 
 /**
@@ -26,8 +25,9 @@ public class OutputNode extends Node {
 	@Override
 	public boolean click(Vec2i mousePosition) {
 		Editor editor = LogicSim.getInstance().getLastInteractedEditor();
-		Shell shell = Editor.showTextDialog(editor.getShell(), "editor.window.change_tag", getLaneTag(), this::setLaneTag);
-		shell.setLocation(mousePosition.x, mousePosition.y);
+		InputDialog configDialog = new InputDialog(editor.getShell(), "editor.config.change_tag", getLaneTag(), this::setLaneTag);
+		configDialog.open();
+		configDialog.setLocation(mousePosition.x, mousePosition.y);
 		return true;
 	}
 	

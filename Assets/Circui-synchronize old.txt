@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+import java.util.concurrent.atomic.AtomicReference;
 
 import de.m_marvin.logicsim.logic.nodes.Node;
 import de.m_marvin.logicsim.logic.simulator.FastAsyncMap;
@@ -33,11 +34,11 @@ public class Circuit {
 	public static Random floatingValue = new Random();
 	public static boolean shortCircuitValue = false;
 	
-	public static boolean getFloatingValue() {
+	public synchronized static boolean getFloatingValue() {
 		return floatingValue.nextBoolean();
 	}
 	
-	public static boolean getShortCircuitValue() {
+	public synchronized static boolean getShortCircuitValue() {
 		shortCircuitValue = !shortCircuitValue;
 		return floatingValue.nextBoolean();
 	}
@@ -128,8 +129,8 @@ public class Circuit {
 	}
 	
 	protected final List<Set<Node>> networks = new ArrayList<>();
-	protected final List<Map<String, NetState>> valuesSec = new ArrayList<>();
-	protected final List<Map<String, NetState>> valuesPri = new ArrayList<>();
+	protected final AtomicReference<List<Map<String, NetState>>> valuesSec = new AtomicReference<>(new ArrayList<>());
+	protected final AtomicReference<List<Map<String, NetState>>> valuesPri = new AtomicReference<>(new ArrayList<>());
 	protected final List<Component> components = new ArrayList<>();
 	protected File circuitFile;
 	protected final boolean virtual;
@@ -204,8 +205,8 @@ public class Circuit {
 		network.addAll(nodeCache);
 		if (network.size() > 0) {
 			this.networks.add(network);
-			this.valuesPri.add(new FastAsyncMap<>());
-			this.valuesSec.add(new FastAsyncMap<>());
+			this.valuesPri.get().add(new FastAsyncMap<>());
+			this.valuesSec.get().add(new FastAsyncMap<>());
 		}
 		return this.networks.size() - 1;
 	}
@@ -223,14 +224,14 @@ public class Circuit {
 		});
 		if (network.size() > 0) {
 			this.networks.add(network);
-			this.valuesPri.add(new FastAsyncMap<>());
-			this.valuesSec.add(new FastAsyncMap<>());
+			this.valuesPri.get().add(new FastAsyncMap<>());
+			this.valuesSec.get().add(new FastAsyncMap<>());
 		}
 	}
 
 	protected synchronized Set<Node> removeNet(int netId) {
-		this.valuesPri.remove(netId);
-		this.valuesSec.remove(netId);
+		this.valuesPri.get().remove(netId);
+		this.valuesSec.get().remove(netId);
 		return this.networks.remove(netId);
 	}
 	
@@ -249,24 +250,24 @@ public class Circuit {
 	}
 	
 	protected NetState getNetValue(int netId, String lane) {
-		return this.valuesSec.size() > netId ? safeLaneRead(valuesSec.get(netId), lane) : NetState.FLOATING;
+		return this.valuesSec.get().size() > netId ? safeLaneRead(valuesSec.get().get(netId), lane) : NetState.FLOATING;
 	}
 
 	protected Map<String, NetState> getNetLanes(int netId) {
-		return this.valuesSec.size() > netId ? this.valuesSec.get(netId) : null;
+		return this.valuesSec.get().size() > netId ? this.valuesSec.get().get(netId) : null;
 	}
 
 	protected void applyNetValue(int netId, NetState state, String lane) {
-		if (netId >= this.valuesPri.size()) return;
-		NetState resultingState = combineStates(safeLaneRead(this.valuesPri.get(netId), lane), state, this.shortCircuitType);
-		this.valuesPri.get(netId).put(lane, resultingState);
-		this.valuesSec.get(netId).put(lane, resultingState);
+		if (netId >= this.valuesPri.get().size()) return;
+		NetState resultingState = combineStates(safeLaneRead(this.valuesPri.get().get(netId), lane), state, this.shortCircuitType);
+		this.valuesPri.get().get(netId).put(lane, resultingState);
+		this.valuesSec.get().get(netId).put(lane, resultingState);
 	}
 	
 	protected void applyNetLanes(int netId, Map<String, NetState> laneStates) {
-		if (netId >= this.valuesPri.size()) return;
-		Map<String, NetState> laneStatesPri = this.valuesPri.get(netId);
-		Map<String, NetState> laneStatesSec = this.valuesSec.get(netId);
+		if (netId >= this.valuesPri.get().size()) return;
+		Map<String, NetState> laneStatesPri = this.valuesPri.get().get(netId);
+		Map<String, NetState> laneStatesSec = this.valuesSec.get().get(netId);
 		for (String lane : laneStates.keySet()) {
 			NetState resultingState = combineStates(safeLaneRead(laneStatesPri, lane), laneStates.get(lane), this.shortCircuitType);
 			if (lane != null && resultingState != null) {
@@ -307,11 +308,11 @@ public class Circuit {
 		if (netId.isPresent()) applyNetValue(netId.getAsInt(), state, lane);
 	}
 
-	public void resetNetworks() {
-		for (int i = 0; i < this.valuesPri.size(); i++) this.valuesPri.get(i).clear();
-		for (int i = 0; i < this.valuesSec.size(); i++) {
-			for (String lane : this.valuesSec.get(i).keySet()) {
-				this.valuesSec.get(i).put(lane, NetState.LOW);
+	public synchronized void resetNetworks() {
+		for (int i = 0; i < this.valuesPri.get().size(); i++) this.valuesPri.get().get(i).clear();
+		for (int i = 0; i < this.valuesSec.get().size(); i++) {
+			for (String lane : this.valuesSec.get().get(i).keySet()) {
+				this.valuesSec.get().get(i).put(lane, NetState.LOW);
 			}
 		}
 		this.components.forEach(Component::reset);
@@ -319,11 +320,11 @@ public class Circuit {
 	
 	public void updateCircuit() {
 		assert !this.virtual : "Can't simulate virtual circuit!";
-		this.valuesPri.forEach(holder -> holder.clear());
+		this.valuesPri.get().forEach(holder -> holder.clear());
 		this.components.forEach(Component::updateIO);
-		for (int i = 0; i < this.valuesPri.size(); i++) {
-			Map<String, NetState> laneDataSec = this.valuesSec.get(i);
-			Map<String, NetState> laneDataPri = this.valuesPri.get(i);
+		for (int i = 0; i < this.valuesPri.get().size(); i++) {
+			Map<String, NetState> laneDataSec = this.valuesSec.get().get(i);
+			Map<String, NetState> laneDataPri = this.valuesPri.get().get(i);
 			laneDataSec.putAll(laneDataPri);
 			laneDataSec.keySet().stream().filter(lane -> !laneDataPri.containsKey(lane)).toList().forEach(laneDataSec::remove);
 		}
@@ -364,8 +365,8 @@ public class Circuit {
 	public synchronized void clear() {
 		this.components.clear();
 		this.networks.clear();
-		this.valuesPri.clear();
-		this.valuesSec.clear();
+		this.valuesPri.get().clear();
+		this.valuesSec.get().clear();
 	}
 	
 	public int nextFreeId() {

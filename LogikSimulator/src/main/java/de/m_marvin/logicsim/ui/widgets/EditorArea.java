@@ -399,7 +399,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		GL11.glPushMatrix();
 		GL11.glTranslatef(this.visualOffset.x, this.visualOffset.y, 0);
 		
-		circuit.getComponents().forEach(component -> {
+		for (Component component : circuit.getComponents()) {
 			
 			if (isComponentVisible(component)) {
 				
@@ -428,7 +428,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 				
 			}
 			
-		});
+		}
 		
 		if (warningSupplier != null) {
 			

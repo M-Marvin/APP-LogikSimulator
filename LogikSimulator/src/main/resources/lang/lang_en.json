@@ -27,7 +27,6 @@
 "editor.window.info.title": "Information",
 "editor.window.info.override_request": "Do you want to override this file?",
 "editor.window.info.clear_circuit_request": "Do you want to clear the current ciruit ?\nThis can not be undone, make sure to safe it first!",
-"editor.window.change_tag": "Enter the new lane-tag to which this node should be connected:",
 "editor.window.warning.title": "Warning",
 "editor.window.error.title": "An exception was thrown!",
 "editor.window.error.load_sub_circuit": "Failed to load sub-circuit from file! An IOException was thrown: %0",
@@ -37,6 +36,12 @@
 "editor.window.error.parese_file": "An error occured loding the circuit:\n%0",
 "editor.window.error.processor_crash": "CRITICAL: On of the running circuit simulation threads crashed!\nThis should never happen and might result in malfunction of the simulation algorithms!\nThe load will be destributed to the other available threads if any!\n\n%0",
 "editor.window.input.title": "Input",
+
+"editor.config.change_tag": "Enter the new lane-tag to which this node should be connected:",
+"editor.config.change_component_name": "Enter the new name for this component:",
+"editor.config.bus_input.index_offset": "Offset of the bus bits:",
+"editor.config.bus_input.bit_count": "Bus width in bits:",
+"editor.config.bus_input.value": "Decimal value to output:",
 
 "editor_area.warning.floating": "FLOATING",
 "editor_area.warning.short_circuit": "SHORT CIRCUIT",
@@ -64,7 +69,12 @@
 "circuit_options.circuit_mode.high_low_short": "High-Low Short",
 "circuit_options.description": "\nDecribes the result of two opposing signals in the simulation.\nHigh-Low Short (default) - Results in an short cut which causes a flickering wire and a warning.\nPrefer High - Results in an high signal, basically like an or gate.\nPrefer Low - Results in an low signal, basically like an and gate.",
 
-"circuit.folders.basic": "Basics",
+"config_dialog.title": "Config",
+"config_dialog.button.confirm": "Ok",
+"config_dialog.button.abbort": "Abbort",
+
+"circuit.folders.logic": "Logic",
+"circuit.folders.io": "I/O",
 "circuit.folders.wires": "Wires",
 "circuit.folders.ics": "Integrated circuits",
 "circuit.folders.user": "User Circuits",

@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
@@ -35,7 +34,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
@@ -46,7 +44,6 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
@@ -113,35 +110,6 @@ public class Editor {
 		msg.setText(Translator.translate("editor.window.error.title"));
 		msg.setMessage(Translator.translate(messageKey, message));
 		msg.open();
-	}
-
-	public static Shell showTextDialog(Shell shell, String messageKey, String initialText, Consumer<String> receiver) {
-		Shell dshell = new Shell(shell);
-		dshell.setText(Translator.translate("editor.window.input.title"));
-		dshell.setLayout(new RowLayout(SWT.VERTICAL));
-		Label label = new Label(dshell, SWT.WRAP);
-		label.setLayoutData(new RowData(200, SWT.DEFAULT));
-		label.setText(Translator.translate(messageKey));
-		Text input = new Text(dshell, SWT.BORDER);
-		input.setText(initialText);
-		input.setLayoutData(new RowData(200, SWT.DEFAULT));
-		Composite group = new Composite(dshell, SWT.NONE);
-		group.setLayoutData(new RowData(200, SWT.DEFAULT));
-		group.setLayout(new RowLayout(SWT.HORIZONTAL));
-		Button buttonOk = new Button(group, SWT.PUSH);
-		buttonOk.setText(Translator.translate("editor.menu.button.ok"));
-		buttonOk.addListener(SWT.Selection, (e) -> {
-			receiver.accept(input.getText());
-			dshell.close();
-		});
-		Button buttonAbbort = new Button(group, SWT.PUSH);
-		buttonAbbort.setText(Translator.translate("editor.menu.button.abbort"));
-		buttonAbbort.addListener(SWT.Selection, (e) -> {
-			dshell.close();
-		});
-		dshell.pack();
-		dshell.open();
-		return dshell;
 	}
 	
 	public Editor(Display display, Circuit circuit) {

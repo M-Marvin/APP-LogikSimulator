@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.Display;
 import de.m_marvin.commandlineparser.CommandLineParser;
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Component;
+import de.m_marvin.logicsim.logic.parts.BusInputComponent;
 import de.m_marvin.logicsim.logic.parts.ButtonComponent;
 import de.m_marvin.logicsim.logic.parts.LampComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent;
@@ -222,13 +223,19 @@ public class LogicSim {
 		
 		this.simulationMonitor.update();
 		
-		synchronized (this.openEditorWindows) { // Prevent iteration of graphic update thread while removing editors
-			this.openEditorWindows.forEach(Editor::updateGraphics);
+		try {
+			synchronized (this.openEditorWindows) { // Prevent iteration of graphic update thread while removing editors
+				this.openEditorWindows.forEach(Editor::updateGraphics);
+			}
+		} catch (Exception e) {
+			System.err.println("Error while updateing graphics!");
+			e.printStackTrace();
 		}
 		
 	}
 	
-	public static final String ICON_PART_GROUP = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGKSURBVFhHzZU7LwVBGIYPoaLmB0hEQaEhQkkodQqNoDhRSUQn8Rc0otT4EwoKEjoFlQSdQic0BOF553LInN2zK7uT3Sd5Mpfd7HzzzWUbVdPlSs+3K2PTGrfblbVBGYiZhbbvV54BH0DsmadSmwxURm0C0LkM74SyGHdlImkXUdi/isP4icd4jnlYxzWcMq2E7+dZglPcxi9UEGc4i1EIj+MIqj1nWpY73LLVTJSBS1s1hN/PzECvKwdduYhDeG9aEWiLEA7wEXdQz5qYl7QMJI1jSHqwgup7w0l1OPZwwVZTyQwgawm0gw9xF/XuMnqWsMdWy6MVGfThC26Ylt3577iPM6j3BrAThZZAm031edOyKAj1PeOROjIodAq0029xE0fVAa94hUq9AhzDQmTtAc2gH29QkZ/gBWrwB7zGaSyNthQ5dA9Ify94/P2QRqEl+MuT88O0flFfIXwAaTMvgwlXJuL/SuHgsX7Nfpx//Q2jUpsAlJJYae9I5RkIZx3rJITUZxNWTKPxA3CzXvc4mpIqAAAAAElFTkSuQmCC";
+	public static final String ICON_LOGIC_GROUP = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAMgSURBVFhHtZfLq01RHMfv8epGXpE3ZSClFAOGHhNKZGLEH8DAVCmZEzEwdUPJwEQGMpKUkrwVAxOKMpGIvC6272ef/T3nd9be65xzxac+d+/12L/9O2utvfa+raIoRlut1reRNlNk0T4tiefQr21EsabpMKldGo40gd+y1T6dMMMmPllOlT8ppNn+CkckoSiBbAqJW+JGuanthRGoTmFcNgX/Vzg+U13iEaDC2f9PHL/zI50AmTHE9SHKs0rG0fs7qilgQXhuc1NAvxPymYz938iTcpEchK/r/tAqARacA2LKevlWxj6ptA9KwvfxyKvUTuC79ALBlDvSbYflCkmQ3fKMdNtF2Y9sAsYdIvx63+AYFQ28k7S/Lkt5agl0M8mzpjrCp+qY4htPr45DkybQ9Bh+rY7wuTpGVst17dORx9UxR+0xZArYv413u8hcSR0+pyIwQ16Rbt8k++H42f2mKQE4JX2To1SILfKRdP1BOYhc/A4OljJTMs9uZ7X7/KXcLofB1/DEYQ13aIJHzu12TDYxW66U6b6QXl8j17BHfpDx4o+S9dHEQ0mfW2WpS7weazQ1MLeufy+vh/I12cQLSfvlstTF19keWJlUslDMXunO9+RiCTek6y9RkcAHDm28O0yMz7ug80o2TQk8kL4Rc2pmybvSbeek2Spdv4OKiqb4PaQd2AEdqGmPXyqfSPfxSJyXlJkuYpqBCbAr0oH9GnZKBz9CRQPLZUziaTg/LSNp/B6YD3bE2GGDdLCrVGRYION0INv3HBnJJuAG6w48Yj+k6zfKHNtkjIH7ZGTCCQDD6Hq+fA7IJRIYMUbpuEy/qCxbOGsFsgnwSMSLyu/1wAUZ2zF+vFjehJvlLpl+PR2Svk8nvl6E5acZf1iZDpomAPvlfRmD2tuSkYnMk2el++QSGI2PCdCBIaptEhUEXiYXSqbklfwic6yV8+VNSQLcvBM/+RorK0nAbykuYN6iJGwniveBzlswHQESaHxFDgnBTTwHlz0K/G+YTSCu0vSXxnLaNiwkw2i2E0jnITCu/5prj0wf+iWXtpULsSiK0T/ALWuwWP6fnQAAAABJRU5ErkJggg==";
+	public static final String ICON_IO_GROUP = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAJnSURBVFhHxZe7jtUwEIZPltsCHULAchNCNPRQIFEsT4DEG221r7Ad2o6elhKBRIOoqZGAgg4E7EL2/2xPjk/iJOOzXD7pP7ZjZzIZj2Ofpm3bzaZpvi8iJ6U2VgN5Hab6FrJ1WsVGbPnoO/BbamK1Gq/jJ6RT0iGNvre/shLhUC4MmfrguAm7uXioaRUikKpwIJWM/ynMPlMdsAhwwbyvpcZhs9/dYw7gGSEehmicB5IZuprKetIUkBAYM82xIzFuL5XXJQ/2nO5FLQK1of8mnZeehZafwRRYBH5IliDLznm2pZoIsLIYby/eVc5IrE3y4J/SefK/6DuwzjKsobgMjxN2+3KuzYb2gZ+pXsNZ6bZ0ObQWi2vSzVh1MZrodIx2ZuxLNjbXQ2kKG8eKQ4M5pxP+Vi6YfaPxOtC/0cucncGLMqDmYVvSPckbMbNffA5GuOhZFZekl1Ju7LE0RW6fvaDbko0aB15JzyX7juxK7A9TkZi173WA5ce4R6EVuSBx7UlolSnaz7+E5j2DpribyjephC/SJ+lOaJUp2jcHmI/BnIxA4rF7fg2tJZ+lK7HqBwcQHwWMeuANSicn7HjyZ4V8Crx8lIjWudBaQmQ+xKofHLC5MeZy4H0q76cSbkkk4uvQKjPIAR2GQiT5IXR2Igp/GGYgAV9IbEAczZ5Kb6UpeM6K/d5fgoDXAR6ME4xH76Qb0hSzDjCvDAi7lOAGS1ITYTQBX8SLsToL9+T2gwNmCHCg61wDjBt5HazNSxEBzp+jDuSnnLwf8na/zwvOEM3oQCkREgc6LdUcuaac6/eFPGjbdvMIlOzBMgTj56QAAAAASUVORK5CYII=";
 	public static final String ICON_WIRE_GROUP = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAGUExURQAAAAAAAKVnuc8AAAACdFJOU/8A5bcwSgAAAAlwSFlzAAAOwwAADsMBx2+oZAAAAFpJREFUOE/djsESgCAIROX/f1qUxchwKGM69C7q7lMpFJApeCpnRvCY70lmN+kCF5cNVvCtgDm3hcFDAc9a+Nx/O0Ch3BEMoRAO+RvhREukUFAoLZFizVuBqALkLQNcVg88CgAAAABJRU5ErkJggg==";
 	public static final String ICON_IC_GROUP = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAGzSURBVFhHxZeNcoMgEIRD07R5/6dtJ20Je7rOegEBJek3syOKnsvxI4YY4zWE8HWaeE+KU9HQMtiqO6VYH+nwNp214Q38JYWp2E2r8XPSJekHJ97trxwhGFIhEOWBcQpxVXgptQYZmIvglpQLPgrGR1cbzAAu0P0zYfylkTQAZ0jxY4qeDA2w7wn7uSSSq4OaoYHe1OuL2HXUFqxfTNIApoRNixkflBoODXwmYW5iHLSghpgNzUozNLAXnxl/XsUb6Hp4B4y/GgOtaX8JXG5LlPq5dN3zEP+/ugALH/TwQrorGWlpZQ/h6Cw4TG8GSrQ+5zO4ygAfHp1movHx9cXCd3gh8iC4qgQ+ftkd0csZ3QWIURoH2fg0gD5ZtkkH0RdUGwMDEBaFb1wYxFYmwGohggHdEWG51K7pAfHQ6my6ZzS+TUPvtJq2gyzx0478TCe42LIjqikH63Jj7ML042gLwyDQoK1MZhciOuSD2KKjXlVrLdB79D7uOxB/WYj0BhiwkbkTbbFvvTYKL7bW238pCjM0oDNC64Ge+7pWYMYybwbcv6FyS3/NaqbGljlfZ+mPMV7ve+GNTka+RrwAAAAASUVORK5CYII=";
 	
@@ -240,20 +247,22 @@ public class LogicSim {
 		System.out.println("Register components ...");
 		
 		ComponentFolder wireFolder = Registries.registerFolder("circuit.folders.wires", ICON_WIRE_GROUP);
-		ComponentFolder partFolder = Registries.registerFolder("circuit.folders.basic", ICON_PART_GROUP);
+		ComponentFolder logicFolder = Registries.registerFolder("circuit.folders.logic", ICON_LOGIC_GROUP);
+		ComponentFolder ioFolder = Registries.registerFolder("circuit.folders.io", ICON_IO_GROUP);
 		this.builtinIcFolder = Registries.registerFolder("circuit.folders.ics", ICON_IC_GROUP);
 		this.userIcFolder = Registries.registerFolder("circuit.folders.user", ICON_IC_GROUP);
 		
-		Registries.registerPart(partFolder, AndGateComponent.class, Component::placeClick, AndGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.and_gate", LogicGateComponent.ICON_AND_B64 );
-		Registries.registerPart(partFolder, OrGateComponent.class, Component::placeClick, OrGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.or_gate",LogicGateComponent.ICON_OR_B64);
-		Registries.registerPart(partFolder, NandGateComponent.class, Component::placeClick, NandGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.nor_gate",LogicGateComponent.ICON_NAND_B64);
-		Registries.registerPart(partFolder, NorGateComponent.class, Component::placeClick, NorGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.nand_gate",LogicGateComponent.ICON_NOR_B64);
-		Registries.registerPart(partFolder, XorGateComponent.class, Component::placeClick, XorGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.xor_gate",LogicGateComponent.ICON_XOR_B64);
-		Registries.registerPart(partFolder, NotGateComponent.class, Component::placeClick, NotGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.not_gate", NotGateComponent.ICON_B64);
-		Registries.registerPart(partFolder, ButtonComponent.class, Component::placeClick, ButtonComponent::coursorMove, Component::abbortPlacement, "circuit.components.button", ButtonComponent.ICON_B64);
-		Registries.registerPart(partFolder, LampComponent.class, Component::placeClick, LampComponent::coursorMove, Component::abbortPlacement, "circuit.components.lamp", LampComponent.ICON_B64);
+		Registries.registerPart(logicFolder, AndGateComponent.class, Component::placeClick, AndGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.and_gate", LogicGateComponent.ICON_AND_B64 );
+		Registries.registerPart(logicFolder, OrGateComponent.class, Component::placeClick, OrGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.or_gate",LogicGateComponent.ICON_OR_B64);
+		Registries.registerPart(logicFolder, NandGateComponent.class, Component::placeClick, NandGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.nor_gate",LogicGateComponent.ICON_NAND_B64);
+		Registries.registerPart(logicFolder, NorGateComponent.class, Component::placeClick, NorGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.nand_gate",LogicGateComponent.ICON_NOR_B64);
+		Registries.registerPart(logicFolder, XorGateComponent.class, Component::placeClick, XorGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.xor_gate",LogicGateComponent.ICON_XOR_B64);
+		Registries.registerPart(logicFolder, NotGateComponent.class, Component::placeClick, NotGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.not_gate", NotGateComponent.ICON_B64);
+		Registries.registerPart(ioFolder, ButtonComponent.class, Component::placeClick, ButtonComponent::coursorMove, Component::abbortPlacement, "circuit.components.button", ButtonComponent.ICON_B64);
+		Registries.registerPart(ioFolder, LampComponent.class, Component::placeClick, LampComponent::coursorMove, Component::abbortPlacement, "circuit.components.lamp", LampComponent.ICON_B64);
+		Registries.registerPart(ioFolder, BusInputComponent.class, Component::placeClick, BusInputComponent::coursorMove, Component::abbortPlacement, "circuit.components.bus_input", LampComponent.ICON_B64);
 		Registries.registerPart(wireFolder, ConnectorWire.class, ConnectorWire::placeClick, ConnectorWire::coursorMove, ConnectorWire::abbortPlacement, "circuit.components.wire", ConnectorWire.ICON_B64);
-				
+		
 		Registries.registerLangFolder("/lang");
 	}
 	

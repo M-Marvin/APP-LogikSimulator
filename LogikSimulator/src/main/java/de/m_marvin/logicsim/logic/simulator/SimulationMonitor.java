@@ -111,8 +111,9 @@ public class SimulationMonitor {
 					component.getInputs().forEach(inputNode -> {
 						
 						NetState state = circuit.getNetState(inputNode, inputNode.getLaneTag());
+						Map<String, NetState> laneData = inputNode.getLaneReference();
 						
-						if (state.isErrorState()) {
+						if (state.isErrorState() && (laneData.isEmpty() || laneData.containsKey(inputNode.getLaneTag()))) {
 							
 							// TODO Optimize
 							for (SimulationWarning w : processInfo.warnings) {
@@ -120,8 +121,8 @@ public class SimulationMonitor {
 							}
 							String message = Translator.translate("editor_area.warning." + (state == NetState.FLOATING ? "floating" : "short_circuit"));
 							processInfo.warnings.add(new SimulationWarning(component, inputNode, message, () -> {
-								Optional<NetState> state2 = queryWarningState(circuit, circuit.getLaneMapReference(inputNode));
-								return state2.isPresent() && state2.get() == state && running;
+								NetState state2 = circuit.getNetState(inputNode, inputNode.getLaneTag());
+								return state2 == state && running && (laneData.isEmpty() || laneData.containsKey(inputNode.getLaneTag()));
 							}, System.currentTimeMillis() + WARNING_DECAY_TIME));
 							
 						}
