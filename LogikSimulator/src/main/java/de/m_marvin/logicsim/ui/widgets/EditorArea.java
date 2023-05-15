@@ -1,5 +1,11 @@
 package de.m_marvin.logicsim.ui.widgets;
 
+import java.awt.HeadlessException;
+import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -35,6 +41,7 @@ import de.m_marvin.logicsim.logic.nodes.Node;
 import de.m_marvin.logicsim.logic.nodes.OutputNode;
 import de.m_marvin.logicsim.logic.nodes.PassivNode;
 import de.m_marvin.logicsim.ui.TextRenderer;
+import de.m_marvin.logicsim.util.CircuitSerializer;
 import de.m_marvin.logicsim.util.Registries.ComponentEntry;
 import de.m_marvin.univec.impl.Vec2i;
 import de.m_marvin.univec.impl.Vec3i;
@@ -53,8 +60,9 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 	protected Supplier<Collection<SimulationWarning>> warningSupplier;
 	
 	protected Component hoveredComponent = null;
-	protected Component grabedComponent = null;
-	protected Vec2i grabOffset = new Vec2i(0, 0);
+	protected List<Component> grabbedComponents = new ArrayList<>();
+	protected List<Vec2i> grabOffsets = new ArrayList<>();
+	protected Vec2i rangeSelectionBegin = null;
 	protected Vec2i mousePosition = new Vec2i(0, 0);
 	protected ComponentEntry activePlacement = null;
 	protected boolean grabbedBackground = false;
@@ -159,14 +167,12 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 	public void setActivePlacement(ComponentEntry activePlacement) {
 		if (this.activePlacement != null) removeActivePlacement();
 		this.activePlacement = activePlacement;
-		this.redraw();
 	}
 	
 	public void removeActivePlacement() {
 		if (this.activePlacement == null) return;
 		this.activePlacement.placementAbbortMethod().accept(circuit);
 		this.activePlacement = null;
-		this.redraw();
 	}
 	
 	public ComponentEntry getActivePlacement() {
@@ -174,34 +180,58 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 	}
 	
 	public void setGrabbedComponent(Component component) {
-		if (this.grabedComponent != null) removeUnplacedComponent();
-		this.grabedComponent = component;
-		this.grabOffset = this.mousePosition.sub(component.getVisualPosition());
-		this.circuit.reconnect(true, component);
-		this.redraw();
-	}
-	
-	public void releaseGrabbedComponent() {
-		if (this.grabedComponent == null) return;
-		this.grabedComponent.setVisualPosition(this.mousePosition.sub(grabOffset));
-		this.circuit.reconnect(false, this.grabedComponent);
-		this.grabedComponent = null;
-		this.grabOffset = new Vec2i(0, 0);
-		this.redraw();
-	}
-	
-	public Component getGrabbedComponent() {
-		return this.grabedComponent;
-	}
-	
-	public void removeUnplacedComponent() {
-		if (this.grabedComponent == null) return;
-		this.circuit.remove(grabedComponent);
-		this.grabOffset = new Vec2i(0, 0);
-		this.grabedComponent = null;
-		this.redraw();
+		if (!this.grabbedComponents.isEmpty()) removeUnplacedComponents();
+		addGrabbedComponent(component);
 	}
 
+	public void addGrabbedComponent(Component component) {
+		this.grabbedComponents.add(component);
+		this.grabOffsets.add(this.mousePosition.sub(component.getVisualPosition()));
+		this.circuit.reconnect(true, component);
+	}
+	
+	public void releaseGrabbedComponents() {
+		if (this.grabbedComponents.isEmpty()) return;
+		for (int i = 0; i < this.grabbedComponents.size(); i++) {
+			this.grabbedComponents.get(i).setVisualPosition(this.mousePosition.sub(grabOffsets.get(i)));
+			this.circuit.reconnect(false, this.grabbedComponents.get(i));
+		}
+		this.grabbedComponents.clear();
+		this.grabOffsets.clear();
+	}
+	
+	public List<Component> getGrabbedComponents() {
+		return this.grabbedComponents;
+	}
+	
+	public void removeUnplacedComponents() {
+		if (this.grabbedComponents == null) return;
+		grabbedComponents.forEach(c -> circuit.remove(c));
+		this.grabOffsets.clear();
+		this.grabbedComponents.clear();
+	}
+	
+	public String getClipboardCopy() {
+		if (!this.grabbedComponents.isEmpty()) {
+			String clipboard = CircuitSerializer.serializeComponents(this.grabbedComponents, this.mousePosition);
+			this.grabbedComponents.clear();
+			this.grabOffsets.clear();
+			return clipboard;
+		}
+		return null;
+	}
+	
+	public void pasteClipboardCopy(String clipboardString) {
+		if (this.grabbedComponents.isEmpty() && !this.grabbedBackground) {
+			try {
+				List<Component> components = CircuitSerializer.deserializeComponents(clipboardString, this.circuit, this.mousePosition);
+				components.forEach(c -> { this.circuit.add(c); addGrabbedComponent(c); });
+			} catch (Exception e) {
+				System.out.println("No or invalid clipboard content!");
+			}
+		}
+	}
+	
 	protected void resizeArea() {
 		Vec2i screenSize = getVisibleArea();
 		if (screenSize.x == 0 || screenSize.y == 0) return;
@@ -222,17 +252,41 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 	
 	@Override
 	public void mouseUp(MouseEvent event) {
-
+		
 		if (!this.isAllowedEditing()) return;
 		if (this.circuit == null) return;
 		
 		if (event.button == 1) {
-			if (this.grabedComponent != null) {
-				this.releaseGrabbedComponent();
+			
+			if (this.rangeSelectionBegin != null) {
+				
+				// Execute area selection
+				Vec2i selectionMin = this.rangeSelectionBegin.min(this.mousePosition.sub(visualOffset));
+				Vec2i selectionMax = this.rangeSelectionBegin.max(this.mousePosition.sub(visualOffset));
+				this.rangeSelectionBegin = null;
+				
+				this.circuit.getComponents().stream().filter(c ->
+					selectionMin.x <= c.getVisualPosition().x && selectionMin.y <= c.getVisualPosition().y &&
+					selectionMax.x >= c.getVisualPosition().x + c.getVisualWidth() && selectionMax.y >= c.getVisualPosition().y + c.getVisualHeight()
+				).forEach(c -> 
+					addGrabbedComponent(c)
+				);
+				
+				return;
+				
+			} else {
+				
+				// Release selected parts
+				if (this.grabbedComponents != null) {
+					this.releaseGrabbedComponents();
+				}
+				
 			}
+			
 		}
-		
-		this.grabOffset = new Vec2i();
+
+		// Background grabbing only if no multi-selection active
+		if (this.grabbedComponents.isEmpty()) this.grabOffsets.clear();
 		this.grabbedBackground = false;
 		
 	}
@@ -245,7 +299,9 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		
 		if (this.activePlacement == null) {
 			
-			if (this.grabedComponent == null) {
+			if (this.grabbedComponents.isEmpty() && event.button == 1) {
+				
+				// Check for click on node
 				for (Component component : this.circuit.getComponents()) {
 					for (Node node : component.getAllNodes()) {
 						if (node.getVisualPosition().add(this.visualOffset).equals(mousePosition)) {
@@ -254,6 +310,8 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 						}
 					}
 				}
+				
+				// Check for click on component
 				if (this.hoveredComponent != null) {
 					if (event.button == 1) {
 						if (event.count == 1) {
@@ -266,10 +324,19 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 					}
 					return;
 				}
+				
+				// Start area selection
+				this.rangeSelectionBegin = this.mousePosition.sub(visualOffset);
+				return;
+				
 			}
-
-			this.grabOffset = this.mousePosition;
-			this.grabbedBackground = true;
+			
+			// Background grabbing only if no multi-selection active
+			if (this.grabbedComponents.isEmpty()) {
+				if (this.grabOffsets.isEmpty()) this.grabOffsets.add(new Vec2i());
+				this.grabOffsets.get(0).setI(this.mousePosition);
+				this.grabbedBackground = true;
+			}
 			
 		} else if (event.button == 1) {
 			this.activePlacement.placementClickMethod().accept(circuit, this.mousePosition.sub(this.visualOffset));
@@ -285,27 +352,25 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 
 		Vec2i screenSize = getVisibleArea();
 		
+		// Update mouse position
 		this.mousePosition = new Vec2i(event.x, event.y).clamp(new Vec2i(0, 0), Vec2i.fromVec(screenSize));
 		Vec2i rasterOffset = this.mousePosition.add(RASTER_SIZE / 2, RASTER_SIZE / 2).module(RASTER_SIZE).sub(RASTER_SIZE / 2, RASTER_SIZE / 2);
 		this.mousePosition.subI(rasterOffset);
 		
 		if (this.activePlacement != null) {
-			boolean redraw = this.activePlacement.placementMoveMethod().apply(circuit, mousePosition.sub(this.visualOffset));
-			if (redraw) this.redraw();
-		}
-		// TODO redraw() should now be obsolete
-		if (this.grabedComponent != null) {
-			this.redraw();
+			this.activePlacement.placementMoveMethod().apply(circuit, mousePosition.sub(this.visualOffset));
 		}
 		
 		if (this.grabbedBackground) {
 			
-			Vec2i scrollVec = this.mousePosition.sub(this.grabOffset);
-			this.grabOffset = this.mousePosition;
+			// Move circuit on screen
+			Vec2i scrollVec = this.mousePosition.sub(this.grabOffsets.get(0));
+			this.grabOffsets.get(0).setI(this.mousePosition);
 			scrollView(scrollVec);
 			
 		}
-
+		
+		// Update hovered component
 		this.hoveredComponent = null;
 		for (Component component : this.circuit.getComponents()) {
 			Vec2i pos = this.mousePosition.sub(this.visualOffset);
@@ -337,8 +402,8 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		if (this.circuit == null) return;
 		
 		if (event.keyCode == SWT.DEL) {
-			if (this.grabedComponent != null) {
-				this.removeUnplacedComponent();
+			if (this.grabbedComponents != null) {
+				this.removeUnplacedComponents();
 			} else {
 				if (this.hoveredComponent != null) {
 					this.circuit.remove(this.hoveredComponent);
@@ -347,10 +412,23 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 				}
 			}
 		} else if (event.keyCode == SWT.ESC) {
-			if (this.grabedComponent != null) {
-				this.removeUnplacedComponent();
+			if (this.grabbedComponents != null) {
+				this.removeUnplacedComponents();
 			} else if (this.activePlacement != null) {
 				this.removeActivePlacement();
+			}
+		} else if (event.keyCode == 'c' && (event.stateMask & SWT.CTRL) > 0) {
+			try {
+				StringSelection clipboardCopy = new StringSelection(getClipboardCopy());
+				Toolkit.getDefaultToolkit().getSystemClipboard().setContents(clipboardCopy, clipboardCopy);
+			} catch (IllegalStateException e) {} // Clipboard unavailable
+		} else if (event.keyCode == 'v' && (event.stateMask & SWT.CTRL) > 0) {
+			try {
+				String clipboardCopy = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+				pasteClipboardCopy(clipboardCopy);
+			} catch (HeadlessException | UnsupportedFlavorException | IOException e) {
+				System.err.println("Failed to read clipboard content!");
+				e.printStackTrace();
 			}
 		}
 	}
@@ -457,13 +535,27 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 			
 		}
 		
-		if (this.grabedComponent != null) {
+		if (!this.grabbedComponents.isEmpty()) {
 			
-			Vec2i topLeft = this.mousePosition.sub(grabOffset).sub(VISUAL_BUNDING_BOX_OFFSET, VISUAL_BUNDING_BOX_OFFSET);
-			int width = this.grabedComponent.getVisualWidth() + VISUAL_BUNDING_BOX_OFFSET * 2;
-			int height = this.grabedComponent.getVisualHeight() + VISUAL_BUNDING_BOX_OFFSET * 2;
+			for (int i = 0; i < this.grabbedComponents.size(); i++) {
+
+				Vec2i topLeft = this.mousePosition.sub(grabOffsets.get(i)).sub(VISUAL_BUNDING_BOX_OFFSET, VISUAL_BUNDING_BOX_OFFSET);
+				int width = this.grabbedComponents.get(i).getVisualWidth() + VISUAL_BUNDING_BOX_OFFSET * 2;
+				int height = this.grabbedComponents.get(i).getVisualHeight() + VISUAL_BUNDING_BOX_OFFSET * 2;
+				swapColor(0, 1, 0, 0.4F);
+				drawRectangle(1, topLeft.x , topLeft.y, width, height);
+				
+			}
+			
+		}
+		
+		if (this.rangeSelectionBegin != null) {
+			
+			Vec2i min = this.rangeSelectionBegin.min(this.mousePosition.sub(visualOffset));
+			Vec2i size = this.rangeSelectionBegin.max(this.mousePosition.sub(visualOffset)).sub(min);
+			
 			swapColor(0, 1, 0, 0.4F);
-			drawRectangle(1, topLeft.x , topLeft.y, width, height);
+			drawRectangle(2, min.x, min.y, size.x, size.y);
 			
 		}
 		
@@ -534,7 +626,6 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 				swapColor(0, 1, 1, 1);
 			}
 			TextRenderer.drawText(position.x + 55 + x, position.y - 40 + y, 14, lane, TextRenderer.ORIGIN_LEFT | TextRenderer.RESIZED);
-			//TextRenderer.drawText(position.x + 50 + x + 60, position.y + 50 + y, 14, state.toString(), TextRenderer.ORIGIN_LEFT | TextRenderer.RESIZED);
 			y += 20;
 		}
 		
@@ -657,6 +748,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		
 		swapColor(1.0F, 0.5F, 0.0F, 0.4F);
 		
+		GL11.glLineWidth(1);
 		GL11.glBegin(GL11.GL_LINES);
 		for (int i = 0; i < screenSize.x; i+= rasterSizePixels) {
 			GL11.glVertex2f(i + rasterOffset.x, 0);

@@ -34,11 +34,10 @@ import de.m_marvin.logicsim.util.Registries;
 import de.m_marvin.logicsim.util.Registries.ComponentFolder;
 
 public class LogicSim {
-	 
+	
 	// TODO
-//	- Zooming
-//	- Multi-Auswahl (Copy/Paste), Undo/Redo
-// 	- Algemein Funktionen (File Extension)
+//	- Fix Selection and Copy/Paste
+// 	- File Extension
 //	- Komponenten zur interaktion mit Dateien, Grphischer Darstellung, Tastatureingabe etc
 	
 	private static LogicSim INSTANCE;
@@ -194,7 +193,10 @@ public class LogicSim {
 	}
 	
 	public Editor getLastInteractedEditor() {
-		// FIXME
+		if (this.lastInteractedEditor.getShell().isDisposed()) {
+			if (this.openEditorWindows.isEmpty()) return null;
+			setLastInteracted(this.openEditorWindows.get(this.openEditorWindows.size() - 1));
+		}
 		return lastInteractedEditor;
 	}
 	

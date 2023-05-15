@@ -10,6 +10,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -19,12 +21,56 @@ import com.google.gson.JsonObject;
 import de.m_marvin.logicsim.LogicSim;
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Circuit.ShortCircuitType;
-import de.m_marvin.logicsim.ui.windows.Editor;
 import de.m_marvin.logicsim.logic.Component;
+import de.m_marvin.logicsim.ui.windows.Editor;
+import de.m_marvin.univec.impl.Vec2i;
 
 public class CircuitSerializer {
 	
 	public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+	
+	public static String serializeComponents(List<Component> components, Vec2i referencePos) {
+
+		JsonArray json = new JsonArray();
+		
+		components.forEach(component -> {
+			JsonObject componentJson = new JsonObject();
+			componentJson.addProperty("id", component.getClass().getName());
+			component.getVisualPosition().subI(referencePos);
+			component.serialize(componentJson);
+			component.getVisualPosition().addI(referencePos);
+			json.add(componentJson);
+		});
+		
+		return json.toString();
+		
+	}
+	
+	public static List<Component> deserializeComponents(String jsonString, Circuit circuit, Vec2i offset) {
+		
+		JsonArray components = GSON.fromJson(jsonString, JsonArray.class);
+		List<Component> componentList = new ArrayList<>();
+		
+		components.forEach(componentJson -> {
+			try {
+				String componentClassName = componentJson.getAsJsonObject().get("id").getAsString();
+				@SuppressWarnings("unchecked")
+				Class<? extends Component> componentClass = (Class<? extends Component>) Class.forName(componentClassName);
+				Component component = componentClass.getConstructor(Circuit.class).newInstance(circuit);
+				component.deserialize(componentJson.getAsJsonObject());
+				component.getVisualPosition().addI(offset);
+				componentList.add(component);
+			} catch (Exception e) {
+				System.err.println("Failed to load component '" + componentJson.toString() + "'");
+				Editor parentWindow = LogicSim.getInstance().getLastInteractedEditor();
+				if (parentWindow != null) Editor.showErrorInfo(parentWindow.getShell(), "editor.window.error.parese_file", e);
+				e.printStackTrace();
+			}
+		});
+		
+		return componentList;
+		
+	}
 	
 	public static void saveCircuit(Circuit circuit, File file) throws IOException {
 		if (!file.equals(circuit.getCircuitFile())) circuit.setCircuitFile(file);

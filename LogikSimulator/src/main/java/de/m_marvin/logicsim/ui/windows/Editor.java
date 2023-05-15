@@ -15,8 +15,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -115,12 +113,7 @@ public class Editor {
 	public Editor(Display display, Circuit circuit) {
 		this.shell = new Shell(display);
 		this.shell.setLayout(new BorderLayout());
-		this.shell.addFocusListener(new FocusListener() {
-			public void focusLost(FocusEvent e) {}
-			public void focusGained(FocusEvent e) {
-				LogicSim.getInstance().setLastInteracted(Editor.this);
-			}
-		});
+		this.shell.addListener(SWT.FocusIn, (e) -> LogicSim.getInstance().setLastInteracted(Editor.this)); // TODO Event not working reliable
 		
 		if (circuit == null) circuit = new Circuit();
 		

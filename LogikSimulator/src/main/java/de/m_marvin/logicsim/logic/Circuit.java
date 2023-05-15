@@ -344,12 +344,12 @@ public class Circuit {
 	}
 	
 	public synchronized void add(Component component) {
-		component.created();
+		if (!this.virtual) component.created();
 		this.components.add(component);
 	}
 	
 	public synchronized void remove(Component component) {
-		component.dispose();
+		if (!this.virtual) component.dispose();
 		this.components.remove(component);
 	}
 	
