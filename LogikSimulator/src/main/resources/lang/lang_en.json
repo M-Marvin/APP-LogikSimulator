@@ -86,7 +86,9 @@
 "circuit.components.nor_gate": "Nor gate",
 "circuit.components.xor_gate": "Xor gate",
 "circuit.components.not_gate": "Not gate",
-"circuit.components.button": "Button",
-"circuit.components.lamp": "Lamp"
+"circuit.components.bool_input": "Bool Input",
+"circuit.components.bool_output": "Bool Output",
+"circuit.components.bus_input": "Bus Input",
+"circuit.components.bus_output": "Bus Output"
 
 }

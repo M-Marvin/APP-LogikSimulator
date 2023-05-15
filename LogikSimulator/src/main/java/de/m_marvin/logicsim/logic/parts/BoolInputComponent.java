@@ -14,14 +14,14 @@ import de.m_marvin.logicsim.ui.TextRenderer;
 import de.m_marvin.logicsim.ui.widgets.EditorArea;
 import de.m_marvin.univec.impl.Vec2i;
 
-public class ButtonComponent extends Component implements ISubCircuitIO {
+public class BoolInputComponent extends Component implements ISubCircuitIO {
 	
-	public static final String ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAF3SURBVFhHzZcNbsMgDIVLf6aeYfc/ZKVuo34kLzKGpEAI3SdZhVKbZ0NIcd77u3PucZq4ivmpGdBtsDV2klhf8nGeemVYAX9ibmpWUyr8InYT+0HHTvYUQxV+Qy8d1/1WoWARYIGApLQdYXwkGbDrtSerEhh/SdIKwPoMpWrHHsFoAW+XYDhWAM6BoZxxEM3tj2Ar8PHHsBUEXILuAXugNhAnL/FL4tuSc7B0KXSwEh/+nu+B2x4BtZMD7QNc6x5omTxLi4Buk4PcOcAJ8JkzsjZ5zgdG0MbrGP8JoiBoc5eiMtrJspX5mh98MMb4CfzBkcdxEl8rYVZrGfQiiq8FHJn5Ki1PQVf+pYBhe0COgMueCsD3ezYLNrT9PveHN5wFGqjLXhg6AAFRfByCugK8LLBEcMC4NmRGq4VPWbTEOhAE4ObSig4cTSLopFCBUPpwL0VjhgJ4LwQ2U91vqQKAmFD5ICDzMiJPuTVrMe/YEmfHwj7w3t9f/w54lcD7KeEAAAAASUVORK5CYII=";
+	public static final String ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsEAAA7BAbiRa+0AAAHzSURBVFhHzZY9TsQwFIQJf1oJQQUUdFyAE3AAbkBLhURJy0HoKWloOQenoKACUSAWCDNOxnrrdRLbZHf5pFGy8fp58vxiu6rrelJV1cdawyZUN7cOe0/62tYQaxuX9eZXGjLwhXvqh8/YUECq8Q1oC+J4c26/zZWiISsGkkJoXGJcKw4qzcIM4MLUkykUCz4Wiq/xfAY0aGn6U1F8/5IyIOZTtGBCA7kcQXfQPXTOB9m0NWCnIrUGrqA3SH2uoSFY2Pyvf/GSDJxAj9AttMsHLUXZDDvxU+vjAnqCzqBnyKZ9FANDHEMcmOnn/D9AoqyA2xrQ56HFposDiKuY0NJN3fDBAIrvP3dmYCjtlheIi0mMsinAPvCJa99bp5JjwI8XdvrLSphiQPGZRZfJorR1kGOeteP2gzENFPEvDYxRkDE0RYzP9LvPeVUZ4J4QPREtnVVNgWflGSDWBN3pYBrjEnqH+L8usf8rdApZOI7aPbkZ4I6309x2wph7UNLuyHnhH+VKDv2pNULqthtmkv1Y+T4+dmIXywakAfd5LACOMxOfRwGmK3S6VGI1QJeEjtluxSmTyCG039wOonOH4jsUSMw0ZmL7hnHsS3EK3DLMKYgZsFMSttvfYVsqHMNl3hloz4Qxpjgt5dRHn7mwzRViXdeTX8wGjZeCBEJuAAAAAElFTkSuQmCC";
 
 	/* Factory methods */
 
 	public static boolean coursorMove(Circuit circuit, Vec2i coursorPosition) {
-		return Component.coursorMove(circuit, coursorPosition, () -> new ButtonComponent(circuit));
+		return Component.coursorMove(circuit, coursorPosition, () -> new BoolInputComponent(circuit));
 	}
 	
 	/* End of factory methods */
@@ -30,10 +30,10 @@ public class ButtonComponent extends Component implements ISubCircuitIO {
 	protected Map<String, NetState> laneReferenceCache;
 	protected boolean toggle;
 	
-	public ButtonComponent(Circuit circuit) {
+	public BoolInputComponent(Circuit circuit) {
 		super(circuit);
 		
-		this.label = "button";
+		this.label = "bool_in";
 		this.outputs.add(new OutputNode(this, 2, "out", new Vec2i(50, 20)));
 	}
 	

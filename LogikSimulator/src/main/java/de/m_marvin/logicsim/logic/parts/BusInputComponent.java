@@ -22,7 +22,7 @@ import de.m_marvin.univec.impl.Vec2i;
 
 public class BusInputComponent extends Component implements ISubCircuitIO {
 	
-	public static final String ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAF3SURBVFhHzZcNbsMgDIVLf6aeYfc/ZKVuo34kLzKGpEAI3SdZhVKbZ0NIcd77u3PucZq4ivmpGdBtsDV2klhf8nGeemVYAX9ibmpWUyr8InYT+0HHTvYUQxV+Qy8d1/1WoWARYIGApLQdYXwkGbDrtSerEhh/SdIKwPoMpWrHHsFoAW+XYDhWAM6BoZxxEM3tj2Ar8PHHsBUEXILuAXugNhAnL/FL4tuSc7B0KXSwEh/+nu+B2x4BtZMD7QNc6x5omTxLi4Buk4PcOcAJ8JkzsjZ5zgdG0MbrGP8JoiBoc5eiMtrJspX5mh98MMb4CfzBkcdxEl8rYVZrGfQiiq8FHJn5Ki1PQVf+pYBhe0COgMueCsD3ezYLNrT9PveHN5wFGqjLXhg6AAFRfByCugK8LLBEcMC4NmRGq4VPWbTEOhAE4ObSig4cTSLopFCBUPpwL0VjhgJ4LwQ2U91vqQKAmFD5ICDzMiJPuTVrMe/YEmfHwj7w3t9f/w54lcD7KeEAAAAASUVORK5CYII=";
+	public static final String ICON_B64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsAAAA7AAWrWiQkAAALmSURBVFhHvZc9rAxRFMd3feUVCoWPRhAN4jPRiYaGjkZCoVAqtCiEQiFK8VEhUXk90SMakQgRiUQlOhEhIXgY/9+5c96euXN33+x6zy/5vbnn3rtnz9y5M7OvX1XVVL/f/95LLJFVahqxDaPGesq1TIdFKepGXsAf2U/Nsela+GK5VP4iyKv9HY5IQVESuTkU7pI3ype6TViBugkzspR8vvD8XGojX4FJl78rnn/2JPMC2ku0wOQF/Hfyu8CXJr8U6+UOuVy+k0/kJLCxfVOyqVubkALyTXhder/7SR6V40IBfH6w8lkBPsG5LYmfyvPyiLxW9+F2OQ5jFbBX0n4jV9ARuCUZu2hRd+YswB82cEXSPmFRkz3Si3N2y52p2YIx8PyDPaYCeH47sYC3kvZGi9r8lIyvtShtTmIuU+Sk9JztAjJiAV+lPa+H8Foy18/6uCR+b1FilSQnQsxfhEHkmnP8IofxTDJnn0WJ+5K+Oxb1etOS+JxFqY08krGFT9hcHz/IYTySzDlkUWKb9Bxn6uMr6fiY28IHWDqOXQrgbolckp4HD0on9mMLH+BJxdGvXYkXkjlbLBqwS3oe9knE+90WdPqXfpbEJCzhd8FqiwY8lvT/qI9npeP5OcHZV3LEJ4BvoNMWNdkvGXtg0YBTkn5W50Ddxg0SaI9a1caEw5KYZVxDR+ChZOyYRQnmcOvSv5UO4Sdx16Jm/iJM4HHp8NajjzO6IS/L53XfTRnh1qP/gkUJHnIfJf2Q52+RT+Apd0/S736TV2UOYy9Ts4E/oIBjq4D4o6Q4QayTbMZNkl+0JVbKmCvCGExcwHzRys9LgVvCO31C8Rap6fq7sXQijfx6EVqumJAJo15A/0ojPz8FWP5SpQtBceVKm4YqgQ8wHuWSucBT0DfYXPj97/mN/IdBY3BM4mfzPPGkuAR2J3EJSgXES5KPxzgf6wrfYStvBfCHoMCM/l8YZ3+MKi4fs41YVdXUX3hSJuCCNgQGAAAAAElFTkSuQmCC";
 
 	/* Factory methods */
 
@@ -35,7 +35,6 @@ public class BusInputComponent extends Component implements ISubCircuitIO {
 	protected Optional<InputNode> subCircuitInput = Optional.empty();
 	protected Map<String, NetState> laneReferenceCache;
 	protected int value;
-	protected int indexOffset = 0;
 	protected int bitCount = 8;
 	
 	protected Map<String, NetState> writeLaneCache = new FastAsyncMap<>();
@@ -61,11 +60,25 @@ public class BusInputComponent extends Component implements ISubCircuitIO {
 		return this.outputs.get(0).getLaneTag();
 	}
 	
+	public int getOutputBitOffset() {
+		String[] s = getOutputBus().split("(?<=\\D)(?=\\d)");
+		if (s.length > 1) return Integer.valueOf(s[1]);
+		return 0;
+	}
+	
+	@Override
+	public void nodeChanged() {
+		rewriteCache();
+	}
+	
 	public void rewriteCache() {
 		writeLaneCache.clear();
+		String[] s = getOutputBus().split("(?<=\\D)(?=\\d)");
+		String outputBus = s[0];
+		int indexOffset = s.length > 1 ? Integer.valueOf(s[1]) : 0;
 		for (int i = 0; i < bitCount; i++) {
 			boolean state = (value & (1 << i + indexOffset)) > 0;
-			writeLaneCache.put(getOutputBus().split("(?<=\\D)(?=\\d)")[0] + (i + indexOffset), state ? NetState.HIGH : NetState.LOW);
+			writeLaneCache.put(outputBus + (i + indexOffset), state ? NetState.HIGH : NetState.LOW);
 		}
 	}
 	
@@ -73,13 +86,17 @@ public class BusInputComponent extends Component implements ISubCircuitIO {
 	public void updateIO() {
 		if (this.subCircuitInput.isPresent() && this.laneReferenceCache != null) {
 			// Read the bus value specified by the lane tag in the parent circuit
-			String laneTag = this.subCircuitInput.get().getLaneTag().split("(?<=\\D)(?=\\d)")[0];
+			String[] s = this.subCircuitInput.get().getLaneTag().split("(?<=\\D)(?=\\d)");
+			String inputBus = s[0];
+			int indexOffset = s.length > 1 ? Integer.valueOf(s[1]) : 0;
+			
+			// TODO Optimize
 			this.value = 0;
 			for (String lane : this.laneReferenceCache.keySet()) {
 				String[] busTag = lane.split("(?<=\\D)(?=\\d)");
-				if (busTag.length == 2 && busTag[0].equals(laneTag)) {
+				if (busTag.length == 2 && busTag[0].equals(inputBus)) {
 					int bitIndex = Integer.parseInt(busTag[1]);
-					if (bitIndex >= this.indexOffset && bitIndex < this.indexOffset + this.bitCount && Circuit.safeLaneRead(laneReferenceCache, lane).getLogicState()) this.value |= (1 << bitIndex);
+					if (bitIndex >= indexOffset && bitIndex < indexOffset + this.bitCount && Circuit.safeLaneRead(laneReferenceCache, lane).getLogicState()) this.value |= (1 << (bitIndex - indexOffset));
 				}
 			}
 			rewriteCache();
@@ -93,8 +110,7 @@ public class BusInputComponent extends Component implements ISubCircuitIO {
 		if (leftClick) {
 			InputDialog configDialog = new InputDialog(editor.getShell());
 			configDialog.addConfig(new InputDialog.StringConfigField("editor.config.change_component_name", getLabel(), this::setLabel));
-			configDialog.addConfig(new InputDialog.NumberConfigField("editor.config.bus_input.index_offset", this.indexOffset, 0, 64, i -> this.indexOffset = i));
-			configDialog.addConfig(new InputDialog.NumberConfigField("editor.config.bus_input.bit_count", this.bitCount, 1, 64, i -> this.bitCount = i));
+			configDialog.addConfig(new InputDialog.NumberConfigField("editor.config.bus_input.bit_count", this.bitCount, 1, 64, i -> { this.bitCount = i; rewriteCache(); }));
 			configDialog.open();
 			configDialog.setLocation(clickPosition.x, clickPosition.y);
 		} else if (this.subCircuitInput.isEmpty()) {
@@ -107,14 +123,12 @@ public class BusInputComponent extends Component implements ISubCircuitIO {
 	@Override
 	public void serialize(JsonObject json) {
 		super.serialize(json);
-		json.addProperty("indexOffset", this.indexOffset);
 		json.addProperty("bitCount", this.bitCount);
 	}
 	
 	@Override
 	public void deserialize(JsonObject json) {
 		super.deserialize(json);
-		this.indexOffset = json.get("indexOffset").getAsInt();
 		this.bitCount = json.get("bitCount").getAsInt();
 	}
 	

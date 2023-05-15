@@ -211,5 +211,7 @@ public abstract class Component {
 				getVisualPosition().y <= pos.y &&
 				getVisualPosition().y + getVisualHeight() >= pos.y;
 	}
+
+	public void nodeChanged() {};
 	
 }

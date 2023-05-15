@@ -36,6 +36,7 @@ public abstract class Node {
 	
 	public void setLaneTag(String laneTag) {
 		this.laneTag = laneTag;
+		this.component.nodeChanged();
 	}
 	
 	public String getLaneTag() {

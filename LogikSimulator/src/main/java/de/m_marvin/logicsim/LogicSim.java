@@ -11,8 +11,9 @@ import de.m_marvin.commandlineparser.CommandLineParser;
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Component;
 import de.m_marvin.logicsim.logic.parts.BusInputComponent;
-import de.m_marvin.logicsim.logic.parts.ButtonComponent;
-import de.m_marvin.logicsim.logic.parts.LampComponent;
+import de.m_marvin.logicsim.logic.parts.BusOutputComponent;
+import de.m_marvin.logicsim.logic.parts.BoolInputComponent;
+import de.m_marvin.logicsim.logic.parts.BoolOutputComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.AndGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.NandGateComponent;
@@ -193,6 +194,7 @@ public class LogicSim {
 	}
 	
 	public Editor getLastInteractedEditor() {
+		// FIXME
 		return lastInteractedEditor;
 	}
 	
@@ -258,9 +260,10 @@ public class LogicSim {
 		Registries.registerPart(logicFolder, NorGateComponent.class, Component::placeClick, NorGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.nand_gate",LogicGateComponent.ICON_NOR_B64);
 		Registries.registerPart(logicFolder, XorGateComponent.class, Component::placeClick, XorGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.xor_gate",LogicGateComponent.ICON_XOR_B64);
 		Registries.registerPart(logicFolder, NotGateComponent.class, Component::placeClick, NotGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.not_gate", NotGateComponent.ICON_B64);
-		Registries.registerPart(ioFolder, ButtonComponent.class, Component::placeClick, ButtonComponent::coursorMove, Component::abbortPlacement, "circuit.components.button", ButtonComponent.ICON_B64);
-		Registries.registerPart(ioFolder, LampComponent.class, Component::placeClick, LampComponent::coursorMove, Component::abbortPlacement, "circuit.components.lamp", LampComponent.ICON_B64);
-		Registries.registerPart(ioFolder, BusInputComponent.class, Component::placeClick, BusInputComponent::coursorMove, Component::abbortPlacement, "circuit.components.bus_input", LampComponent.ICON_B64);
+		Registries.registerPart(ioFolder, BoolInputComponent.class, Component::placeClick, BoolInputComponent::coursorMove, Component::abbortPlacement, "circuit.components.bool_input", BoolInputComponent.ICON_B64);
+		Registries.registerPart(ioFolder, BoolOutputComponent.class, Component::placeClick, BoolOutputComponent::coursorMove, Component::abbortPlacement, "circuit.components.bool_output", BoolOutputComponent.ICON_B64);
+		Registries.registerPart(ioFolder, BusInputComponent.class, Component::placeClick, BusInputComponent::coursorMove, Component::abbortPlacement, "circuit.components.bus_input", BusInputComponent.ICON_B64);
+		Registries.registerPart(ioFolder, BusOutputComponent.class, Component::placeClick, BusOutputComponent::coursorMove, Component::abbortPlacement, "circuit.components.bus_output", BusOutputComponent.ICON_B64);
 		Registries.registerPart(wireFolder, ConnectorWire.class, ConnectorWire::placeClick, ConnectorWire::coursorMove, ConnectorWire::abbortPlacement, "circuit.components.wire", ConnectorWire.ICON_B64);
 		
 		Registries.registerLangFolder("/lang");
