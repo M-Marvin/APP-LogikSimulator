@@ -8,6 +8,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
+import de.m_marvin.logicsim.LogicSim;
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Circuit.ShortCircuitType;
 import de.m_marvin.logicsim.ui.Translator;
@@ -23,6 +24,7 @@ public class CircuitOptions {
 	
 	public CircuitOptions(Display display, Circuit circuit) {
 		this.shell = new Shell(display, SWT.SHELL_TRIM & (~SWT.RESIZE));
+		this.shell.setImage(Editor.decodeImage(LogicSim.LOGIC_SIM_ICON));
 		this.shell.setText(Translator.translate("circuit_options.title"));
 		this.shell.setLayout(new GridLayout(1, true));
 		
@@ -45,12 +47,6 @@ public class CircuitOptions {
 		
 		this.shell.pack();
 		this.shell.open();
-	}
-	
-	public void updateUI() {
-		
-		
-		
 	}
 	
 }

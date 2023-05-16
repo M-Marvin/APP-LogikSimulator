@@ -1,0 +1,20 @@
+REGEDIT4
+
+[HKEY_CLASSES_ROOT\.lcf]
+@="lcf-File"
+
+[HKEY_CLASSES_ROOT\lcf-File]
+@="LogikSimulator Schaltplan"
+"EditFlags"=dword:00000000
+
+[HKEY_CLASSES_ROOT\lcf-File\DefaultIcon]
+@="%INSTALL_PATH%File-Icon.ico,0"
+
+[HKEY_CLASSES_ROOT\lcf-File\shell]
+@="Öffnen"
+
+[HKEY_CLASSES_ROOT\lcf-File\shell\Öffnen]
+@="Öffnen"
+
+[HKEY_CLASSES_ROOT\lcf-File\shell\Öffnen\command]
+@="%INSTALL_PATH%LogikSimulator.exe %1"

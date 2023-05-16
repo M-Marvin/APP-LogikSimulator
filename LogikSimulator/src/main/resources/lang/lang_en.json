@@ -92,5 +92,4 @@
 "circuit.components.bool_output": "Bool Output",
 "circuit.components.bus_input": "Bus Input",
 "circuit.components.bus_output": "Bus Output"
-
 }

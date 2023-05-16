@@ -55,6 +55,7 @@ public class CircuitViewer {
 	
 	public CircuitViewer(Display display) {
 		this.shell = new Shell(display);
+		this.shell.setImage(decodeImage(LogicSim.LOGIC_SIM_ICON));
 		this.shell.setText(Translator.translate("circuit_viewer.title"));
 		this.shell.setLayout(new BorderLayout());
 		

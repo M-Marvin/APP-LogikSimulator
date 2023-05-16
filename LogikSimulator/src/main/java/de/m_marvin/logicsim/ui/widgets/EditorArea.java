@@ -299,14 +299,16 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		
 		if (this.activePlacement == null) {
 			
-			if (this.grabbedComponents.isEmpty() && event.button == 1) {
+			if (this.grabbedComponents.isEmpty()) {
 				
 				// Check for click on node
-				for (Component component : this.circuit.getComponents()) {
-					for (Node node : component.getAllNodes()) {
-						if (node.getVisualPosition().equals(mousePosition)) {
-							Vec2i location = Vec2i.fromVec(event.display.getCursorLocation());
-							if (node.click(location)) return;
+				if (event.button == 1) {
+					for (Component component : this.circuit.getComponents()) {
+						for (Node node : component.getAllNodes()) {
+							if (node.getVisualPosition().equals(mousePosition)) {
+								Vec2i location = Vec2i.fromVec(event.display.getCursorLocation());
+								if (node.click(location)) return;
+							}
 						}
 					}
 				}
@@ -326,8 +328,10 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 				}
 				
 				// Start area selection
-				this.rangeSelectionBegin = this.mousePosition;
-				return;
+				if (event.button == 1) {
+					this.rangeSelectionBegin = this.mousePosition;
+					return;
+				}
 				
 			}
 			
@@ -365,7 +369,6 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 			
 			// Move circuit on screen
 			Vec2i scrollVec = this.mousePosition.sub(this.grabOffsets.get(0));
-			this.grabOffsets.get(0).setI(this.mousePosition);
 			scrollView(scrollVec);
 			
 		}

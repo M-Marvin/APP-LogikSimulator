@@ -111,9 +111,11 @@ public class Editor {
 	}
 	
 	public Editor(Display display, Circuit circuit) {
+		
 		this.shell = new Shell(display);
+		this.shell.setImage(decodeImage(LogicSim.LOGIC_SIM_ICON));
 		this.shell.setLayout(new BorderLayout());
-		this.shell.addListener(SWT.FocusIn, (e) -> LogicSim.getInstance().setLastInteracted(Editor.this)); // TODO Event not working reliable
+		this.shell.addListener(SWT.FocusIn, (e) -> LogicSim.getInstance().setLastInteracted(Editor.this)); // FIXME Event not working reliable
 		
 		if (circuit == null) circuit = new Circuit();
 		
@@ -400,7 +402,7 @@ public class Editor {
 	public void saveCircuit(boolean saveAs) {
 		if (saveAs || this.editorArea.getCircuit().getCircuitFile() == null || !this.editorArea.getCircuit().getCircuitFile().exists()) {
 			FileDialog fileDialog = new FileDialog(shell, SWT.SAVE);
-			// TODO File-type specific dialog
+			fileDialog.setFilterExtensions(new String[] {"*." + LogicSim.CIRCUIT_FILE_EXTENSION});
 			String path = fileDialog.open();
 			if (path != null) {
 				File filePath = new File(path);
@@ -433,7 +435,7 @@ public class Editor {
 	
 	public void loadCircuit(boolean newWindow) {
 		FileDialog fileDialog = new FileDialog(shell, SWT.OPEN);
-		// TODO File-type specific dialog
+		fileDialog.setFilterExtensions(new String[] {"*." + LogicSim.CIRCUIT_FILE_EXTENSION});
 		String path = fileDialog.open();
 		if (path != null) {
 			File filePath = new File(path);
@@ -488,7 +490,7 @@ public class Editor {
 				if (!LogicSim.isCircuitFile(file)) return;
 				String name = Translator.translate(LogicSim.getFileName(file.getName()));
 				userIcs.add(new ComponentEntry(LogicSim.getInstance().userIcFolder, SubCircuitComponent.class, Component::placeClick, (circuit, pos) -> SubCircuitComponent.coursorMove(circuit, pos, file), Component::abbortPlacement, name, SubCircuitComponent.ICON_B64));
-			});
+			}, 2);
 		}
 		return userIcs;
 	}

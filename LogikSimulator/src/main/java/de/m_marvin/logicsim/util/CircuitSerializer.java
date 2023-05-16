@@ -83,7 +83,8 @@ public class CircuitSerializer {
 		try {
 			deserializeCircuit(circuit, new FileInputStream(file));
 		} catch (Exception e) {
-			Editor.showErrorInfo(LogicSim.getInstance().getLastInteractedEditor().getShell(), "editor.window.error.failed_load_circuit", e);
+			Editor editorWindow = LogicSim.getInstance().getLastInteractedEditor();
+			if (editorWindow != null) Editor.showErrorInfo(editorWindow.getShell(), "editor.window.error.failed_load_circuit", e);
 			System.err.println("Failed to load circuit from file '" + file + "'!");
 			e.printStackTrace();
 		}

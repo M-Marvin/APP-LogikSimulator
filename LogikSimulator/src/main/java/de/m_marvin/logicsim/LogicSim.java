@@ -1,6 +1,7 @@
 package de.m_marvin.logicsim;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -30,15 +31,19 @@ import de.m_marvin.logicsim.ui.Translator;
 import de.m_marvin.logicsim.ui.windows.CircuitOptions;
 import de.m_marvin.logicsim.ui.windows.CircuitViewer;
 import de.m_marvin.logicsim.ui.windows.Editor;
+import de.m_marvin.logicsim.util.CircuitSerializer;
 import de.m_marvin.logicsim.util.ConfigFile;
 import de.m_marvin.logicsim.util.Registries;
 import de.m_marvin.logicsim.util.Registries.ComponentFolder;
 
 public class LogicSim {
 	
-	// TODO
-// 	- File Extension
-//	- Komponenten zur interaktion mit Dateien, Grphischer Darstellung, Tastatureingabe etc
+// TODO Features planed
+// - Zoom
+// - Komponenten zur interaktion mit Dateien, Grphischer Darstellung, Tastatureingabe etc
+	
+	public static final String LOGIC_SIM_ICON = "iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAA40lEQVRoge2YwQ2DMAxF3Yqhshy3LsIQrNFzJJbIBu0BoVZIUeLEIf7B78IFJH/5/9iEyDCqeGS+92laRZxkfc8rqmiJCejNVPhdbna4sLMWE9ArtGxua6EfrzW/W9t7fy6zmAXhOwAvoN5Chy06ERNw9qjaU6l0F7pqDtgupJ76EP/hnMvOSgiBiIi891V2hO8AvABRCx22ECR5KsF3QPscODNeB+AFwM8BUQENGH8X0j4HksB3QPscGD8D8AJEb+bsf6AAeAE2B3oTCxB7LxeCPQfgb+ZKM6BGEHwGTIBhgPMFj3A0g04XsBUAAAAASUVORK5CYII=";
+	public static final String CIRCUIT_FILE_EXTENSION = "lcf";
 	
 	private static LogicSim INSTANCE;
 	
@@ -53,17 +58,28 @@ public class LogicSim {
 	protected List<Editor> openEditorWindows = new ArrayList<>();
 	protected CircuitViewer circuitViewWindow;
 	protected Editor lastInteractedEditor;
-	 
+	
 	public static void main(String... args) {
 		
 		LogicSim logicSim = new LogicSim();
 		
 		CommandLineParser parser = new CommandLineParser();
+		parser.addOption("config-file", "");
+		parser.addOption("sub-circuit-folder", "");
+		parser.addOption("open-files", "");
 		parser.parseInput(args);
 		logicSim.subCircuitFolder = new File(parser.getOption("sub-circuit-folder"));
 		logicSim.configFile = new File(parser.getOption("config-file"));
 		
-		logicSim.start();
+		String[] circuitFileList = parser.getOption("open-files").split(",");
+		List<File> filesToOpen = new ArrayList<>();
+		for (String fileToOpen : circuitFileList) {
+			if (fileToOpen.isEmpty()) continue;
+			File file = new File(fileToOpen);
+			if (isCircuitFile(file)) filesToOpen.add(file);
+		}
+		
+		logicSim.start(filesToOpen.toArray(new File[] {}));
 		
 	}
 	
@@ -108,7 +124,7 @@ public class LogicSim {
 		Translator.changeLanguage(lang);
 	}
 		
-	private void start() {
+	private void start(File... filesToOpen) {
 
 		registerIncludedParts();
 		updateSubCircuitCache();
@@ -119,8 +135,20 @@ public class LogicSim {
 		this.processor = new CircuitProcessor();
 		this.simulationMonitor = new SimulationMonitor(processor);
 		
-		System.out.println("Open default editor window");
-		openEditor(null);
+		if (filesToOpen.length == 0) {
+			System.out.println("Open default editor window");
+			openEditor(null);
+		} else {
+			System.out.println("Open editor windows for passed files");
+			for (int i = 0; i < filesToOpen.length; i++) {
+				try {
+					openEditor(CircuitSerializer.loadCircuit(filesToOpen[i]));
+				} catch (IOException e) {
+					System.err.println("Failed to load file '" + filesToOpen[i] + "'!");
+					e.printStackTrace();
+				}
+			}
+		}
 
 		System.out.println("Start ui-logic thread");
 		this.uiLogicThread = new Thread(() -> {
@@ -200,7 +228,7 @@ public class LogicSim {
 	}
 	
 	public Editor getLastInteractedEditor() {
-		if (this.lastInteractedEditor.getShell().isDisposed()) {
+		if (this.lastInteractedEditor == null || this.lastInteractedEditor.getShell().isDisposed()) {
 			if (this.openEditorWindows.isEmpty()) return null;
 			setLastInteracted(this.openEditorWindows.get(this.openEditorWindows.size() - 1));
 		}
@@ -290,18 +318,19 @@ public class LogicSim {
 			if (!isCircuitFile(file)) return;
 			String name = Translator.translate(getFileName(file.getName()));
 			Registries.cacheSubCircuit(this.subCircuitFolder, SubCircuitComponent.class, this.builtinIcFolder, Component::placeClick, (circuit, pos) -> SubCircuitComponent.coursorMove(circuit, pos, file), Component::abbortPlacement, name, SubCircuitComponent.ICON_B64);
-		});
+		}, 2);
 		triggerMenuUpdates();
 	}
 	
-	public static void scanForFiles(File circuitFolder, Consumer<File> consumer) {
+	public static void scanForFiles(File circuitFolder, Consumer<File> consumer, int scannDepth) {
+		if (scannDepth == 0) return;
 		if (circuitFolder.list() == null) return;
 		for (String entry : circuitFolder.list()) {
 			File entryPath = new File(circuitFolder, entry);
 			if (entryPath.isFile()) {
 				consumer.accept(entryPath);
 			} else {
-				scanForFiles(entryPath, consumer);
+				scanForFiles(entryPath, consumer, scannDepth - 1);
 			}
 		}
 	}
@@ -315,8 +344,8 @@ public class LogicSim {
 	}
 	
 	public static boolean isCircuitFile(File file) {
-		// TODO File extension check
-		return true;
+		String[] s = file.getName().split("\\.");
+		return s[s.length - 1].equals(CIRCUIT_FILE_EXTENSION);
 	}
 	
 }
