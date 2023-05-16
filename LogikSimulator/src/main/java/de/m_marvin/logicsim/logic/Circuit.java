@@ -229,8 +229,8 @@ public class Circuit {
 	}
 
 	protected synchronized Set<Node> removeNet(int netId) {
-		this.valuesPri.remove(netId);
-		this.valuesSec.remove(netId);
+		if (this.valuesPri.size() > netId) this.valuesPri.remove(netId);
+		if (this.valuesSec.size() > netId) this.valuesSec.remove(netId);
 		return this.networks.remove(netId);
 	}
 	
@@ -336,7 +336,7 @@ public class Circuit {
 		for (int i = 0; i < this.networks.size(); i++) {
 			for (Node n : this.networks.get(i)) {
 				if (n.equals(node)) {
-					return networks.get(i).size() > 1;
+					return networks.size() > i ?  networks.get(i).size() > 1 : false;
 				}
 			}
 		}

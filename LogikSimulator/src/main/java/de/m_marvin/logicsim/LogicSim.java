@@ -10,39 +10,40 @@ import org.eclipse.swt.widgets.Display;
 import de.m_marvin.commandlineparser.CommandLineParser;
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Component;
-import de.m_marvin.logicsim.logic.parts.BusInputComponent;
-import de.m_marvin.logicsim.logic.parts.BusOutputComponent;
 import de.m_marvin.logicsim.logic.parts.BoolInputComponent;
 import de.m_marvin.logicsim.logic.parts.BoolOutputComponent;
+import de.m_marvin.logicsim.logic.parts.BusInputComponent;
+import de.m_marvin.logicsim.logic.parts.BusOutputComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.AndGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.NandGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.NorGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.OrGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.XorGateComponent;
-import de.m_marvin.logicsim.logic.simulator.CircuitProcessor;
-import de.m_marvin.logicsim.logic.simulator.SimulationMonitor;
 import de.m_marvin.logicsim.logic.parts.NotGateComponent;
 import de.m_marvin.logicsim.logic.parts.SubCircuitComponent;
+import de.m_marvin.logicsim.logic.simulator.CircuitProcessor;
+import de.m_marvin.logicsim.logic.simulator.SimulationMonitor;
 import de.m_marvin.logicsim.logic.wires.ConnectorWire;
 import de.m_marvin.logicsim.ui.TextRenderer;
 import de.m_marvin.logicsim.ui.Translator;
 import de.m_marvin.logicsim.ui.windows.CircuitOptions;
 import de.m_marvin.logicsim.ui.windows.CircuitViewer;
 import de.m_marvin.logicsim.ui.windows.Editor;
+import de.m_marvin.logicsim.util.ConfigFile;
 import de.m_marvin.logicsim.util.Registries;
 import de.m_marvin.logicsim.util.Registries.ComponentFolder;
 
 public class LogicSim {
 	
 	// TODO
-//	- Fix Selection and Copy/Paste
 // 	- File Extension
 //	- Komponenten zur interaktion mit Dateien, Grphischer Darstellung, Tastatureingabe etc
 	
 	private static LogicSim INSTANCE;
 	
 	protected File subCircuitFolder;
+	protected File configFile;
 	
 	protected boolean shouldTerminate;
 	protected Display display;
@@ -60,6 +61,7 @@ public class LogicSim {
 		CommandLineParser parser = new CommandLineParser();
 		parser.parseInput(args);
 		logicSim.subCircuitFolder = new File(parser.getOption("sub-circuit-folder"));
+		logicSim.configFile = new File(parser.getOption("config-file"));
 		
 		logicSim.start();
 		
@@ -101,12 +103,17 @@ public class LogicSim {
 		return simulationMonitor;
 	}
 	
+	public void setLanguage(String lang) {
+		ConfigFile.setValue(configFile, "language", lang);
+		Translator.changeLanguage(lang);
+	}
+		
 	private void start() {
 
 		registerIncludedParts();
 		updateSubCircuitCache();
 		
-		Translator.changeLanguage("lang_en");
+		Translator.changeLanguage(ConfigFile.getValue(configFile, "language", "lang_en"));
 		
 		this.display = new Display();
 		this.processor = new CircuitProcessor();
@@ -268,7 +275,10 @@ public class LogicSim {
 		Registries.registerPart(ioFolder, BusOutputComponent.class, Component::placeClick, BusOutputComponent::coursorMove, Component::abbortPlacement, "circuit.components.bus_output", BusOutputComponent.ICON_B64);
 		Registries.registerPart(wireFolder, ConnectorWire.class, ConnectorWire::placeClick, ConnectorWire::coursorMove, ConnectorWire::abbortPlacement, "circuit.components.wire", ConnectorWire.ICON_B64);
 		
-		Registries.registerLangFolder("/lang");
+		Translator.addLanguage("lang_en", "English");
+		Translator.addLanguage("lang_de", "Deutsch");
+		Translator.addLangFolder("/lang");
+		
 	}
 	
 	public void updateSubCircuitCache() {

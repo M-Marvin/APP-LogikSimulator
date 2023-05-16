@@ -5,6 +5,7 @@ import java.lang.management.ManagementFactory;
 import com.sun.management.OperatingSystemMXBean;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +49,14 @@ public class CircuitProcessor {
 			executionEnd = getCurrentTime();
 			executionTime = executionEnd - executionStart;
 			executionStart = getCurrentTime();
-			circuit.updateCircuit();
+			try {
+				circuit.updateCircuit();
+			} catch (ConcurrentModificationException e) {
+				// This catches exceptions that are thrown by interfering with the simulation while it is running
+				// When performing mass-selection or copy paste for example
+				// If this message appears while doing a normal simulation, it is definitely a bug!
+				System.out.println("Concurrent modification occured in sumulation!");
+			}
 		}
 		
 	}

@@ -187,12 +187,12 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 	public void addGrabbedComponent(Component component) {
 		this.grabbedComponents.add(component);
 		this.grabOffsets.add(this.mousePosition.sub(component.getVisualPosition()));
-		this.circuit.reconnect(true, component);
 	}
 	
 	public void releaseGrabbedComponents() {
 		if (this.grabbedComponents.isEmpty()) return;
 		for (int i = 0; i < this.grabbedComponents.size(); i++) {
+			this.circuit.reconnect(true, this.grabbedComponents.get(i));
 			this.grabbedComponents.get(i).setVisualPosition(this.mousePosition.sub(grabOffsets.get(i)));
 			this.circuit.reconnect(false, this.grabbedComponents.get(i));
 		}
@@ -304,7 +304,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 				// Check for click on node
 				for (Component component : this.circuit.getComponents()) {
 					for (Node node : component.getAllNodes()) {
-						if (node.getVisualPosition().add(this.visualOffset).equals(mousePosition)) {
+						if (node.getVisualPosition().equals(mousePosition)) {
 							Vec2i location = Vec2i.fromVec(event.display.getCursorLocation());
 							if (node.click(location)) return;
 						}
@@ -326,7 +326,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 				}
 				
 				// Start area selection
-				this.rangeSelectionBegin = this.mousePosition.sub(visualOffset);
+				this.rangeSelectionBegin = this.mousePosition;
 				return;
 				
 			}
@@ -353,7 +353,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		Vec2i screenSize = getVisibleArea();
 		
 		// Update mouse position
-		this.mousePosition = new Vec2i(event.x, event.y).clamp(new Vec2i(0, 0), Vec2i.fromVec(screenSize));
+		this.mousePosition = new Vec2i(event.x, event.y).clamp(new Vec2i(0, 0), Vec2i.fromVec(screenSize)).sub(visualOffset);
 		Vec2i rasterOffset = this.mousePosition.add(RASTER_SIZE / 2, RASTER_SIZE / 2).module(RASTER_SIZE).sub(RASTER_SIZE / 2, RASTER_SIZE / 2);
 		this.mousePosition.subI(rasterOffset);
 		
@@ -373,8 +373,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		// Update hovered component
 		this.hoveredComponent = null;
 		for (Component component : this.circuit.getComponents()) {
-			Vec2i pos = this.mousePosition.sub(this.visualOffset);
-			if (component.isInBounds(pos)) {
+			if (component.isInBounds(this.mousePosition)) {
 				this.hoveredComponent = component;
 				break;
 			}
@@ -413,7 +412,8 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 			}
 		} else if (event.keyCode == SWT.ESC) {
 			if (this.grabbedComponents != null) {
-				this.removeUnplacedComponents();
+				this.grabbedComponents.clear();
+				this.grabOffsets.clear();
 			} else if (this.activePlacement != null) {
 				this.removeActivePlacement();
 			}
@@ -551,8 +551,8 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		
 		if (this.rangeSelectionBegin != null) {
 			
-			Vec2i min = this.rangeSelectionBegin.min(this.mousePosition.sub(visualOffset));
-			Vec2i size = this.rangeSelectionBegin.max(this.mousePosition.sub(visualOffset)).sub(min);
+			Vec2i min = this.rangeSelectionBegin.min(this.mousePosition);
+			Vec2i size = this.rangeSelectionBegin.max(this.mousePosition).sub(min);
 			
 			swapColor(0, 1, 0, 0.4F);
 			drawRectangle(2, min.x, min.y, size.x, size.y);
@@ -564,7 +564,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		if (this.hoveredComponent instanceof NetConnector connector) {
 			
 			Map<String, NetState> laneData = connector.getLaneData();
-			if (laneData != null) drawLaneInfo(this.mousePosition, laneData);
+			if (laneData != null) drawLaneInfo(this.mousePosition.add(visualOffset), laneData);
 			
 		}
 		

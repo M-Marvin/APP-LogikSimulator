@@ -159,6 +159,22 @@ public class Editor {
 		editorWindow.setText(Translator.translate("editor.menu.views.circuit_editor"));
 		editorWindow.addListener(SWT.Selection, (e) -> LogicSim.getInstance().openEditor(null));
 		
+		MenuItem languageTab = new MenuItem(titleBar, SWT.CASCADE);
+		languageTab.setText(Translator.translate("editor.menu.language"));
+		Menu languageMenu = new Menu(shell, SWT.DROP_DOWN);
+		languageTab.setMenu(languageMenu);
+		Translator.getAvailableLanguages().forEach(lang -> {
+			MenuItem languageSelecor = new MenuItem(languageMenu, SWT.PUSH);
+			languageSelecor.setText(Translator.resolveLangName(lang));
+			languageSelecor.addListener(SWT.Selection, e -> {
+				LogicSim.getInstance().setLanguage(lang);
+				MessageBox msg = new MessageBox(shell, SWT.ICON_WARNING);
+				msg.setMessage(Translator.translate("editor.window.info.language_change"));
+				msg.setText(Translator.translate("editor.window.info"));	
+				msg.open();
+			});
+		});
+		
 		// Left tool group
 		
 		Composite groupLeft = new Composite(shell, SWT.NONE);

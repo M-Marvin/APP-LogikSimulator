@@ -54,18 +54,6 @@ public class Registries {
 		return logicParts;
 	}
 	
-	/* Language File Registry */
-	
-	protected static List<String> langFolders = new ArrayList<>();
-	
-	public static void registerLangFolder(String langFolder) {
-		langFolders.add(langFolder);
-	}
-	
-	public static List<String> getLangFolders() {
-		return langFolders;
-	}
-	
 	/* Sub Circuit cache */
 	
 	protected static List<ComponentEntry> subCircuitParts = new ArrayList<ComponentEntry>();
