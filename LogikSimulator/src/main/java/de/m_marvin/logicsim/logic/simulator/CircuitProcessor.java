@@ -51,11 +51,11 @@ public class CircuitProcessor {
 			executionStart = getCurrentTime();
 			try {
 				circuit.updateCircuit();
-			} catch (ConcurrentModificationException e) {
+			} catch (ConcurrentModificationException | NullPointerException | IndexOutOfBoundsException e) {
 				// This catches exceptions that are thrown by interfering with the simulation while it is running
 				// When performing mass-selection or copy paste for example
 				// If this message appears while doing a normal simulation, it is definitely a bug!
-				System.out.println("Concurrent modification occured in sumulation!");
+				System.out.println("Concurrent modification occured in simulation!");
 			}
 		}
 		

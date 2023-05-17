@@ -35,8 +35,10 @@ public abstract class Component {
 	protected static Vec2i placeOffset;
 	
 	public static void placeClick(Circuit circuit, Vec2i coursorPosition) {
-		if (currentComponent != null) circuit.reconnect(false, currentComponent);
-		currentComponent.reset();
+		if (currentComponent != null) {
+			circuit.reconnect(false, currentComponent);
+			currentComponent.reset();
+		}
 		currentComponent = null;
 	}
 	

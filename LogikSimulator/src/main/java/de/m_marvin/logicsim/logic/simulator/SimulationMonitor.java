@@ -70,7 +70,7 @@ public class SimulationMonitor {
 		
 		if (laneData == null) return Optional.empty();
 		if (laneData.isEmpty()) return Optional.of(NetState.FLOATING);
-		return laneData.keySet().stream().map(v -> laneData.get(v)).filter(s -> s.isErrorState()).findAny();
+		return laneData.keySet().stream().map(v -> laneData.get(v)).filter(s -> s == null ? false : s.isErrorState()).findAny();
 		
 	}
 	
@@ -112,6 +112,7 @@ public class SimulationMonitor {
 						
 						NetState state = circuit.getNetState(inputNode, inputNode.getLaneTag());
 						Map<String, NetState> laneData = inputNode.getLaneReference();
+						if (laneData == null) return;
 						
 						if (state.isErrorState() && (laneData.isEmpty() || laneData.containsKey(inputNode.getLaneTag()))) {
 							

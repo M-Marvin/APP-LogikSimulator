@@ -89,7 +89,7 @@ public class BusOutputComponent extends Component implements ISubCircuitIO {
 		String outputBus = s[0];
 		int indexOffset = s.length > 1 ? Integer.valueOf(s[1]) : 0;
 		for (int i = 0; i < bitCount; i++) {
-			boolean state = (value & (1 << i + indexOffset)) > 0;
+			boolean state = (value & (1 << i)) > 0;
 			writeLaneCache.put(outputBus + (i + indexOffset), state ? NetState.HIGH : NetState.LOW);
 		}
 	}

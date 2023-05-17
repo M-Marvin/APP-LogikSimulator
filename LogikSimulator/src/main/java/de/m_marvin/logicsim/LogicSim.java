@@ -2,9 +2,13 @@ package de.m_marvin.logicsim;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 import org.eclipse.swt.widgets.Display;
 
@@ -81,6 +85,17 @@ public class LogicSim {
 		
 		logicSim.start(filesToOpen.toArray(new File[] {}));
 		
+	}
+	
+	public static String getVersion() {
+		try {
+			URL url = LogicSim.class.getClassLoader().getResource("META-INF/MANIFEST.MF");
+			Manifest manifest = new Manifest(url.openStream());
+			Attributes attr = manifest.getMainAttributes();
+			return attr.getValue("Implementation-Version");
+		} catch (IOException e) {
+			return "N/A";
+		}
 	}
 	
 	public LogicSim() {
@@ -293,8 +308,8 @@ public class LogicSim {
 		
 		Registries.registerPart(logicFolder, AndGateComponent.class, Component::placeClick, AndGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.and_gate", LogicGateComponent.ICON_AND_B64 );
 		Registries.registerPart(logicFolder, OrGateComponent.class, Component::placeClick, OrGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.or_gate",LogicGateComponent.ICON_OR_B64);
-		Registries.registerPart(logicFolder, NandGateComponent.class, Component::placeClick, NandGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.nor_gate",LogicGateComponent.ICON_NAND_B64);
-		Registries.registerPart(logicFolder, NorGateComponent.class, Component::placeClick, NorGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.nand_gate",LogicGateComponent.ICON_NOR_B64);
+		Registries.registerPart(logicFolder, NandGateComponent.class, Component::placeClick, NandGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.nand_gate",LogicGateComponent.ICON_NAND_B64);
+		Registries.registerPart(logicFolder, NorGateComponent.class, Component::placeClick, NorGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.nor_gate",LogicGateComponent.ICON_NOR_B64);
 		Registries.registerPart(logicFolder, XorGateComponent.class, Component::placeClick, XorGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.xor_gate",LogicGateComponent.ICON_XOR_B64);
 		Registries.registerPart(logicFolder, NotGateComponent.class, Component::placeClick, NotGateComponent::coursorMove, Component::abbortPlacement, "circuit.components.not_gate", NotGateComponent.ICON_B64);
 		Registries.registerPart(ioFolder, BoolInputComponent.class, Component::placeClick, BoolInputComponent::coursorMove, Component::abbortPlacement, "circuit.components.bool_input", BoolInputComponent.ICON_B64);

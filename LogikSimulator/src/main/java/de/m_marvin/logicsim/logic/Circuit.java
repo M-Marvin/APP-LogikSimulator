@@ -1,7 +1,6 @@
 package de.m_marvin.logicsim.logic;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,6 +13,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import de.m_marvin.logicsim.logic.nodes.Node;
+import de.m_marvin.logicsim.logic.simulator.AsyncArrayList;
 import de.m_marvin.logicsim.logic.simulator.FastAsyncMap;
 import de.m_marvin.univec.impl.Vec4i;
 
@@ -127,10 +127,10 @@ public class Circuit {
 		
 	}
 	
-	protected final List<Set<Node>> networks = new ArrayList<>();
-	protected final List<Map<String, NetState>> valuesSec = new ArrayList<>();
-	protected final List<Map<String, NetState>> valuesPri = new ArrayList<>();
-	protected final List<Component> components = new ArrayList<>();
+	protected final List<Set<Node>> networks = new AsyncArrayList<>();
+	protected final List<Map<String, NetState>> valuesSec = new AsyncArrayList<>();
+	protected final List<Map<String, NetState>> valuesPri = new AsyncArrayList<>();
+	protected final List<Component> components = new AsyncArrayList<>();
 	protected File circuitFile;
 	protected final boolean virtual;
 	protected ShortCircuitType shortCircuitType = ShortCircuitType.HIGH_LOW_SHORT;
@@ -167,7 +167,7 @@ public class Circuit {
 	
 	
 	protected synchronized void reconnectNet(List<Node> nodes, boolean excludeNodes) {
-		List<Node> nodesToReconnect = new ArrayList<>();
+		List<Node> nodesToReconnect = new AsyncArrayList<>();
 		nodes.forEach(node -> {
 			OptionalInt netId = findNet(node);
 			if (netId.isPresent()) {
@@ -177,11 +177,11 @@ public class Circuit {
 			}
 		});
 		List<Node> excluded = excludeNodes ? nodes : null;
-		Stream.of(nodesToReconnect.toArray(l -> new Node[l])).mapToInt(node -> groupNodeToNet(node, excluded)).forEach(this::combineNets);
+		nodesToReconnect.stream().mapToInt(node -> groupNodeToNet(node, excluded)).forEach(this::combineNets);
 	}
 	
 	protected synchronized int groupNodeToNet(Node node, List<Node> excluded) {
-		List<Node> nodeCache = new ArrayList<Node>();
+		List<Node> nodeCache = new AsyncArrayList<Node>();
 		Set<Node> network = new HashSet<>();
 		this.components.forEach(component -> {
 			component.getAllNodes().forEach(node2 -> {
@@ -332,7 +332,7 @@ public class Circuit {
 	
 	
 	
-	public boolean isNodeConnected(Node node) {
+	public synchronized boolean isNodeConnected(Node node) {
 		for (int i = 0; i < this.networks.size(); i++) {
 			for (Node n : this.networks.get(i)) {
 				if (n.equals(node)) {
@@ -352,6 +352,8 @@ public class Circuit {
 		if (!this.virtual) component.dispose();
 		this.components.remove(component);
 	}
+	
+	
 	
 	public List<Component> getComponents() {
 		return this.components;

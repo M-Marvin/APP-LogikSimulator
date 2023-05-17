@@ -191,9 +191,11 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 	
 	public void releaseGrabbedComponents() {
 		if (this.grabbedComponents.isEmpty()) return;
+		this.circuit.reconnect(true, this.grabbedComponents.toArray(i -> new Component[i]));
 		for (int i = 0; i < this.grabbedComponents.size(); i++) {
-			this.circuit.reconnect(true, this.grabbedComponents.get(i));
 			this.grabbedComponents.get(i).setVisualPosition(this.mousePosition.sub(grabOffsets.get(i)));
+		}
+		for (int i = 0; i < this.grabbedComponents.size(); i++) {
 			this.circuit.reconnect(false, this.grabbedComponents.get(i));
 		}
 		this.grabbedComponents.clear();
@@ -261,8 +263,8 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 			if (this.rangeSelectionBegin != null) {
 				
 				// Execute area selection
-				Vec2i selectionMin = this.rangeSelectionBegin.min(this.mousePosition.sub(visualOffset));
-				Vec2i selectionMax = this.rangeSelectionBegin.max(this.mousePosition.sub(visualOffset));
+				Vec2i selectionMin = this.rangeSelectionBegin.min(this.mousePosition);
+				Vec2i selectionMax = this.rangeSelectionBegin.max(this.mousePosition);
 				this.rangeSelectionBegin = null;
 				
 				this.circuit.getComponents().stream().filter(c ->
@@ -319,10 +321,10 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 						if (event.count == 1) {
 							this.setGrabbedComponent(this.hoveredComponent);
 						} else {
-							this.hoveredComponent.click(mousePosition, true);
+							this.hoveredComponent.click(mousePosition.add(visualOffset), true);
 						}
 					} else {
-						this.hoveredComponent.click(mousePosition, false);
+						this.hoveredComponent.click(mousePosition.add(visualOffset), false);
 					}
 					return;
 				}
@@ -343,7 +345,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 			}
 			
 		} else if (event.button == 1) {
-			this.activePlacement.placementClickMethod().accept(circuit, this.mousePosition.sub(this.visualOffset));
+			this.activePlacement.placementClickMethod().accept(circuit, this.mousePosition);
 		}
 		
 	}
@@ -362,7 +364,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		this.mousePosition.subI(rasterOffset);
 		
 		if (this.activePlacement != null) {
-			this.activePlacement.placementMoveMethod().apply(circuit, mousePosition.sub(this.visualOffset));
+			this.activePlacement.placementMoveMethod().apply(circuit, mousePosition);
 		}
 		
 		if (this.grabbedBackground) {
@@ -404,7 +406,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		if (this.circuit == null) return;
 		
 		if (event.keyCode == SWT.DEL) {
-			if (this.grabbedComponents != null) {
+			if (!this.grabbedComponents.isEmpty()) {
 				this.removeUnplacedComponents();
 			} else {
 				if (this.hoveredComponent != null) {
@@ -414,7 +416,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 				}
 			}
 		} else if (event.keyCode == SWT.ESC) {
-			if (this.grabbedComponents != null) {
+			if (!this.grabbedComponents.isEmpty()) {
 				this.grabbedComponents.clear();
 				this.grabOffsets.clear();
 			} else if (this.activePlacement != null) {
@@ -480,87 +482,91 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		GL11.glPushMatrix();
 		GL11.glTranslatef(this.visualOffset.x, this.visualOffset.y, 0);
 		
-		for (Component component : circuit.getComponents()) {
-			
-			if (isComponentVisible(component)) {
-				
-				component.render();
-				
-				swapColor(1, 1, 1, 1);
+		try {
 
-				for (InputNode inputNode : component.getInputs()) {
-					boolean mouseNearBy = this.mousePosition.dist(inputNode.getVisualPosition().add(visualOffset)) < SHOW_HIDEN_TAG_RANGE;
-					boolean connected = circuit.isNodeConnected(inputNode);
-					Vec2i position = inputNode.getVisualOffset().add(component.getVisualPosition());
-					drawNode(position, 1, inputNode.getLaneTag(), inputNode.getLabel(), connected, mouseNearBy);
-				}
-				for (OutputNode outputNode : component.getOutputs()) {
-					boolean mouseNearBy = this.mousePosition.dist(outputNode.getVisualPosition().add(visualOffset)) < SHOW_HIDEN_TAG_RANGE;
-					boolean connected = circuit.isNodeConnected(outputNode);
-					Vec2i position = outputNode.getVisualOffset().add(component.getVisualPosition());
-					drawNode(position, 2, outputNode.getLaneTag(), outputNode.getLabel(), connected, mouseNearBy);
-				}
-				for (PassivNode passivNode : component.getPassives()) {
-					boolean mouseNearBy = this.mousePosition.dist(passivNode.getVisualPosition().add(visualOffset)) < SHOW_HIDEN_TAG_RANGE;
-					boolean connected = circuit.isNodeConnected(passivNode);
-					Vec2i position = passivNode.getVisualOffset().add(component.getVisualPosition());
-					drawNode(position, 3, passivNode.getLaneTag(), "", connected, mouseNearBy);
-				}
+			for (Component component : circuit.getComponents()) {
 				
-			}
-			
-		}
-		
-		if (warningSupplier != null) {
-			
-			if (System.currentTimeMillis() - animationTimer > 1000) {
-				animationTimer = System.currentTimeMillis();
-			}
-			
-			if (System.currentTimeMillis() - animationTimer > 500) {
-				
-				List<Vec2i> drawnWarnings = new ArrayList<>();
-				warningSupplier.get().forEach(warning -> {
+				if (isComponentVisible(component)) {
 					
-					Vec2i position = warning.component.getVisualPosition().add(new Vec2i(warning.component.getVisualWidth() / 2, warning.component.getVisualHeight() / 2));
-					if (warning.node != null) position.addI(warning.node.getVisualOffset().sub(20, 25));
+					component.render();
 					
-					for (Vec2i dw : drawnWarnings) {
-						if (dw.dist(position) < MIN_WARNING_DISTANCE) return;
+					swapColor(1, 1, 1, 1);
+
+					for (InputNode inputNode : component.getInputs()) {
+						boolean mouseNearBy = this.mousePosition.dist(inputNode.getVisualPosition()) < SHOW_HIDEN_TAG_RANGE;
+						boolean connected = circuit.isNodeConnected(inputNode);
+						Vec2i position = inputNode.getVisualOffset().add(component.getVisualPosition());
+						drawNode(position, 1, inputNode.getLaneTag(), inputNode.getLabel(), connected, mouseNearBy);
 					}
-					drawnWarnings.add(position);
+					for (OutputNode outputNode : component.getOutputs()) {
+						boolean mouseNearBy = this.mousePosition.dist(outputNode.getVisualPosition()) < SHOW_HIDEN_TAG_RANGE;
+						boolean connected = circuit.isNodeConnected(outputNode);
+						Vec2i position = outputNode.getVisualOffset().add(component.getVisualPosition());
+						drawNode(position, 2, outputNode.getLaneTag(), outputNode.getLabel(), connected, mouseNearBy);
+					}
+					for (PassivNode passivNode : component.getPassives()) {
+						boolean mouseNearBy = this.mousePosition.dist(passivNode.getVisualPosition()) < SHOW_HIDEN_TAG_RANGE;
+						boolean connected = circuit.isNodeConnected(passivNode);
+						Vec2i position = passivNode.getVisualOffset().add(component.getVisualPosition());
+						drawNode(position, 3, passivNode.getLaneTag(), "", connected, mouseNearBy);
+					}
 					
-					drawWarning(position, warning);
-					
-				});
+				}
 				
 			}
 			
-		}
-		
-		if (!this.grabbedComponents.isEmpty()) {
+			if (warningSupplier != null) {
+				
+				if (System.currentTimeMillis() - animationTimer > 1000) {
+					animationTimer = System.currentTimeMillis();
+				}
+				
+				if (System.currentTimeMillis() - animationTimer > 500) {
+					
+					List<Vec2i> drawnWarnings = new ArrayList<>();
+					warningSupplier.get().forEach(warning -> {
+						
+						Vec2i position = warning.component.getVisualPosition().add(new Vec2i(warning.component.getVisualWidth() / 2, warning.component.getVisualHeight() / 2));
+						if (warning.node != null) position.addI(warning.node.getVisualOffset().sub(20, 25));
+						
+						for (Vec2i dw : drawnWarnings) {
+							if (dw.dist(position) < MIN_WARNING_DISTANCE) return;
+						}
+						drawnWarnings.add(position);
+						
+						drawWarning(position, warning);
+						
+					});
+					
+				}
+				
+			}
 			
-			for (int i = 0; i < this.grabbedComponents.size(); i++) {
+			if (!this.grabbedComponents.isEmpty()) {
+				
+				for (int i = 0; i < this.grabbedComponents.size(); i++) {
 
-				Vec2i topLeft = this.mousePosition.sub(grabOffsets.get(i)).sub(VISUAL_BUNDING_BOX_OFFSET, VISUAL_BUNDING_BOX_OFFSET);
-				int width = this.grabbedComponents.get(i).getVisualWidth() + VISUAL_BUNDING_BOX_OFFSET * 2;
-				int height = this.grabbedComponents.get(i).getVisualHeight() + VISUAL_BUNDING_BOX_OFFSET * 2;
-				swapColor(0, 1, 0, 0.4F);
-				drawRectangle(1, topLeft.x , topLeft.y, width, height);
+					Vec2i topLeft = this.mousePosition.sub(grabOffsets.get(i)).sub(VISUAL_BUNDING_BOX_OFFSET, VISUAL_BUNDING_BOX_OFFSET);
+					int width = this.grabbedComponents.get(i).getVisualWidth() + VISUAL_BUNDING_BOX_OFFSET * 2;
+					int height = this.grabbedComponents.get(i).getVisualHeight() + VISUAL_BUNDING_BOX_OFFSET * 2;
+					swapColor(0, 1, 0, 0.4F);
+					drawRectangle(1, topLeft.x , topLeft.y, width, height);
+					
+				}
 				
 			}
 			
-		}
-		
-		if (this.rangeSelectionBegin != null) {
+			if (this.rangeSelectionBegin != null) {
+				
+				Vec2i min = this.rangeSelectionBegin.min(this.mousePosition);
+				Vec2i size = this.rangeSelectionBegin.max(this.mousePosition).sub(min);
+				
+				swapColor(0, 1, 0, 0.4F);
+				drawRectangle(2, min.x, min.y, size.x, size.y);
+				
+			}
 			
-			Vec2i min = this.rangeSelectionBegin.min(this.mousePosition);
-			Vec2i size = this.rangeSelectionBegin.max(this.mousePosition).sub(min);
-			
-			swapColor(0, 1, 0, 0.4F);
-			drawRectangle(2, min.x, min.y, size.x, size.y);
-			
-		}
+		} catch (Exception e) {}
 		
 		GL11.glPopMatrix();
 

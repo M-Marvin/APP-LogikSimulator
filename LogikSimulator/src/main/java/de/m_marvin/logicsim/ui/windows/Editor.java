@@ -326,7 +326,7 @@ public class Editor {
 	public void updateUI() {
 		
 		boolean instanced = LogicSim.getInstance().getCircuitProcessor().holdsCircuit(this.editorArea.getCircuit());
-		this.shell.setText(Translator.translate("editor.title") + (this.editorArea.getCircuit().getCircuitFile() != null ? " - " + this.editorArea.getCircuit().getCircuitFile().toString() : "") + (instanced ? Translator.translate("editor.title.instanced") : ""));
+		this.shell.setText(Translator.translate("editor.title", LogicSim.getVersion()) + (this.editorArea.getCircuit().getCircuitFile() != null ? " - " + this.editorArea.getCircuit().getCircuitFile().toString() : "") + (instanced ? Translator.translate("editor.title.instanced") : ""));
 		
 		SimulationMonitor monitor = LogicSim.getInstance().getSimulationMonitor();
 		Optional<CircuitProcessInfo> processInfo = monitor.getProcessForCircuit(this.editorArea.getCircuit());
@@ -409,7 +409,7 @@ public class Editor {
 				if (filePath.exists()) {
 					MessageBox msg = new MessageBox(shell, SWT.YES | SWT.NO | SWT.ICON_QUESTION);
 					msg.setMessage(Translator.translate("editor.window.info.override_request"));
-					msg.setText(Translator.translate("editor.window.info"));
+					msg.setText(Translator.translate("editor.window.info.title"));
 					if (msg.open() == SWT.NO) return;
 				}
 				this.editorArea.getCircuit().setCircuitFile(filePath);

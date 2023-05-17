@@ -176,6 +176,13 @@ public class SubCircuitComponent extends Component {
 		}
 	}
 	
+	@Override
+	public void click(Vec2i clickPosition, boolean leftClick) {
+		if (!leftClick) {
+			LogicSim.getInstance().openEditor(this.subCircuit);
+		}
+	}
+	
 	public String getComponentName() {
 		return Translator.translate(LogicSim.getFileName(this.getRelativeCircuitPath()));
 	}

@@ -52,6 +52,9 @@ dependencies {
 jar {
     manifest {
         attributes 'Main-Class': 'de.m_marvin.logicsim.LogicSim'
+        attributes 'Implementation-Version': '0.1.1 - alpha'
+        attributes 'Implementation-Title': 'Multithreadding Logic Simulator'
+        attributes 'Implementation-Vendor-Id': 'de.m_marvin'
     }
 }
 

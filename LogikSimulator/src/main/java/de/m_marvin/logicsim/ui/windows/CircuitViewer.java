@@ -27,7 +27,6 @@ import org.eclipse.swt.widgets.TreeItem;
 
 import de.m_marvin.logicsim.LogicSim;
 import de.m_marvin.logicsim.logic.Circuit;
-import de.m_marvin.logicsim.logic.simulator.CircuitProcessor.CircuitProcess;
 import de.m_marvin.logicsim.logic.simulator.SimulationMonitor;
 import de.m_marvin.logicsim.logic.simulator.SimulationMonitor.CircuitProcessInfo;
 import de.m_marvin.logicsim.ui.Translator;
@@ -199,7 +198,7 @@ public class CircuitViewer {
 		
 		monitor.getRunningProcesses().forEach(process -> {
 			if (!this.viewItems.containsKey(process.circuit())) {
-				Optional<TreeItem> parent = this.viewItems.values().stream().filter(item ->  !item.isDisposed() ? ((CircuitProcess) item.getData()).circuit == process.parentCircuit() : false).findAny();
+				Optional<TreeItem> parent = this.viewItems.values().stream().filter(item ->  !item.isDisposed() ? ((CircuitProcessInfo) item.getData()).circuit() == process.parentCircuit() : false).findAny();
 				TreeItem item = parent.isPresent() ? new TreeItem(parent.get(), SWT.NONE) : new TreeItem(this.treeView, SWT.NONE);
 				item.setData(process);
 				item.setText("N/A");

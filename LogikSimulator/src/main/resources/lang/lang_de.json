@@ -1,5 +1,5 @@
 {
-"editor.title": "LogikSimulator - alpha",
+"editor.title": "LogikSimulator - v%0",
 "editor.title.instanced": " - Instanz",
 "editor.menu.file": "Datei",
 "editor.menu.file.new_file": "Neu",
@@ -78,7 +78,7 @@
 "circuit.folders.logic": "Logik",
 "circuit.folders.io": "I/O",
 "circuit.folders.wires": "Leitungen",
-"circuit.folders.ics": "Integrierte Schalrungen",
+"circuit.folders.ics": "Integrierte Schaltungen",
 "circuit.folders.user": "Benutzer Schaltungen",
 
 "circuit.components.wire": "Logik Leitung",

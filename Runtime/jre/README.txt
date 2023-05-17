@@ -1,0 +1,1 @@
+Light-Weight JRE build with Oracle jlink.exe from JRE 18.0.2.
