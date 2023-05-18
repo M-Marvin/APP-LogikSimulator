@@ -224,7 +224,7 @@ public class Editor {
 					}
 				} else if (event.item.getData() instanceof ComponentEntry entry) {
 					Editor.this.editorArea.setActivePlacement(entry);
-					Editor.this.editorArea.forceFocus();
+					Editor.this.editorArea.getGlCanvas().forceFocus();
 				} else {
 					Editor.this.editorArea.setActivePlacement(null);
 				}
