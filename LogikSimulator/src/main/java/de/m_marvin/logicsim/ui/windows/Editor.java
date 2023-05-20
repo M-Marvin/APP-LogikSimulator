@@ -172,7 +172,7 @@ public class Editor {
 				LogicSim.getInstance().setLanguage(lang);
 				MessageBox msg = new MessageBox(shell, SWT.ICON_WARNING);
 				msg.setMessage(Translator.translate("editor.window.info.language_change"));
-				msg.setText(Translator.translate("editor.window.info"));	
+				msg.setText(Translator.translate("editor.window.info.title"));	
 				msg.open();
 			});
 		});
@@ -394,7 +394,7 @@ public class Editor {
 	public void newCircuit() {
 		MessageBox msg = new MessageBox(shell, SWT.YES | SWT.NO | SWT.ICON_QUESTION);
 		msg.setMessage(Translator.translate("editor.window.info.clear_circuit_request"));
-		msg.setText(Translator.translate("editor.window.info"));
+		msg.setText(Translator.translate("editor.window.info.title"));
 		if (msg.open() == SWT.NO) return;
 		this.changeCircuit(new Circuit());
 	}

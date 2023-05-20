@@ -3,7 +3,6 @@ package de.m_marvin.logicsim;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -320,6 +319,7 @@ public class LogicSim {
 		
 		Translator.addLanguage("lang_en", "English");
 		Translator.addLanguage("lang_de", "Deutsch");
+		Translator.addLanguage("lang_fr", "Francais [En progres]");
 		Translator.addLangFolder("/lang");
 		
 	}
