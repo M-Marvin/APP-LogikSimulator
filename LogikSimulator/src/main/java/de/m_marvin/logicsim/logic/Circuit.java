@@ -1,20 +1,19 @@
 package de.m_marvin.logicsim.logic;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Random;
-import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import de.m_marvin.logicsim.logic.nodes.Node;
 import de.m_marvin.logicsim.logic.simulator.AsyncArrayList;
 import de.m_marvin.logicsim.logic.simulator.FastAsyncMap;
+import de.m_marvin.univec.impl.Vec2i;
 import de.m_marvin.univec.impl.Vec4i;
 
 /**
@@ -127,7 +126,7 @@ public class Circuit {
 		
 	}
 	
-	protected final List<Set<Node>> networks = new AsyncArrayList<>();
+	protected final List<List<Node>> networks = new AsyncArrayList<>();
 	protected final List<Map<String, NetState>> valuesSec = new AsyncArrayList<>();
 	protected final List<Map<String, NetState>> valuesPri = new AsyncArrayList<>();
 	protected final List<Component> components = new AsyncArrayList<>();
@@ -165,70 +164,7 @@ public class Circuit {
 	
 	
 	
-	
-	protected synchronized void reconnectNet(List<Node> nodes, boolean excludeNodes) {
-		List<Node> nodesToReconnect = new AsyncArrayList<>();
-		nodes.forEach(node -> {
-			OptionalInt netId = findNet(node);
-			if (netId.isPresent()) {
-				nodesToReconnect.addAll(removeNet(netId.getAsInt()));
-			} else {
-				nodesToReconnect.add(node);
-			}
-		});
-		List<Node> excluded = excludeNodes ? nodes : null;
-		nodesToReconnect.stream().mapToInt(node -> groupNodeToNet(node, excluded)).forEach(this::combineNets);
-	}
-	
-	protected synchronized int groupNodeToNet(Node node, List<Node> excluded) {
-		List<Node> nodeCache = new AsyncArrayList<Node>();
-		Set<Node> network = new HashSet<>();
-		this.components.forEach(component -> {
-			component.getAllNodes().forEach(node2 -> {
-				if (excluded != null) for (Node n : excluded) if (n == node2) return;
-				if (node2.equals(node)) {
-					nodeCache.add(node2);
-				}
-			});
-		});
-		this.components.forEach(component -> {
-			component.getAllNodes().forEach(node2 -> {
-				nodeCache.forEach(node1 -> {
-					if (excluded != null) for (Node n : excluded) if (n == node2) return;
-					if (node2.getVisualPosition().equals(node1.getVisualPosition())) {
-						network.add(node2);
-					}
-				});
-			});
-		});
-		network.addAll(nodeCache);
-		if (network.size() > 0) {
-			this.networks.add(network);
-			this.valuesPri.add(new FastAsyncMap<>());
-			this.valuesSec.add(new FastAsyncMap<>());
-		}
-		return this.networks.size() - 1;
-	}
-	
-	protected synchronized void combineNets(int netId) {
-		if (netId == -1) return;
-		Set<Node> network = new HashSet<>();
-		removeNet(netId).forEach(node -> {
-			OptionalInt existingNet = findNet(node);
-			if (existingNet.isPresent()) {
-				network.addAll(removeNet(existingNet.getAsInt()));
-			} else {
-				network.add(node);
-			}
-		});
-		if (network.size() > 0) {
-			this.networks.add(network);
-			this.valuesPri.add(new FastAsyncMap<>());
-			this.valuesSec.add(new FastAsyncMap<>());
-		}
-	}
-
-	protected synchronized Set<Node> removeNet(int netId) {
+	protected synchronized List<Node> removeNet(int netId) {
 		if (this.valuesPri.size() > netId) this.valuesPri.remove(netId);
 		if (this.valuesSec.size() > netId) this.valuesSec.remove(netId);
 		return this.networks.remove(netId);
@@ -243,9 +179,90 @@ public class Circuit {
 		return OptionalInt.empty();
 	}
 	
-	public void reconnect(boolean excludeComponents, Component... components) {
-		List<Node> nodes = Stream.of(components).flatMap(component -> component.getAllNodes().stream()).toList();
-		reconnectNet(nodes, excludeComponents);
+	public void reconnect(boolean disconnect, Component... components) {
+		
+		if (!disconnect) {
+			
+			for (Component c : components) {
+				
+				for (Node n : c.getAllNodes()) {
+					
+					List<Node> newNet = null;
+					
+					Vec2i pos = n.getVisualPosition();
+					
+					for (int net = 0; net < this.networks.size(); net++) {
+						List<Node> network = this.networks.get(net);
+						for (Node n2 : network) {
+							
+							if (n2.getVisualPosition().equals(pos) || n2.equals(n)) {
+								
+								if (newNet == null) {
+									newNet = network;
+								} else {
+									removeNet(net);
+									newNet.addAll(network);
+									
+
+								}
+								
+								break;
+								
+							}
+							
+						}
+					}
+
+					if (newNet == null) {
+						newNet = new AsyncArrayList<>();
+						newNet.add(n);
+						this.networks.add(newNet);
+						this.valuesPri.add(new FastAsyncMap<>());
+						this.valuesSec.add(new FastAsyncMap<>());
+					} else {
+						newNet.add(n);
+					}
+					
+				}
+				
+			}
+			
+		} else {
+			
+			List<Component> disconnectedComponents = new ArrayList<>();
+			
+			for (Component c : components) {
+				for (Node n : c.getAllNodes()) {
+					
+					
+					for (int net = 0; net < this.networks.size(); net++) {
+						List<Node> network = this.networks.get(net);
+						
+						if (network.contains(n)) {
+							
+							removeNet(net);
+							for (Node n2 : network) {
+								if (!disconnectedComponents.contains(n2.getComponent())) disconnectedComponents.add(n2.getComponent());
+							}
+							
+						}
+						
+					}
+					
+					
+				}
+			}
+			
+			for (Component c : components) {
+				disconnectedComponents.remove(c);
+			}
+			
+			if (!disconnectedComponents.isEmpty()) {
+				reconnect(false, disconnectedComponents.toArray(i -> new Component[i]));
+			}
+			
+		}
+		
 	}
 	
 	protected NetState getNetValue(int netId, String lane) {

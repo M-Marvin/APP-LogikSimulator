@@ -59,6 +59,7 @@ public class CircuitSerializer {
 				Component component = componentClass.getConstructor(Circuit.class).newInstance(circuit);
 				component.deserialize(componentJson.getAsJsonObject());
 				component.getVisualPosition().addI(offset);
+				circuit.add(component);
 				componentList.add(component);
 			} catch (Exception e) {
 				System.err.println("Failed to load component '" + componentJson.toString() + "'");

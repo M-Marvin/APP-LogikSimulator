@@ -79,6 +79,7 @@ public class CircuitProcessor {
 		
 		public CircuitProcessorThread(String name) {
 			super(name);
+			this.setDaemon(true);
 		}
 		
 		@Override

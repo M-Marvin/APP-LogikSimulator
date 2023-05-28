@@ -17,4 +17,4 @@ REGEDIT4
 @="Öffnen"
 
 [HKEY_CLASSES_ROOT\lcf-File\shell\Öffnen\command]
-@="%INSTALL_PATH%LogikSimulator.exe %1"
+@="\"%INSTALL_PATH%LogikSimulator.exe\" \"%1\""

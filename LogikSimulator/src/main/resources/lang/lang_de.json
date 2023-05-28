@@ -91,5 +91,7 @@
 "circuit.components.bool_input": "Bool-Eingang",
 "circuit.components.bool_output": "Bool-Ausgang",
 "circuit.components.bus_input": "Bus-Eingang",
-"circuit.components.bus_output": "Bus-Ausgang"
+"circuit.components.bus_output": "Bus-Ausgang",
+"circuit.components.bus_const": "Bus-Konstante",
+"circuit.components.bool_const": "Bool-Konstante"
 }

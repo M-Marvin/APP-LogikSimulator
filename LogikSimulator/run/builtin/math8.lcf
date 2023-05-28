@@ -1,0 +1,3731 @@
+{
+  "shortCircuitType": "HIGH_LOW_SHORT",
+  "components": [
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1110,
+      "y": 430,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1310,
+      "y": 440,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1510,
+      "y": 430,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 1450,
+      "y": 480,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 957,
+      "y": 457,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 143,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 457,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 143,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1157,
+      "y": 447,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 53,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1207,
+      "y": 447,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 93,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1207,
+      "y": 557,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 93,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1237,
+      "y": 467,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 63,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1237,
+      "y": 577,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 63,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 1310,
+      "y": 550,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$OrGateComponent",
+      "label": "logic_gate",
+      "x": 1510,
+      "y": 540,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 437,
+      "laneTags": {},
+      "x1": 93,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 397,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 43,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 437,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 487,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 33,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 457,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 507,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 83,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1497,
+      "y": 497,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1237,
+      "y": 467,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 113
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1207,
+      "y": 447,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 113
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 567,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 143,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 437,
+      "laneTags": {},
+      "x1": 73,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 397,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 43,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 437,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 163
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 957,
+      "y": 397,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 63,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 957,
+      "y": 457,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 143
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 927,
+      "y": 397,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 183
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 927,
+      "y": 577,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 23
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 927,
+      "y": 577,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 313,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1557,
+      "y": 557,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 43
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 597,
+      "laneTags": {},
+      "x1": 153,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1110,
+      "y": 630,
+      "laneTags": {
+        "1": "bus1"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1310,
+      "y": 640,
+      "laneTags": {
+        "1": "bus1"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1510,
+      "y": 630,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 1450,
+      "y": 680,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 957,
+      "y": 657,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 143,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 657,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 143,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1157,
+      "y": 647,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 53,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1207,
+      "y": 647,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 93,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1207,
+      "y": 757,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 93,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1237,
+      "y": 667,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 63,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1237,
+      "y": 777,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 63,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 1310,
+      "y": 750,
+      "laneTags": {
+        "1": "bus1"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$OrGateComponent",
+      "label": "logic_gate",
+      "x": 1510,
+      "y": 740,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 637,
+      "laneTags": {},
+      "x1": 93,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 597,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 43,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 637,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 687,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 33,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 657,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 707,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 83,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1497,
+      "y": 697,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1237,
+      "y": 667,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 113
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1207,
+      "y": 647,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 113
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 767,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 143,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 637,
+      "laneTags": {},
+      "x1": 73,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 597,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 43,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 637,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 163
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 957,
+      "y": 597,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 63,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 957,
+      "y": 657,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 143
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 927,
+      "y": 597,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 183
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 927,
+      "y": 777,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 23
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 927,
+      "y": 777,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 313,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1557,
+      "y": 757,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 43
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 797,
+      "laneTags": {},
+      "x1": 153,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1110,
+      "y": 830,
+      "laneTags": {
+        "1": "bus2"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1310,
+      "y": 840,
+      "laneTags": {
+        "1": "bus2"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1510,
+      "y": 830,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 1450,
+      "y": 880,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 957,
+      "y": 857,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 143,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 857,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 143,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1157,
+      "y": 847,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 53,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1207,
+      "y": 847,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 93,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1207,
+      "y": 957,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 93,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1237,
+      "y": 867,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 63,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1237,
+      "y": 977,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 63,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 1310,
+      "y": 950,
+      "laneTags": {
+        "1": "bus2"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$OrGateComponent",
+      "label": "logic_gate",
+      "x": 1510,
+      "y": 940,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 837,
+      "laneTags": {},
+      "x1": 93,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 797,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 43,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 837,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 887,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 33,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 857,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 907,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 83,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1497,
+      "y": 897,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1237,
+      "y": 867,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 113
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1207,
+      "y": 847,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 113
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 967,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 143,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 837,
+      "laneTags": {},
+      "x1": 73,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 797,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 43,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 837,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 163
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 957,
+      "y": 797,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 63,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 957,
+      "y": 857,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 143
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 927,
+      "y": 797,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 183
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 927,
+      "y": 977,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 23
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 927,
+      "y": 977,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 313,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1557,
+      "y": 957,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 43
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 997,
+      "laneTags": {},
+      "x1": 153,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1110,
+      "y": 1030,
+      "laneTags": {
+        "1": "bus3"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1310,
+      "y": 1040,
+      "laneTags": {
+        "1": "bus3"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1510,
+      "y": 1030,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 1450,
+      "y": 1080,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 957,
+      "y": 1057,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 143,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 1057,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 143,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1157,
+      "y": 1047,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 53,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1207,
+      "y": 1047,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 93,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1207,
+      "y": 1157,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 93,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1237,
+      "y": 1067,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 63,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1237,
+      "y": 1177,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 63,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 1310,
+      "y": 1150,
+      "laneTags": {
+        "1": "bus3"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$OrGateComponent",
+      "label": "logic_gate",
+      "x": 1510,
+      "y": 1140,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 1037,
+      "laneTags": {},
+      "x1": 93,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 997,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 43,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 1037,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 1087,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 33,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 1057,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 1107,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 83,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1497,
+      "y": 1097,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1237,
+      "y": 1067,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 113
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1207,
+      "y": 1047,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 113
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 1167,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 143,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 1037,
+      "laneTags": {},
+      "x1": 73,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 997,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 43,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 1037,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 163
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 957,
+      "y": 997,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 63,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 957,
+      "y": 1057,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 143
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 927,
+      "y": 997,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 183
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 927,
+      "y": 1177,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 23
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 927,
+      "y": 1177,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 313,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1557,
+      "y": 1157,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 43
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 1197,
+      "laneTags": {},
+      "x1": 153,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.BusInputComponent",
+      "label": "val1",
+      "x": 810,
+      "y": 330,
+      "laneTags": {},
+      "bitCount": 8
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.BusInputComponent",
+      "label": "val2",
+      "x": 810,
+      "y": 230,
+      "laneTags": {},
+      "bitCount": 8
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.BoolInputComponent",
+      "label": "carrier",
+      "x": 830,
+      "y": 130,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.BusOutputComponent",
+      "label": "result",
+      "x": 2110,
+      "y": 230,
+      "laneTags": {},
+      "bitCount": 8
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.BoolOutputComponent",
+      "label": "carrier",
+      "x": 2130,
+      "y": 330,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 897,
+      "y": 347,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 33,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 927,
+      "y": 347,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 897,
+      "y": 247,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 63,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 957,
+      "y": 247,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 153
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1827,
+      "y": 247,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 153,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1827,
+      "y": 247,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 73,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1867,
+      "y": 397,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 803
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.BoolInputComponent",
+      "label": "subtract",
+      "x": 830,
+      "y": 30,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 877,
+      "y": 47,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 153,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1110,
+      "y": 1230,
+      "laneTags": {
+        "1": "bus4"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1310,
+      "y": 1240,
+      "laneTags": {
+        "1": "bus4"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1510,
+      "y": 1230,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 1450,
+      "y": 1280,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 957,
+      "y": 1257,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 143,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 1257,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 143,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1157,
+      "y": 1247,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 53,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1207,
+      "y": 1247,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 93,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1207,
+      "y": 1357,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 93,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1237,
+      "y": 1267,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 63,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1237,
+      "y": 1377,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 63,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 1310,
+      "y": 1350,
+      "laneTags": {
+        "1": "bus4"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$OrGateComponent",
+      "label": "logic_gate",
+      "x": 1510,
+      "y": 1340,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 1237,
+      "laneTags": {},
+      "x1": 93,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 1197,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 43,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 1237,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 1287,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 33,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 1257,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 1307,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 83,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1497,
+      "y": 1297,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1237,
+      "y": 1267,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 113
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1207,
+      "y": 1247,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 113
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 1367,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 143,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 1237,
+      "laneTags": {},
+      "x1": 73,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 1197,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 43,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 1237,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 163
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 957,
+      "y": 1197,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 63,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 957,
+      "y": 1257,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 143
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 927,
+      "y": 1197,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 183
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 927,
+      "y": 1377,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 23
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 927,
+      "y": 1377,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 313,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1557,
+      "y": 1357,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 43
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 1397,
+      "laneTags": {},
+      "x1": 153,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1110,
+      "y": 1430,
+      "laneTags": {
+        "1": "bus5"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1310,
+      "y": 1440,
+      "laneTags": {
+        "1": "bus5"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1510,
+      "y": 1430,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 1450,
+      "y": 1480,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 957,
+      "y": 1457,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 143,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 1457,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 143,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1157,
+      "y": 1447,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 53,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1207,
+      "y": 1447,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 93,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1207,
+      "y": 1557,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 93,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1237,
+      "y": 1467,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 63,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1237,
+      "y": 1577,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 63,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 1310,
+      "y": 1550,
+      "laneTags": {
+        "1": "bus5"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$OrGateComponent",
+      "label": "logic_gate",
+      "x": 1510,
+      "y": 1540,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 1437,
+      "laneTags": {},
+      "x1": 93,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 1397,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 43,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 1437,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 1487,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 33,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 1457,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 1507,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 83,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1497,
+      "y": 1497,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1237,
+      "y": 1467,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 113
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1207,
+      "y": 1447,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 113
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 1567,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 143,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 1437,
+      "laneTags": {},
+      "x1": 73,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 1397,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 43,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 1437,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 163
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 957,
+      "y": 1397,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 63,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 957,
+      "y": 1457,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 143
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 927,
+      "y": 1397,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 183
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 927,
+      "y": 1577,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 23
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 927,
+      "y": 1577,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 313,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1557,
+      "y": 1557,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 43
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 1597,
+      "laneTags": {},
+      "x1": 153,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1110,
+      "y": 1630,
+      "laneTags": {
+        "1": "bus6"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1310,
+      "y": 1640,
+      "laneTags": {
+        "1": "bus6"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1510,
+      "y": 1630,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 1450,
+      "y": 1680,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 957,
+      "y": 1657,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 143,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 1657,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 143,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1157,
+      "y": 1647,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 53,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1207,
+      "y": 1647,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 93,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1207,
+      "y": 1757,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 93,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1237,
+      "y": 1667,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 63,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1237,
+      "y": 1777,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 63,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 1310,
+      "y": 1750,
+      "laneTags": {
+        "1": "bus6"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$OrGateComponent",
+      "label": "logic_gate",
+      "x": 1510,
+      "y": 1740,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 1637,
+      "laneTags": {},
+      "x1": 93,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 1597,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 43,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 1637,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 1687,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 33,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 1657,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 1707,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 83,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1497,
+      "y": 1697,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1237,
+      "y": 1667,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 113
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1207,
+      "y": 1647,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 113
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 1767,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 143,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 1637,
+      "laneTags": {},
+      "x1": 73,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 1597,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 43,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 1637,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 163
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 957,
+      "y": 1597,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 63,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 957,
+      "y": 1657,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 143
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 927,
+      "y": 1597,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 183
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 927,
+      "y": 1777,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 23
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 927,
+      "y": 1777,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 313,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1557,
+      "y": 1757,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 43
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 1797,
+      "laneTags": {},
+      "x1": 153,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1110,
+      "y": 1830,
+      "laneTags": {
+        "1": "bus7"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1310,
+      "y": 1840,
+      "laneTags": {
+        "1": "bus7"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1510,
+      "y": 1830,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 1450,
+      "y": 1880,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 957,
+      "y": 1857,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 143,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 1857,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 143,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1157,
+      "y": 1847,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 53,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1207,
+      "y": 1847,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 93,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1207,
+      "y": 1957,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 93,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1237,
+      "y": 1867,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 63,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1237,
+      "y": 1977,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 63,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 1310,
+      "y": 1950,
+      "laneTags": {
+        "1": "bus7"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$OrGateComponent",
+      "label": "logic_gate",
+      "x": 1510,
+      "y": 1940,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 1837,
+      "laneTags": {},
+      "x1": 93,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 1797,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 43,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 1837,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 1887,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 33,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 1857,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 1907,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 83,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1497,
+      "y": 1897,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 53
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1237,
+      "y": 1867,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 113
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1207,
+      "y": 1847,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 113
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 1967,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 143,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 1837,
+      "laneTags": {},
+      "x1": 73,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 1797,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 43,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 957,
+      "y": 1797,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 63,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 927,
+      "y": 1797,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 183
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 927,
+      "y": 1977,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 313,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1557,
+      "y": 1957,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 43
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1867,
+      "y": 1197,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 803
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1557,
+      "y": 1997,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 113,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1407,
+      "y": 247,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 153,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1357,
+      "y": 247,
+      "laneTags": {},
+      "x1": 53,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1297,
+      "y": 147,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 93,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 877,
+      "y": 147,
+      "laneTags": {},
+      "x1": 423,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 257,
+      "laneTags": {},
+      "x1": 273,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 47,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 213
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1027,
+      "y": 257,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 143
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1930,
+      "y": 330,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1867,
+      "y": 357,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 43
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1297,
+      "y": 257,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 83,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$XorGateComponent",
+      "label": "logic_gate",
+      "x": 1310,
+      "y": 230,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 1720,
+      "y": 640,
+      "laneTags": {
+        "2": "bus1"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 1720,
+      "y": 440,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 1720,
+      "y": 840,
+      "laneTags": {
+        "2": "bus2"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 1720,
+      "y": 1040,
+      "laneTags": {
+        "2": "bus3"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 1720,
+      "y": 1240,
+      "laneTags": {
+        "2": "bus4"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 1720,
+      "y": 1440,
+      "laneTags": {
+        "2": "bus5"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 1720,
+      "y": 1640,
+      "laneTags": {
+        "2": "bus6"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$AndGateComponent",
+      "label": "logic_gate",
+      "x": 1720,
+      "y": 1840,
+      "laneTags": {
+        "2": "bus7"
+      }
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1557,
+      "y": 447,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 153,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1557,
+      "y": 647,
+      "laneTags": {},
+      "x1": 153,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1557,
+      "y": 847,
+      "laneTags": {},
+      "x1": 153,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1557,
+      "y": 1047,
+      "laneTags": {},
+      "x1": 153,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1557,
+      "y": 1247,
+      "laneTags": {},
+      "x1": 153,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1557,
+      "y": 1447,
+      "laneTags": {},
+      "x1": 153,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1557,
+      "y": 1647,
+      "laneTags": {},
+      "x1": 153,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1557,
+      "y": 1847,
+      "laneTags": {},
+      "x1": 153,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1647,
+      "y": 1867,
+      "laneTags": {},
+      "x1": 63,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1647,
+      "y": 1797,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 73,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1647,
+      "y": 1667,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 133,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1647,
+      "y": 1667,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 63,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1647,
+      "y": 1597,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 73,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1647,
+      "y": 1467,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 133,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1647,
+      "y": 1467,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 63,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1647,
+      "y": 1397,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 73,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1647,
+      "y": 1267,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 133,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1647,
+      "y": 1267,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 63,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1647,
+      "y": 1197,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 73,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1647,
+      "y": 1067,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 133,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1647,
+      "y": 1067,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 63,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1647,
+      "y": 997,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 73,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1647,
+      "y": 867,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 133,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1647,
+      "y": 867,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 63,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1647,
+      "y": 797,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 73,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1647,
+      "y": 667,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 133,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1647,
+      "y": 667,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 63,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1647,
+      "y": 597,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 73,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1647,
+      "y": 467,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 133,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1647,
+      "y": 467,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 63,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1647,
+      "y": 397,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 73,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1827,
+      "y": 397,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 63
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1767,
+      "y": 457,
+      "laneTags": {},
+      "x1": 63,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1827,
+      "y": 457,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 203
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1767,
+      "y": 657,
+      "laneTags": {},
+      "x1": 63,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1827,
+      "y": 657,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 203
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1767,
+      "y": 857,
+      "laneTags": {},
+      "x1": 63,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1827,
+      "y": 857,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 203
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1767,
+      "y": 1057,
+      "laneTags": {},
+      "x1": 63,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1827,
+      "y": 1057,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 203
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1767,
+      "y": 1257,
+      "laneTags": {},
+      "x1": 63,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1827,
+      "y": 1257,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 203
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1767,
+      "y": 1457,
+      "laneTags": {},
+      "x1": 63,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1827,
+      "y": 1457,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 203
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1767,
+      "y": 1657,
+      "laneTags": {},
+      "x1": 63,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1827,
+      "y": 1657,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 203
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1767,
+      "y": 1857,
+      "laneTags": {},
+      "x1": 63,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1667,
+      "y": 1997,
+      "laneTags": {},
+      "x1": 203,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1977,
+      "y": 297,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 53,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1497,
+      "y": 257,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 43,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1447,
+      "y": 237,
+      "laneTags": {},
+      "x1": 53,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1447,
+      "y": 237,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 3,
+      "y2": 103
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1447,
+      "y": 337,
+      "laneTags": {},
+      "x1": 373,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1297,
+      "y": 337,
+      "laneTags": {},
+      "x1": 153,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1647,
+      "y": 247,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 153,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1557,
+      "y": 247,
+      "laneTags": {},
+      "x1": 93,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.parts.LogicGateComponent$NorGateComponent",
+      "label": "logic_gate",
+      "x": 1510,
+      "y": 230,
+      "laneTags": {}
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1497,
+      "y": 297,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 483,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1867,
+      "y": 357,
+      "laneTags": {},
+      "x1": 53,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1817,
+      "y": 337,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 103,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1897,
+      "y": 247,
+      "laneTags": {},
+      "x1": 3,
+      "y1": 3,
+      "x2": 203,
+      "y2": 3
+    },
+    {
+      "id": "de.m_marvin.logicsim.logic.wires.ConnectorWire",
+      "label": "wire",
+      "x": 1977,
+      "y": 347,
+      "laneTags": {},
+      "x1": 143,
+      "y1": 3,
+      "x2": 3,
+      "y2": 3
+    }
+  ]
+}

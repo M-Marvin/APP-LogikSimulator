@@ -14,8 +14,10 @@ import org.eclipse.swt.widgets.Display;
 import de.m_marvin.commandlineparser.CommandLineParser;
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Component;
+import de.m_marvin.logicsim.logic.parts.BoolConstComponent;
 import de.m_marvin.logicsim.logic.parts.BoolInputComponent;
 import de.m_marvin.logicsim.logic.parts.BoolOutputComponent;
+import de.m_marvin.logicsim.logic.parts.BusConstComponent;
 import de.m_marvin.logicsim.logic.parts.BusInputComponent;
 import de.m_marvin.logicsim.logic.parts.BusOutputComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent;
@@ -41,9 +43,10 @@ import de.m_marvin.logicsim.util.Registries.ComponentFolder;
 
 public class LogicSim {
 	
-// TODO Features planed
-// - Zoom
-// - Komponenten zur interaktion mit Dateien, Grphischer Darstellung, Tastatureingabe etc
+	// TODO Features planed
+	// - Zoom
+	// - Cache für Werte-Abfrage (?)
+	// - Komponenten zur interaktion mit Dateien, Grphischer Darstellung, Tastatureingabe etc
 	
 	public static final String LOGIC_SIM_ICON = "iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAA40lEQVRoge2YwQ2DMAxF3Yqhshy3LsIQrNFzJJbIBu0BoVZIUeLEIf7B78IFJH/5/9iEyDCqeGS+92laRZxkfc8rqmiJCejNVPhdbna4sLMWE9ArtGxua6EfrzW/W9t7fy6zmAXhOwAvoN5Chy06ERNw9qjaU6l0F7pqDtgupJ76EP/hnMvOSgiBiIi891V2hO8AvABRCx22ECR5KsF3QPscODNeB+AFwM8BUQENGH8X0j4HksB3QPscGD8D8AJEb+bsf6AAeAE2B3oTCxB7LxeCPQfgb+ZKM6BGEHwGTIBhgPMFj3A0g04XsBUAAAAASUVORK5CYII=";
 	public static final String CIRCUIT_FILE_EXTENSION = "lcf";
@@ -315,6 +318,8 @@ public class LogicSim {
 		Registries.registerPart(ioFolder, BoolOutputComponent.class, Component::placeClick, BoolOutputComponent::coursorMove, Component::abbortPlacement, "circuit.components.bool_output", BoolOutputComponent.ICON_B64);
 		Registries.registerPart(ioFolder, BusInputComponent.class, Component::placeClick, BusInputComponent::coursorMove, Component::abbortPlacement, "circuit.components.bus_input", BusInputComponent.ICON_B64);
 		Registries.registerPart(ioFolder, BusOutputComponent.class, Component::placeClick, BusOutputComponent::coursorMove, Component::abbortPlacement, "circuit.components.bus_output", BusOutputComponent.ICON_B64);
+		Registries.registerPart(ioFolder, BoolConstComponent.class, Component::placeClick, BoolConstComponent::coursorMove, Component::abbortPlacement, "circuit.components.bool_const", BoolConstComponent.ICON_B64);
+		Registries.registerPart(ioFolder, BusConstComponent.class, Component::placeClick, BusConstComponent::coursorMove, Component::abbortPlacement, "circuit.components.bool_const", BusConstComponent.ICON_B64);
 		Registries.registerPart(wireFolder, ConnectorWire.class, ConnectorWire::placeClick, ConnectorWire::coursorMove, ConnectorWire::abbortPlacement, "circuit.components.wire", ConnectorWire.ICON_B64);
 		
 		Translator.addLanguage("lang_en", "English");

@@ -195,9 +195,10 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		for (int i = 0; i < this.grabbedComponents.size(); i++) {
 			this.grabbedComponents.get(i).setVisualPosition(this.mousePosition.sub(grabOffsets.get(i)));
 		}
-		for (int i = 0; i < this.grabbedComponents.size(); i++) {
-			this.circuit.reconnect(false, this.grabbedComponents.get(i));
-		}
+		this.circuit.reconnect(false, this.grabbedComponents.toArray(i -> new Component[i]));
+//		for (int i = 0; i < this.grabbedComponents.size(); i++) {
+//			this.circuit.reconnect(false, this.grabbedComponents.get(i));
+//		}
 		this.grabbedComponents.clear();
 		this.grabOffsets.clear();
 	}
@@ -208,6 +209,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 	
 	public void removeUnplacedComponents() {
 		if (this.grabbedComponents == null) return;
+		circuit.reconnect(true, grabbedComponents.toArray(i -> new Component[i]));
 		grabbedComponents.forEach(c -> circuit.remove(c));
 		this.grabOffsets.clear();
 		this.grabbedComponents.clear();
@@ -227,7 +229,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		if (this.grabbedComponents.isEmpty() && !this.grabbedBackground) {
 			try {
 				List<Component> components = CircuitSerializer.deserializeComponents(clipboardString, this.circuit, this.mousePosition);
-				components.forEach(c -> { this.circuit.add(c); addGrabbedComponent(c); });
+				components.forEach(c -> { addGrabbedComponent(c); });
 			} catch (Exception e) {
 				System.out.println("No or invalid clipboard content!");
 			}
@@ -335,13 +337,11 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 					return;
 				}
 				
-			}
-			
-			// Background grabbing only if no multi-selection active
-			if (this.grabbedComponents.isEmpty()) {
+				// Background grabbing only if no multi-selection active
 				if (this.grabOffsets.isEmpty()) this.grabOffsets.add(new Vec2i());
 				this.grabOffsets.get(0).setI(this.mousePosition);
 				this.grabbedBackground = true;
+				
 			}
 			
 		} else if (event.button == 1) {
@@ -410,8 +410,8 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 				this.removeUnplacedComponents();
 			} else {
 				if (this.hoveredComponent != null) {
-					this.circuit.remove(this.hoveredComponent);
 					this.circuit.reconnect(true, this.hoveredComponent);
+					this.circuit.remove(this.hoveredComponent);
 					this.hoveredComponent = null;
 				}
 			}
