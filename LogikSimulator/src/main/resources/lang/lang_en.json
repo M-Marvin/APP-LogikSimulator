@@ -35,7 +35,9 @@
 "editor.window.error.failed_load_circuit": "Failed to load circuit from file! An IOException was thrown: %0",
 "editor.window.error.save_file": "Failed to save file! An IOException was thrown: %0",
 "editor.window.error.load_file": "Failed to load file! An IOException was thrown: %0",
-"editor.window.error.parese_file": "An error occured loading the circuit:\n%0",
+"editor.window.error.parse_file": "An error occured loading the circuit:\n%0",
+"editor.window.error.save_memory": "Failed to save data to file! An IOException was thrown: %0",
+"editor.window.error.load_memory": "Failed to load data from file! An IOException was thrown: %0",
 "editor.window.error.processor_crash": "CRITICAL: One of the running circuit simulation threads crashed!\nThis should never happen and might result in malfunction of the simulation algorithms!\nThe load will be destributed to the other available threads if any remain!\n\n%0",
 "editor.window.input.title": "Input",
 
@@ -44,6 +46,16 @@
 "editor.config.bus_input.index_offset": "Offset of the bus bits:",
 "editor.config.bus_input.bit_count": "Bus width in bits:",
 "editor.config.bus_input.value": "Decimal value at output:",
+"editor.config.memory.load_data.description": "Load data from file:",
+"editor.config.memory.load_data.last_file": "From last file",
+"editor.config.memory.load_data.new_file": "From other file ...",
+"editor.config.memory.save_data.description": "Save data to file:",
+"editor.config.memory.save_data.last_file": "In last file",
+"editor.config.memory.save_data.new_file": "In other file ...",
+"editor.config.memory.row_width": "Data-Row width:",
+"editor.config.memory.min_rows": "Min. rows to allocate:",
+"editor.config.memory.clear.description": "Clear memory:",
+"editor.config.memory.clear": "Clear",
 
 "editor_area.warning.floating": "FLOATING",
 "editor_area.warning.short_circuit": "SHORT CIRCUIT",
@@ -91,5 +103,6 @@
 "circuit.components.bool_input": "Bool Input",
 "circuit.components.bool_output": "Bool Output",
 "circuit.components.bus_input": "Bus Input",
-"circuit.components.bus_output": "Bus Output"
+"circuit.components.bus_output": "Bus Output",
+"circuit.components.memory": "Memory"
 }

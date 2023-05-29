@@ -1,9 +1,11 @@
 package de.m_marvin.logicsim.logic.nodes;
 
+import java.util.Map;
 import java.util.Objects;
 
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Component;
+import de.m_marvin.logicsim.logic.Circuit.NetState;
 import de.m_marvin.univec.impl.Vec2i;
 
 /**
@@ -66,7 +68,11 @@ public abstract class Node {
 	public Circuit getCircuit() {
 		return this.component.getCircuit();
 	}
-
+	
+	public Map<String, NetState> getLaneReference() {
+		return this.getCircuit().getLaneMapReference(this);
+	}
+	
 	/**
 	 * Gets called when the user clicks on the node in the editor.
 	 * Used to open the lane tag window.

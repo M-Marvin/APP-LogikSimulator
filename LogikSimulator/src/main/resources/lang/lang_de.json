@@ -35,7 +35,9 @@
 "editor.window.error.failed_load_circuit": "Das Laden einer Schaltung von der Datei ist fehlgeschlagen! Eine IOException wurde geworfen: %0",
 "editor.window.error.save_file": "Das Speichern der Datei ist fehlgeschlagen! Eine IOException wurde geworfen: %0",
 "editor.window.error.load_file": "Das Laden der Datei ist fehlgeschlagen! Eine IOException wurde geworfen: %0",
-"editor.window.error.parese_file": "Ein Fehler ist beim Laden der Schaltung aufgetreten:\n%0",
+"editor.window.error.parse_file": "Ein Fehler ist beim Laden der Schaltung aufgetreten:\n%0",
+"editor.window.error.save_memory": "Das Speichern der Daten ist fehlgeschlagen! Eine IOException wurde geworfen: %0",
+"editor.window.error.load_memory": "Das Laden der Daten ist fehlgeschlagen! Eine IOException wurde geworfen: %0",
 "editor.window.error.processor_crash": "KRITISCHE WARNUNG: Einer der aktiven Simulations-Threads ist abgestürzt!\nDies sollte niemals passieren und könnte zu einer Fehlfunktion in der Simulation führen!\nDie Simulations-Prozesse wurden auf andere Threads aufgeteilt!\n\n%0",
 "editor.window.input.title": "Eingabe",
 
@@ -44,6 +46,16 @@
 "editor.config.bus_input.index_offset": "Offset der Bus-Bits:",
 "editor.config.bus_input.bit_count": "Bus-Weite in Bits:",
 "editor.config.bus_input.value": "Dezimal-Wert am Ausgang:",
+"editor.config.memory.load_data.description": "Lade Daten von Datei:",
+"editor.config.memory.load_data.last_file": "Von letzter Datei",
+"editor.config.memory.load_data.new_file": "Von anderer Datei ...",
+"editor.config.memory.save_data.description": "Speichere Daten in Datei:",
+"editor.config.memory.save_data.last_file": "In letzte Datei",
+"editor.config.memory.save_data.new_file": "In andere Datei ...",
+"editor.config.memory.row_width": "Speicher-Zeilen Breite:",
+"editor.config.memory.min_rows": "Min. Zeilen zuordnen:",
+"editor.config.memory.clear.description": "Speicher löschen:",
+"editor.config.memory.clear": "Löschen",
 
 "editor_area.warning.floating": "FLOATING",
 "editor_area.warning.short_circuit": "KURZSCHLUSS",
@@ -78,6 +90,7 @@
 "circuit.folders.logic": "Logik",
 "circuit.folders.io": "I/O",
 "circuit.folders.wires": "Leitungen",
+"circuit.folders.utility": "Sonstiges",
 "circuit.folders.ics": "Integrierte Schaltungen",
 "circuit.folders.user": "Benutzer-Schaltungen",
 
@@ -93,5 +106,6 @@
 "circuit.components.bus_input": "Bus-Eingang",
 "circuit.components.bus_output": "Bus-Ausgang",
 "circuit.components.bus_const": "Bus-Konstante",
-"circuit.components.bool_const": "Bool-Konstante"
+"circuit.components.bool_const": "Bool-Konstante",
+"circuit.components.memory": "Speicher"
 }

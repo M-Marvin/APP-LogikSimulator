@@ -4,6 +4,7 @@ import java.util.Map;
 
 import de.m_marvin.logicsim.LogicSim;
 import de.m_marvin.logicsim.logic.Circuit.NetState;
+import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Component;
 import de.m_marvin.logicsim.ui.widgets.InputDialog;
 import de.m_marvin.logicsim.ui.windows.Editor;
@@ -30,13 +31,28 @@ public class InputNode extends Node {
 		configDialog.setLocation(mousePosition.x, mousePosition.y);
 		return true;
 	}
-	
-	public Map<String, NetState> getLaneReference() {
-		return this.getCircuit().getLaneMapReference(this);
-	}
-	
+		
 	public boolean getState() {
 		return this.getCircuit().getNetState(this, getLaneTag()).getLogicState();
+	}
+	
+	public int readBusValue(int bitCount) {
+		String[] s = this.getLaneTag().split("(?<=\\D)(?=\\d)");
+		String inputBus = s[0];
+		int indexOffset = s.length > 1 ? Integer.valueOf(s[1]) : 0;
+		Map<String, NetState> laneData = this.getLaneReference();
+		
+		// TODO Optimize
+		int value = 0;
+		for (String lane : laneData.keySet()) {
+			String[] busTag = lane.split("(?<=\\D)(?=\\d)");
+			if (busTag.length == 2 && busTag[0].equals(inputBus)) {
+				int bitIndex = Integer.parseInt(busTag[1]);
+				if (bitIndex >= indexOffset && bitIndex < indexOffset + bitCount && Circuit.safeLaneRead(laneData, lane).getLogicState()) value |= (1 << (bitIndex - indexOffset));
+			}
+		}
+		
+		return value;
 	}
 	
 }

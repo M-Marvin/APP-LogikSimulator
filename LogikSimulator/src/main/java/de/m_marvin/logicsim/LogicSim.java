@@ -26,6 +26,7 @@ import de.m_marvin.logicsim.logic.parts.LogicGateComponent.NandGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.NorGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.OrGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.XorGateComponent;
+import de.m_marvin.logicsim.logic.parts.MemoryComponent;
 import de.m_marvin.logicsim.logic.parts.NotGateComponent;
 import de.m_marvin.logicsim.logic.parts.SubCircuitComponent;
 import de.m_marvin.logicsim.logic.simulator.CircuitProcessor;
@@ -47,6 +48,7 @@ public class LogicSim {
 	// - Zoom
 	// - Cache für Werte-Abfrage (?)
 	// - Komponenten zur interaktion mit Dateien, Grphischer Darstellung, Tastatureingabe etc
+	// - Replace Array List for IO Nodes
 	
 	public static final String LOGIC_SIM_ICON = "iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAA40lEQVRoge2YwQ2DMAxF3Yqhshy3LsIQrNFzJJbIBu0BoVZIUeLEIf7B78IFJH/5/9iEyDCqeGS+92laRZxkfc8rqmiJCejNVPhdbna4sLMWE9ArtGxua6EfrzW/W9t7fy6zmAXhOwAvoN5Chy06ERNw9qjaU6l0F7pqDtgupJ76EP/hnMvOSgiBiIi891V2hO8AvABRCx22ECR5KsF3QPscODNeB+AFwM8BUQENGH8X0j4HksB3QPscGD8D8AJEb+bsf6AAeAE2B3oTCxB7LxeCPQfgb+ZKM6BGEHwGTIBhgPMFj3A0g04XsBUAAAAASUVORK5CYII=";
 	public static final String CIRCUIT_FILE_EXTENSION = "lcf";
@@ -293,6 +295,7 @@ public class LogicSim {
 	public static final String ICON_LOGIC_GROUP = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAMgSURBVFhHtZfLq01RHMfv8epGXpE3ZSClFAOGHhNKZGLEH8DAVCmZEzEwdUPJwEQGMpKUkrwVAxOKMpGIvC6272ef/T3nd9be65xzxac+d+/12L/9O2utvfa+raIoRlut1reRNlNk0T4tiefQr21EsabpMKldGo40gd+y1T6dMMMmPllOlT8ppNn+CkckoSiBbAqJW+JGuanthRGoTmFcNgX/Vzg+U13iEaDC2f9PHL/zI50AmTHE9SHKs0rG0fs7qilgQXhuc1NAvxPymYz938iTcpEchK/r/tAqARacA2LKevlWxj6ptA9KwvfxyKvUTuC79ALBlDvSbYflCkmQ3fKMdNtF2Y9sAsYdIvx63+AYFQ28k7S/Lkt5agl0M8mzpjrCp+qY4htPr45DkybQ9Bh+rY7wuTpGVst17dORx9UxR+0xZArYv413u8hcSR0+pyIwQ16Rbt8k++H42f2mKQE4JX2To1SILfKRdP1BOYhc/A4OljJTMs9uZ7X7/KXcLofB1/DEYQ13aIJHzu12TDYxW66U6b6QXl8j17BHfpDx4o+S9dHEQ0mfW2WpS7weazQ1MLeufy+vh/I12cQLSfvlstTF19keWJlUslDMXunO9+RiCTek6y9RkcAHDm28O0yMz7ug80o2TQk8kL4Rc2pmybvSbeek2Spdv4OKiqb4PaQd2AEdqGmPXyqfSPfxSJyXlJkuYpqBCbAr0oH9GnZKBz9CRQPLZUziaTg/LSNp/B6YD3bE2GGDdLCrVGRYION0INv3HBnJJuAG6w48Yj+k6zfKHNtkjIH7ZGTCCQDD6Hq+fA7IJRIYMUbpuEy/qCxbOGsFsgnwSMSLyu/1wAUZ2zF+vFjehJvlLpl+PR2Svk8nvl6E5acZf1iZDpomAPvlfRmD2tuSkYnMk2el++QSGI2PCdCBIaptEhUEXiYXSqbklfwic6yV8+VNSQLcvBM/+RorK0nAbykuYN6iJGwniveBzlswHQESaHxFDgnBTTwHlz0K/G+YTSCu0vSXxnLaNiwkw2i2E0jnITCu/5prj0wf+iWXtpULsSiK0T/ALWuwWP6fnQAAAABJRU5ErkJggg==";
 	public static final String ICON_IO_GROUP = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAJnSURBVFhHxZe7jtUwEIZPltsCHULAchNCNPRQIFEsT4DEG221r7Ad2o6elhKBRIOoqZGAgg4E7EL2/2xPjk/iJOOzXD7pP7ZjZzIZj2Ofpm3bzaZpvi8iJ6U2VgN5Hab6FrJ1WsVGbPnoO/BbamK1Gq/jJ6RT0iGNvre/shLhUC4MmfrguAm7uXioaRUikKpwIJWM/ynMPlMdsAhwwbyvpcZhs9/dYw7gGSEehmicB5IZuprKetIUkBAYM82xIzFuL5XXJQ/2nO5FLQK1of8mnZeehZafwRRYBH5IliDLznm2pZoIsLIYby/eVc5IrE3y4J/SefK/6DuwzjKsobgMjxN2+3KuzYb2gZ+pXsNZ6bZ0ObQWi2vSzVh1MZrodIx2ZuxLNjbXQ2kKG8eKQ4M5pxP+Vi6YfaPxOtC/0cucncGLMqDmYVvSPckbMbNffA5GuOhZFZekl1Ju7LE0RW6fvaDbko0aB15JzyX7juxK7A9TkZi173WA5ce4R6EVuSBx7UlolSnaz7+E5j2DpribyjephC/SJ+lOaJUp2jcHmI/BnIxA4rF7fg2tJZ+lK7HqBwcQHwWMeuANSicn7HjyZ4V8Crx8lIjWudBaQmQ+xKofHLC5MeZy4H0q76cSbkkk4uvQKjPIAR2GQiT5IXR2Igp/GGYgAV9IbEAczZ5Kb6UpeM6K/d5fgoDXAR6ME4xH76Qb0hSzDjCvDAi7lOAGS1ITYTQBX8SLsToL9+T2gwNmCHCg61wDjBt5HazNSxEBzp+jDuSnnLwf8na/zwvOEM3oQCkREgc6LdUcuaac6/eFPGjbdvMIlOzBMgTj56QAAAAASUVORK5CYII=";
 	public static final String ICON_WIRE_GROUP = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAGUExURQAAAAAAAKVnuc8AAAACdFJOU/8A5bcwSgAAAAlwSFlzAAAOwwAADsMBx2+oZAAAAFpJREFUOE/djsESgCAIROX/f1qUxchwKGM69C7q7lMpFJApeCpnRvCY70lmN+kCF5cNVvCtgDm3hcFDAc9a+Nx/O0Ch3BEMoRAO+RvhREukUFAoLZFizVuBqALkLQNcVg88CgAAAABJRU5ErkJggg==";
+	public static final String ICON_UTILITY_GROUP = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAGBSURBVFhHxZeLcoMgEEVD07T5/69tJ23pnjU3s2JQcYKemTtijMtleQgp53xNKX2dBt5NeSg6sQxzz04W68Mub8PdOkoDf6Y0FJtZa/xsuph+uCnd/oYrwlAUgaQSjEvEjaJSaQwZuBfhZnoW/FUoPl3tKAP8IPc9UfxHI2UAZ6R4mqLOyID6fndkoJZ6DbhW1ah2AVPCp8XeyMCnibnJONgVGaihmdGq1ZQGml7egOKPxsDatMdB1qJZyhZjppbGxWAVYqxJ/KO6gIUPTSpUK3sZKbOYlmZBd1oy8IoxMJsB/XFrRWshPl9fFr7FhagXfPwmSz8ZwF3P5XgS/6gueCAD9Mljm1SBF7doFgwgFoVvftibowbhCPaBMWU9Nyaj+LYjPysDvSuuccEAc5KrLwwdebrjjmNAs4BsAC/wPIqpKrWi+a/4TgyEAf9EbiQGHlVixEbR1Z5tP5dSuCMD8YxQtjTeb8kCYMYz7waKs2HkZqfmlgPLnLnymQ/4nPP1HwSLlSbKQGLzAAAAAElFTkSuQmCC";
 	public static final String ICON_IC_GROUP = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAGzSURBVFhHxZeNcoMgEIRD07R5/6dtJ20Je7rOegEBJek3syOKnsvxI4YY4zWE8HWaeE+KU9HQMtiqO6VYH+nwNp214Q38JYWp2E2r8XPSJekHJ97trxwhGFIhEOWBcQpxVXgptQYZmIvglpQLPgrGR1cbzAAu0P0zYfylkTQAZ0jxY4qeDA2w7wn7uSSSq4OaoYHe1OuL2HXUFqxfTNIApoRNixkflBoODXwmYW5iHLSghpgNzUozNLAXnxl/XsUb6Hp4B4y/GgOtaX8JXG5LlPq5dN3zEP+/ugALH/TwQrorGWlpZQ/h6Cw4TG8GSrQ+5zO4ygAfHp1movHx9cXCd3gh8iC4qgQ+ftkd0csZ3QWIURoH2fg0gD5ZtkkH0RdUGwMDEBaFb1wYxFYmwGohggHdEWG51K7pAfHQ6my6ZzS+TUPvtJq2gyzx0478TCe42LIjqikH63Jj7ML042gLwyDQoK1MZhciOuSD2KKjXlVrLdB79D7uOxB/WYj0BhiwkbkTbbFvvTYKL7bW238pCjM0oDNC64Ge+7pWYMYybwbcv6FyS3/NaqbGljlfZ+mPMV7ve+GNTka+RrwAAAAASUVORK5CYII=";
 	
 	public ComponentFolder builtinIcFolder;
@@ -305,6 +308,7 @@ public class LogicSim {
 		ComponentFolder wireFolder = Registries.registerFolder("circuit.folders.wires", ICON_WIRE_GROUP);
 		ComponentFolder logicFolder = Registries.registerFolder("circuit.folders.logic", ICON_LOGIC_GROUP);
 		ComponentFolder ioFolder = Registries.registerFolder("circuit.folders.io", ICON_IO_GROUP);
+		ComponentFolder utilityFolder = Registries.registerFolder("circuit.folders.utility", ICON_UTILITY_GROUP);
 		this.builtinIcFolder = Registries.registerFolder("circuit.folders.ics", ICON_IC_GROUP);
 		this.userIcFolder = Registries.registerFolder("circuit.folders.user", ICON_IC_GROUP);
 		
@@ -318,8 +322,10 @@ public class LogicSim {
 		Registries.registerPart(ioFolder, BoolOutputComponent.class, Component::placeClick, BoolOutputComponent::coursorMove, Component::abbortPlacement, "circuit.components.bool_output", BoolOutputComponent.ICON_B64);
 		Registries.registerPart(ioFolder, BusInputComponent.class, Component::placeClick, BusInputComponent::coursorMove, Component::abbortPlacement, "circuit.components.bus_input", BusInputComponent.ICON_B64);
 		Registries.registerPart(ioFolder, BusOutputComponent.class, Component::placeClick, BusOutputComponent::coursorMove, Component::abbortPlacement, "circuit.components.bus_output", BusOutputComponent.ICON_B64);
+		Registries.registerPart(ioFolder, BusConstComponent.class, Component::placeClick, BusConstComponent::coursorMove, Component::abbortPlacement, "circuit.components.bus_const", BusConstComponent.ICON_B64);
 		Registries.registerPart(ioFolder, BoolConstComponent.class, Component::placeClick, BoolConstComponent::coursorMove, Component::abbortPlacement, "circuit.components.bool_const", BoolConstComponent.ICON_B64);
-		Registries.registerPart(ioFolder, BusConstComponent.class, Component::placeClick, BusConstComponent::coursorMove, Component::abbortPlacement, "circuit.components.bool_const", BusConstComponent.ICON_B64);
+		Registries.registerPart(utilityFolder, MemoryComponent.class, Component::placeClick, MemoryComponent::coursorMove, Component::abbortPlacement, "circuit.components.memory", MemoryComponent.ICON_B64);
+		
 		Registries.registerPart(wireFolder, ConnectorWire.class, ConnectorWire::placeClick, ConnectorWire::coursorMove, ConnectorWire::abbortPlacement, "circuit.components.wire", ConnectorWire.ICON_B64);
 		
 		Translator.addLanguage("lang_en", "English");

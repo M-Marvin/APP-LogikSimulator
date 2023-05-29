@@ -27,13 +27,15 @@ public class InputDialog {
 		public ConfigField(String description) {
 			this.description = description;
 		}
-		
+		 
 		public void setupWidget(Composite composite) {
 			RowLayout layout = new RowLayout(SWT.VERTICAL);
 			layout.fill = true;
 			composite.setLayout(layout);
-			Label descLabel = new Label(composite, SWT.NONE);
-			descLabel.setText(Translator.translate(description));
+			if (this.description != null) {
+				Label descLabel = new Label(composite, SWT.NONE);
+				descLabel.setText(Translator.translate(description));
+			}
 		}
 		
 		public abstract void applyValue();
@@ -91,6 +93,41 @@ public class InputDialog {
 		public void applyValue() {
 			this.configReceiver.accept(this.textField.getText());
 		}
+	}
+	
+	public static class ButtonConfigField extends ConfigField {
+		public List<String> buttonTitle = new ArrayList<>();
+		public List<Runnable> buttonTask = new ArrayList<>();
+		public List<Button> button = new ArrayList<>();
+		
+		public ButtonConfigField(String description) {
+			super(description);
+		}
+		
+		public ButtonConfigField(String description, String title, Runnable task) {
+			this(description);
+			this.addButton(title, task);
+		}
+		
+		public ButtonConfigField addButton(String title, Runnable task) {
+			this.buttonTitle.add(title);
+			this.buttonTask.add(task);
+			return this;
+		}
+		
+		@Override
+		public void setupWidget(Composite composite) {
+			super.setupWidget(composite);
+			for (int i = 0; i < this.buttonTask.size(); i++) {
+				Runnable task = this.buttonTask.get(i);
+				this.button.add(new Button(composite, SWT.PUSH));
+				this.button.get(i).setText(Translator.translate(buttonTitle.get(i)));
+				this.button.get(i).addListener(SWT.Selection, (e) -> task.run());
+			}
+		}
+		
+		@Override
+		public void applyValue() {}
 	}
 	
 	protected Shell shell;
