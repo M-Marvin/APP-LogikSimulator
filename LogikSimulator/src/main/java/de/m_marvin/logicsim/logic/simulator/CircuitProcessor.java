@@ -112,7 +112,12 @@ public class CircuitProcessor {
 								this.executionTime = this.executionEnd - this.executionStart;
 								this.executionStart = getCurrentTime();
 								for (int i = 0; i < this.processes.size(); i++) {
-									CircuitProcess process = processes.size() > i ? processes.get(i) : null;
+									CircuitProcess process;
+									try {
+										process = processes.get(i);
+									} catch (IndexOutOfBoundsException e) {
+										process = null;
+									}
 									if (process != null ? process.active : false) process.run();
 								}
 								if (this.processes.isEmpty()) {

@@ -10,6 +10,9 @@ import java.io.OutputStream;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import de.m_marvin.logicsim.LogicSim;
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Component;
@@ -36,11 +39,11 @@ public class MemoryComponent extends Component {
 	public static final int ADDRESS_BUS_WIDTH = 64;
 	
 	protected File lastDataFile;
+	protected int dataRowCount;
 	
 	protected boolean isVolatile;
 	protected int minDataRowCount;
 	protected int dataRowWidth;
-	protected int dataRowCount;
 	protected byte[] data;
 	
 	public MemoryComponent(Circuit circuit) {
@@ -170,6 +173,30 @@ public class MemoryComponent extends Component {
 	public void reset() {
 		super.reset();
 		if (this.isVolatile) clearMemory();
+	}
+	
+	@Override
+	public void serialize(JsonObject json) {
+		super.serialize(json);
+		json.addProperty("isVolatile", this.isVolatile);
+		json.addProperty("minDataRows", this.minDataRowCount);
+		json.addProperty("dataRowWidth", this.dataRowWidth);
+		JsonArray arr = new JsonArray(this.data.length);
+		for (int i = 0; i < this.data.length; i++) arr.add(this.data[i]);
+		json.add("data", arr);
+	}
+	
+	@Override
+	public void deserialize(JsonObject json) {
+		super.deserialize(json);
+		this.isVolatile = json.get("isVolatile").getAsBoolean();
+		this.minDataRowCount = json.get("minDataRowCount").getAsInt();
+		this.dataRowWidth = json.get("dataRowWidth").getAsInt();
+		JsonArray arr = json.get("data").getAsJsonArray();
+		this.dataRowCount = arr.size() / this.dataRowWidth;
+		this.data = new byte[arr.size()];
+		for (int i = 0; i < arr.size(); i++) this.data[i] = arr.get(i).getAsByte();
+		verifyMemory();
 	}
 	
 	@Override
