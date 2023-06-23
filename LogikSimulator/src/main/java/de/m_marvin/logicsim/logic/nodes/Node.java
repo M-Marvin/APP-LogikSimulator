@@ -21,6 +21,7 @@ import de.m_marvin.univec.impl.Vec2i;
  */
 public abstract class Node {
 	
+	protected Map<String, NetState> stateMapReference;
 	protected final Component component;
 	protected final int nodeNr;
 	protected final String label;
@@ -70,7 +71,12 @@ public abstract class Node {
 	}
 	
 	public Map<String, NetState> getLaneReference() {
-		return this.getCircuit().getLaneMapReference(this);
+		if (this.stateMapReference == null) return this.stateMapReference = this.getCircuit().getLaneMapReference(this);
+		return this.stateMapReference;
+	}
+	
+	public void disconnect() {
+		this.stateMapReference = null;
 	}
 	
 	/**

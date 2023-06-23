@@ -13,6 +13,7 @@ import de.m_marvin.logicsim.logic.nodes.InputNode;
 import de.m_marvin.logicsim.logic.nodes.Node;
 import de.m_marvin.logicsim.logic.nodes.OutputNode;
 import de.m_marvin.logicsim.logic.nodes.PassivNode;
+import de.m_marvin.logicsim.logic.simulator.AsyncArrayList;
 import de.m_marvin.logicsim.ui.widgets.EditorArea;
 import de.m_marvin.logicsim.ui.widgets.InputDialog;
 import de.m_marvin.logicsim.ui.windows.Editor;
@@ -66,9 +67,9 @@ public abstract class Component {
 	protected Vec2i visualPosition = new Vec2i(0, 0);
 	protected String label = "unnamed";
 	
-	protected final List<InputNode> inputs = new ArrayList<>();
-	protected final List<OutputNode> outputs = new ArrayList<>();
-	protected final List<PassivNode> passives = new ArrayList<>();
+	protected final List<InputNode> inputs = new AsyncArrayList<>();
+	protected final List<OutputNode> outputs = new AsyncArrayList<>();
+	protected final List<PassivNode> passives = new AsyncArrayList<>();
 	protected final Circuit circuit;
 	protected final int componentNr;
 	

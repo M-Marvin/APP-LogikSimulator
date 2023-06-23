@@ -165,7 +165,7 @@ public class ConnectorWire extends NetConnector {
 
 	@Override
 	public Map<String, NetState> getLaneData() {
-		return this.circuit.getLaneMapReference(this.passives.get(0));
+		return this.passives.get(0).getLaneReference();
 	}
 	
 }

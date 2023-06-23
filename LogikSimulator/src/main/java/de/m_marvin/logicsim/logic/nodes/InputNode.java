@@ -33,7 +33,7 @@ public class InputNode extends Node {
 	}
 		
 	public boolean getState() {
-		return this.getCircuit().getNetState(this, getLaneTag()).getLogicState();
+		return Circuit.safeLaneRead(this.getLaneReference(), getLaneTag()).getLogicState();
 	}
 	
 	public int readBusValue(int bitCount) {

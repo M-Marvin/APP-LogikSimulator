@@ -200,10 +200,8 @@ public class Circuit {
 								if (newNet == null) {
 									newNet = network;
 								} else {
-									removeNet(net);
+									removeNet(net).forEach(Node::disconnect);
 									newNet.addAll(network);
-									
-
 								}
 								
 								break;
@@ -240,7 +238,7 @@ public class Circuit {
 						
 						if (network.contains(n)) {
 							
-							removeNet(net);
+							removeNet(net).forEach(Node::disconnect);
 							for (Node n2 : network) {
 								if (!disconnectedComponents.contains(n2.getComponent())) disconnectedComponents.add(n2.getComponent());
 							}
