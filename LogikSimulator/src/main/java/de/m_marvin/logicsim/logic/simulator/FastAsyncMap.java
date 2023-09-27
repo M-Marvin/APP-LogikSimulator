@@ -371,7 +371,6 @@ public class FastAsyncMap<K, V> implements Map<K, V> {
 			return FastAsyncMap.this.isEmpty();
 		}
 
-		@SuppressWarnings("rawtypes")
 		@Override
 		public boolean contains(Object o) {
 			if (o instanceof Entry entry) {
