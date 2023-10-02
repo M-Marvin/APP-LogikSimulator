@@ -27,7 +27,7 @@ public class ValueHistoryGraph extends Composite {
 	protected Map<String, Color> dataColor = new HashMap<>();
 	
 	protected GLData glData;
-	protected GLCanvas glCanvas;
+	protected MTGLCanvas glCanvas;
 	protected GLCapabilities glCapabilities;
 	protected boolean resized;
 	protected boolean initialized = false;
@@ -49,7 +49,7 @@ public class ValueHistoryGraph extends Composite {
 	}
 
 	public Vec2i getVisibleArea() {
-		return this.glCanvas.isDisposed() ? new Vec2i() : Vec2i.fromVec(this.glCanvas.getSize());
+		return this.glCanvas.isDisposed() ? new Vec2i() : Vec2i.fromVec(this.glCanvas.getSizePixels());
 	}
 	
 	public void putData(String variable, float value) {

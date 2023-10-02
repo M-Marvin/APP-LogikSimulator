@@ -70,7 +70,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 	protected Slider sliderHorizontal;
 	protected Slider sliderVertical;
 	protected GLData glData;
-	protected GLCanvas glCanvas;
+	protected MTGLCanvas glCanvas;
 	protected GLCapabilities glCapabilities;
 	protected boolean resized;
 	protected boolean initialized = false;
@@ -468,13 +468,13 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 		
 		if (resized) {
-			GL11.glViewport(0, 0, getVisibleArea().x, getVisibleArea().y);
+			GL11.glViewport(0, 0, this.glCanvas.getSizePixels().x, this.glCanvas.getSizePixels().y);
 			GL11.glLoadIdentity();
 			GL11.glOrtho(0.0, getVisibleArea().x, getVisibleArea().y, 0.0, 0.0, 1.0);
 			GL11.glClearColor(0, 0, 0, 1);
 			this.resized = false;
 		}
-		
+
 		drawRaster();
 
 		swapColor(1, 1, 1, 1);
