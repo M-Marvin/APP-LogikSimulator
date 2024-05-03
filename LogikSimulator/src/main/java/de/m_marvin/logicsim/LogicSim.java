@@ -242,7 +242,9 @@ public class LogicSim {
 	
 	public void openEditor(Circuit circuit) {
 		synchronized (this.openEditorWindows) {
-			this.openEditorWindows.add(new Editor(display, circuit));
+			Editor editor = new Editor(display, circuit);
+			this.openEditorWindows.add(editor);
+			editor.start();
 		}
 	}
 	

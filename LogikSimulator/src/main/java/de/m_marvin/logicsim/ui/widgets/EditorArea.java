@@ -1,5 +1,6 @@
 package de.m_marvin.logicsim.ui.widgets;
 
+import java.awt.Color;
 import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -43,12 +44,18 @@ import de.m_marvin.logicsim.logic.nodes.PassivNode;
 import de.m_marvin.logicsim.ui.TextRenderer;
 import de.m_marvin.logicsim.util.CircuitSerializer;
 import de.m_marvin.logicsim.util.Registries.ComponentEntry;
+import de.m_marvin.openui.core.UIRenderMode;
+import de.m_marvin.openui.flatmono.UtilRenderer;
+import de.m_marvin.openui.flatmono.components.ScrollBarComponent;
+import de.m_marvin.renderengine.buffers.defimpl.SimpleBufferSource;
+import de.m_marvin.renderengine.resources.defimpl.ResourceLocation;
+import de.m_marvin.renderengine.translation.PoseStack;
 import de.m_marvin.simplelogging.printing.LogType;
 import de.m_marvin.simplelogging.printing.Logger;
 import de.m_marvin.univec.impl.Vec2i;
 import de.m_marvin.univec.impl.Vec3i;
 
-public class EditorArea extends Composite implements MouseListener, MouseMoveListener, KeyListener, MouseWheelListener {
+public class EditorArea extends de.m_marvin.openui.core.components.Component<ResourceLocation> {
 	
 	public static final int RASTER_SIZE = 10;
 	public static final int VISUAL_BUNDING_BOX_OFFSET = 5;
@@ -69,11 +76,8 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 	protected ComponentEntry activePlacement = null;
 	protected boolean grabbedBackground = false;
 
-	protected Slider sliderHorizontal;
-	protected Slider sliderVertical;
-	protected GLData glData;
-	protected GLCanvas glCanvas;
-	protected GLCapabilities glCapabilities;
+	protected ScrollBarComponent sliderHorizontal;
+	protected ScrollBarComponent sliderVertical;
 	protected boolean resized;
 	protected boolean initialized = false;
 	protected long animationTimer;
@@ -94,43 +98,37 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		}
 	}
 
-	public EditorArea(Composite parent) {
-		this(parent, true);
+	public EditorArea() {
+		this(true);
 	}
 	
-	public EditorArea(Composite parent, boolean sliders) {
-		super(parent, SWT.NONE);
-		this.setLayout(new BorderLayout());
-		this.glData = new GLData();
-		this.glData.doubleBuffer = true;
-		this.glCanvas = new MTGLCanvas(this, SWT.None, glData);
-		this.glCanvas.setLayoutData(new BorderData(SWT.CENTER));
-		this.glCanvas.addListener(SWT.Resize, (event) -> this.resized = true);
-		this.glCanvas.addMouseListener(this);
-		this.glCanvas.addMouseMoveListener(this);
-		this.glCanvas.addMouseWheelListener(this);
-		this.glCanvas.addKeyListener(this);
-		if (sliders) {
-			this.sliderHorizontal = new Slider(this, SWT.NONE);
-			this.sliderHorizontal.setLayoutData(new BorderData(SWT.BOTTOM));
-			this.sliderHorizontal.setMaximum(1);
-			this.sliderHorizontal.addListener(SWT.Selection, (e) -> {
-				this.visualOffset.setX(-this.sliderHorizontal.getSelection());
-			});
-			this.sliderVertical = new Slider(this, SWT.VERTICAL);
-			this.sliderVertical.setLayoutData(new BorderData(SWT.RIGHT));
-			this.sliderVertical.setMaximum(1);
-			this.sliderVertical.addListener(SWT.Selection, (e) -> {
-				this.visualOffset.setY(-this.sliderVertical.getSelection());
-			});
-			this.glCanvas.addListener(SWT.Resize, (event) -> Display.getDefault().asyncExec(() -> resizeArea()));
-		}
-	}
-	
-	@Override
-	public void setSize(int width, int height) {
-		super.setSize(width, height);
-		resizeArea();
+	public EditorArea(boolean sliders) {
+		//super(parent, SWT.NONE);
+//		this.setLayout(new BorderLayout());
+//		this.glData = new GLData();
+//		this.glData.doubleBuffer = true;
+//		this.glCanvas = new MTGLCanvas(this, SWT.None, glData);
+//		this.glCanvas.setLayoutData(new BorderData(SWT.CENTER));
+//		this.glCanvas.addListener(SWT.Resize, (event) -> this.resized = true);
+//		this.glCanvas.addMouseListener(this);
+//		this.glCanvas.addMouseMoveListener(this);
+//		this.glCanvas.addMouseWheelListener(this);
+//		this.glCanvas.addKeyListener(this);
+//		if (sliders) {
+//			this.sliderHorizontal = new Slider(this, SWT.NONE);
+//			this.sliderHorizontal.setLayoutData(new BorderData(SWT.BOTTOM));
+//			this.sliderHorizontal.setMaximum(1);
+//			this.sliderHorizontal.addListener(SWT.Selection, (e) -> {
+//				this.visualOffset.setX(-this.sliderHorizontal.getSelection());
+//			});
+//			this.sliderVertical = new Slider(this, SWT.VERTICAL);
+//			this.sliderVertical.setLayoutData(new BorderData(SWT.RIGHT));
+//			this.sliderVertical.setMaximum(1);
+//			this.sliderVertical.addListener(SWT.Selection, (e) -> {
+//				this.visualOffset.setY(-this.sliderVertical.getSelection());
+//			});
+//			this.glCanvas.addListener(SWT.Resize, (event) -> Display.getDefault().asyncExec(() -> resizeArea()));
+//		}
 	}
 	
 	public void setAreaSize(Vec2i size) {
@@ -143,7 +141,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 	}
 	
 	public Vec2i getVisibleArea() {
-		return this.glCanvas.isDisposed() ? new Vec2i() : Vec2i.fromVec(this.glCanvas.getSize());
+		return new Vec2i();
 	}
 	
 	public void setAllowEditing(boolean allowEditing) {
@@ -160,10 +158,6 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 	
 	public Circuit getCircuit() {
 		return circuit;
-	}
-	
-	public GLCanvas getGlCanvas() {
-		return glCanvas;
 	}
 	
 	public void setActivePlacement(ComponentEntry activePlacement) {
@@ -239,21 +233,20 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		Vec2i screenSize = getVisibleArea();
 		if (screenSize.x == 0 || screenSize.y == 0) return;
 		Vec2i scrollableArea = this.areaSize.sub(this.getVisibleArea()).max(1);
-		this.sliderVertical.setMaximum(scrollableArea.y);
-		this.sliderHorizontal.setMaximum(scrollableArea.x);
+//		this.sliderVertical.setMaximum(scrollableArea.y);
+//		this.sliderHorizontal.setMaximum(scrollableArea.x);
 		this.visualOffset.clampI(scrollableArea.mul(-1).add(1, 1), new Vec2i(0, 0));
-		if (scrollableArea.x > 1) this.sliderHorizontal.setSelection(-this.visualOffset.x);
-		if (scrollableArea.y > 1) this.sliderVertical.setSelection(-this.visualOffset.y);
+//		if (scrollableArea.x > 1) this.sliderHorizontal.setSelection(-this.visualOffset.x);
+//		if (scrollableArea.y > 1) this.sliderVertical.setSelection(-this.visualOffset.y);
 	}
 	
 	public void scrollView(Vec2i scrollVec) {
 		Vec2i scrollableArea = this.areaSize.sub(this.getVisibleArea()).max(1);
 		this.visualOffset = this.visualOffset.add(scrollVec).clamp(scrollableArea.mul(-1).add(1, 1), new Vec2i(0, 0));
-		if (scrollableArea.x > 1 && this.sliderHorizontal != null) this.sliderHorizontal.setSelection(-this.visualOffset.x);
-		if (scrollableArea.y > 1 && this.sliderVertical != null) this.sliderVertical.setSelection(-this.visualOffset.y);
+//		if (scrollableArea.x > 1 && this.sliderHorizontal != null) this.sliderHorizontal.setSelection(-this.visualOffset.x);
+//		if (scrollableArea.y > 1 && this.sliderVertical != null) this.sliderVertical.setSelection(-this.visualOffset.y);
 	}
 	
-	@Override
 	public void mouseUp(MouseEvent event) {
 		
 		if (!this.isAllowedEditing()) return;
@@ -294,7 +287,6 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		
 	}
 	
-	@Override
 	public void mouseDown(MouseEvent event) {
 
 		if (!this.isAllowedEditing()) return;
@@ -349,7 +341,6 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		
 	}
 
-	@Override
 	public void mouseMove(MouseEvent event) {
 
 		if (!this.isAllowedEditing()) return;
@@ -385,10 +376,6 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		
 	}
 	
-	@Override
-	public void mouseDoubleClick(MouseEvent event) {}
-
-	@Override
 	public void mouseScrolled(MouseEvent e) {
 		
 		int scroll = e.count;
@@ -398,7 +385,6 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		
 	}
 	
-	@Override
 	public void keyPressed(KeyEvent event) {
 
 		if (!this.isAllowedEditing()) return;
@@ -436,33 +422,12 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 			}
 		}
 	}
-
-	@Override
-	public void keyReleased(KeyEvent event) {}
-	
-	protected void initOpenGL() {
-		if (this.glCanvas.isDisposed()) return;
-		if (!this.glCanvas.isDisposed()) this.glCanvas.setCurrent();
-		this.glCapabilities = GL.createCapabilities();
-        GL11.glLoadIdentity();
-        GL11.glMatrixMode(GL11.GL_PROJECTION);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
-        GL11.glDisable(GL11.GL_CULL_FACE);
-	    this.resized = true;
-	    this.initialized = true;
-	}
 	
 	public void render() {
 		
-		if (this.isDisposed() || this.glCanvas == null || this.circuit == null) return;
+		if (false || this.circuit == null) return;
 		
-		if (!initialized) {
-			initOpenGL();
-		}
-		
-		if (!this.glCanvas.isDisposed()) this.glCanvas.setCurrent();
+//		if (!this.glCanvas.isDisposed()) this.glCanvas.setCurrent();
 		
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 		
@@ -576,7 +541,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 			
 		}
 		
-		if (!this.glCanvas.isDisposed()) this.glCanvas.swapBuffers();
+//		if (!this.glCanvas.isDisposed()) this.glCanvas.swapBuffers();
 		
 	}
 	
@@ -868,6 +833,20 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 		GL11.glVertex2f(x + w, y + h - (h - f1) / 2);
 		GL11.glVertex2f(x + w, y + h);
 		GL11.glEnd();
+		
+	}
+
+	@Override
+	public void drawBackground(SimpleBufferSource<ResourceLocation, UIRenderMode<ResourceLocation>> bufferSource, PoseStack matrixStack) {
+		
+		UtilRenderer.renderRectangle(this.size.x, this.size.y, Color.red, bufferSource, matrixStack);
+		
+	}
+	
+	@Override
+	public void drawForeground(SimpleBufferSource<ResourceLocation, UIRenderMode<ResourceLocation>> bufferSource, PoseStack matrixStack) {
+		
+		UtilRenderer.renderFrame(this.size.x, this.size.y, 4, Color.yellow, bufferSource, matrixStack);
 		
 	}
 	
