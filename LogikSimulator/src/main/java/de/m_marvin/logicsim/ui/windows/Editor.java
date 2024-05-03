@@ -62,6 +62,8 @@ import de.m_marvin.logicsim.util.CircuitSerializer;
 import de.m_marvin.logicsim.util.Registries;
 import de.m_marvin.logicsim.util.Registries.ComponentEntry;
 import de.m_marvin.logicsim.util.Registries.ComponentFolder;
+import de.m_marvin.simplelogging.printing.LogType;
+import de.m_marvin.simplelogging.printing.Logger;
 import de.m_marvin.univec.impl.Vec2i;
 
 /**
@@ -115,7 +117,7 @@ public class Editor {
 		this.shell = new Shell(display);
 		this.shell.setImage(decodeImage(LogicSim.LOGIC_SIM_ICON));
 		this.shell.setLayout(new BorderLayout());
-		this.shell.addListener(SWT.FocusIn, (e) -> LogicSim.getInstance().setLastInteracted(Editor.this)); // FIXME Event not working reliable
+		this.shell.addListener(SWT.FocusIn, (e) -> LogicSim.getInstance().setLastInteracted(Editor.this));
 		
 		if (circuit == null) circuit = new Circuit();
 		
@@ -417,7 +419,7 @@ public class Editor {
 					CircuitSerializer.saveCircuit(getCurrentCurcit(), this.editorArea.getCircuit().getCircuitFile());
 				} catch (IOException ex) {
 					showErrorInfo(this.shell, "editor.window.error.save_file", ex);
-					ex.printStackTrace();
+					Logger.defaultLogger().printException(LogType.WARN, ex);
 				}
 				LogicSim.getInstance().updateSubCircuitCache();
 				updateUI();
@@ -428,7 +430,7 @@ public class Editor {
 			CircuitSerializer.saveCircuit(getCurrentCurcit(), this.editorArea.getCircuit().getCircuitFile());
 		} catch (IOException ex) {
 			showErrorInfo(this.shell, "editor.window.error.save_file", ex);
-			ex.printStackTrace();
+			Logger.defaultLogger().printException(LogType.ERROR, ex);
 		}
 		LogicSim.getInstance().updateSubCircuitCache();
 	}
@@ -448,7 +450,7 @@ public class Editor {
 				}
 			} catch (IOException ex) {
 				showErrorInfo(this.shell, "info.error.load_file", ex);
-				ex.printStackTrace();
+				Logger.defaultLogger().printException(LogType.WARN, ex);
 			}
 		}
 		updatePartSelector();

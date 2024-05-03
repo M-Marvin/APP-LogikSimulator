@@ -11,11 +11,16 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.m_marvin.simplelogging.printing.LogType;
+import de.m_marvin.simplelogging.printing.Logger;
+
 public class ConfigFile {
+
+	protected static final String LOG_LEVEL = "config";
 	
 	public static void setValue(File configFile, String field, String value) {
 		if (configFile == null || !configFile.isFile()) {
-			System.err.println("Config file '" + configFile + "' not found!");
+			Logger.defaultLogger().logError(LOG_LEVEL,"Config file '" + configFile + "' not found!");
 			return;
 		}
 		try {
@@ -39,14 +44,14 @@ public class ConfigFile {
 			if (!configWritten) configWriter.write(field + "=" + value + "\r\n");
 			configWriter.close();
 		} catch (IOException e) {
-			System.err.println("Could not access config file!");
-			e.printStackTrace();
+			Logger.defaultLogger().logError(LOG_LEVEL,"Could not access config file!");
+			Logger.defaultLogger().printException(LogType.ERROR, e);
 		}
 	}
 	
 	public static String getValue(File configFile, String field, String defaultValue) {
 		if (configFile == null || !configFile.isFile()) {
-			System.err.println("Config file '" + configFile + "' not found!");
+			Logger.defaultLogger().logError(LOG_LEVEL,"Config file '" + configFile + "' not found!");
 			return defaultValue;
 		}
 		try {
@@ -60,8 +65,8 @@ public class ConfigFile {
 			configReader.close();
 			return value;
 		} catch (IOException e) {
-			System.err.println("Could not access config file!");
-			e.printStackTrace();
+			Logger.defaultLogger().logError(LOG_LEVEL,"Could not access config file!");
+			Logger.defaultLogger().printException(LogType.ERROR, e);
 			return defaultValue;
 		}
 	}

@@ -43,6 +43,8 @@ import de.m_marvin.logicsim.logic.nodes.PassivNode;
 import de.m_marvin.logicsim.ui.TextRenderer;
 import de.m_marvin.logicsim.util.CircuitSerializer;
 import de.m_marvin.logicsim.util.Registries.ComponentEntry;
+import de.m_marvin.simplelogging.printing.LogType;
+import de.m_marvin.simplelogging.printing.Logger;
 import de.m_marvin.univec.impl.Vec2i;
 import de.m_marvin.univec.impl.Vec3i;
 
@@ -196,9 +198,6 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 			this.grabbedComponents.get(i).setVisualPosition(this.mousePosition.sub(grabOffsets.get(i)));
 		}
 		this.circuit.reconnect(false, this.grabbedComponents.toArray(i -> new Component[i]));
-//		for (int i = 0; i < this.grabbedComponents.size(); i++) {
-//			this.circuit.reconnect(false, this.grabbedComponents.get(i));
-//		}
 		this.grabbedComponents.clear();
 		this.grabOffsets.clear();
 	}
@@ -231,7 +230,7 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 				List<Component> components = CircuitSerializer.deserializeComponents(clipboardString, this.circuit, this.mousePosition);
 				components.forEach(c -> { addGrabbedComponent(c); });
 			} catch (Exception e) {
-				System.out.println("No or invalid clipboard content!");
+				Logger.defaultLogger().logError("No or invalid clipboard content!");
 			}
 		}
 	}
@@ -432,8 +431,8 @@ public class EditorArea extends Composite implements MouseListener, MouseMoveLis
 				String clipboardCopy = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
 				pasteClipboardCopy(clipboardCopy);
 			} catch (HeadlessException | UnsupportedFlavorException | IOException e) {
-				System.err.println("Failed to read clipboard content!");
-				e.printStackTrace();
+				Logger.defaultLogger().logError("Failed to read clipboard content!");
+				Logger.defaultLogger().printException(LogType.ERROR, e);
 			}
 		}
 	}

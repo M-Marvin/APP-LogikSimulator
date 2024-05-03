@@ -85,21 +85,6 @@ public class BusInputComponent extends Component implements ISubCircuitIO {
 	@Override
 	public void updateIO() {
 		if (this.subCircuitInput.isPresent() && this.laneReferenceCache != null) {
-			// Read the bus value specified by the lane tag in the parent circuit
-//			String[] s = this.subCircuitInput.get().getLaneTag().split("(?<=\\D)(?=\\d)");
-//			String inputBus = s[0];
-//			int indexOffset = s.length > 1 ? Integer.valueOf(s[1]) : 0;
-//			
-//			// TODO Optimize
-//			this.value = 0;
-//			for (String lane : this.laneReferenceCache.keySet()) {
-//				String[] busTag = lane.split("(?<=\\D)(?=\\d)");
-//				if (busTag.length == 2 && busTag[0].equals(inputBus)) {
-//					int bitIndex = Integer.parseInt(busTag[1]);
-//					if (bitIndex >= indexOffset && bitIndex < indexOffset + this.bitCount && Circuit.safeLaneRead(laneReferenceCache, lane).getLogicState()) this.value |= (1 << (bitIndex - indexOffset));
-//				}
-//			}
-			
 			this.value = this.subCircuitInput.get().readBusValue(this.bitCount);
 			rewriteCache();
 		}

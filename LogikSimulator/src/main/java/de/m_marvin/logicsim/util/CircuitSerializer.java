@@ -23,10 +23,13 @@ import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.logic.Circuit.ShortCircuitType;
 import de.m_marvin.logicsim.logic.Component;
 import de.m_marvin.logicsim.ui.windows.Editor;
+import de.m_marvin.simplelogging.printing.LogType;
+import de.m_marvin.simplelogging.printing.Logger;
 import de.m_marvin.univec.impl.Vec2i;
 
 public class CircuitSerializer {
 	
+	protected static final String LOG_LEVEL = "serializer";
 	public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	
 	public static String serializeComponents(List<Component> components, Vec2i referencePos) {
@@ -62,10 +65,10 @@ public class CircuitSerializer {
 				circuit.add(component);
 				componentList.add(component);
 			} catch (Exception e) {
-				System.err.println("Failed to load component '" + componentJson.toString() + "'");
+				Logger.defaultLogger().logError(LOG_LEVEL, "Failed to load component '" + componentJson.toString() + "'");
 				Editor parentWindow = LogicSim.getInstance().getLastInteractedEditor();
 				if (parentWindow != null) Editor.showErrorInfo(parentWindow.getShell(), "editor.window.error.parese_file", e);
-				e.printStackTrace();
+				Logger.defaultLogger().printException(LogType.ERROR, e);
 			}
 		});
 		
@@ -86,8 +89,8 @@ public class CircuitSerializer {
 		} catch (Exception e) {
 			Editor editorWindow = LogicSim.getInstance().getLastInteractedEditor();
 			if (editorWindow != null) Editor.showErrorInfo(editorWindow.getShell(), "editor.window.error.failed_load_circuit", e);
-			System.err.println("Failed to load circuit from file '" + file + "'!");
-			e.printStackTrace();
+			Logger.defaultLogger().logError(LOG_LEVEL,"Failed to load circuit from file '" + file + "'!");
+			Logger.defaultLogger().printException(LogType.ERROR, e);
 		}
 		return circuit;
 	}
@@ -125,10 +128,10 @@ public class CircuitSerializer {
 				component.deserialize(componentJson.getAsJsonObject());
 				circuit.add(component);
 			} catch (Exception e) {
-				System.err.println("Failed to load component '" + componentJson.toString() + "'");
+				Logger.defaultLogger().logError(LOG_LEVEL,"Failed to load component '" + componentJson.toString() + "'");
 				Editor parentWindow = LogicSim.getInstance().getLastInteractedEditor();
 				if (parentWindow != null) Editor.showErrorInfo(parentWindow.getShell(), "editor.window.error.parese_file", e);
-				e.printStackTrace();
+				Logger.defaultLogger().printException(LogType.ERROR, e);
 			}
 		});
 		

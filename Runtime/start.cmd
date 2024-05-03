@@ -31,4 +31,4 @@
 ::
 ::
 ::978f952a14a936cc963da21a135fa983
-%~dp0jre\bin\java.exe -jar %~dp0\logicsim.jar --built-in-folder %~dp0\builtin --config-file %~dp0\config.cfg --open-files %1,%2,%3,%4,%5,%6,%7,%8,%9
+%~dp0jre\bin\java.exe -jar %~dp0\logicsim.jar --built-in-folder %~dp0\builtin --config-file %~dp0\config.cfg --log-folder %~dp0\logs --open-files %1,%2,%3,%4,%5,%6,%7,%8,%9

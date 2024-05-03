@@ -167,11 +167,6 @@ public class SubCircuitComponent extends Component {
 		if (subCircuitFile.toString().startsWith(LogicSim.getInstance().getSubCircuitFolder().toString())) {
 			return LogicSim.getInstance().getSubCircuitFolder().toURI().relativize(subCircuitFile.toURI()).toString();
 		} else {
-			// FIXME Does not generate backward relative paths like "../../"
-//			if (getCircuit().getCircuitFile() == null) return "";
-//			System.out.println(getCircuit().getCircuitFile().getParentFile().toURI());
-//			System.out.println(subCircuitFile.toURI());
-//			System.out.println(getCircuit().getCircuitFile().getParentFile().toURI().relativize(subCircuitFile.toURI()).toString());
 			return getCircuit().getCircuitFile() == null ? "NA" : getCircuit().getCircuitFile().getParentFile().toURI().relativize(subCircuitFile.toURI()).toString();
 		}
 	}

@@ -181,14 +181,12 @@ public class AsyncArrayList<E> extends AbstractCollection<E> implements List<E> 
 
 	@Override
 	public ListIterator<E> listIterator() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("not implemented");
 	}
 
 	@Override
 	public ListIterator<E> listIterator(int index) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("not implemented");
 	}
 	
 }

@@ -3,8 +3,8 @@ package de.m_marvin.logicsim.logic.nodes;
 import java.util.Map;
 
 import de.m_marvin.logicsim.LogicSim;
-import de.m_marvin.logicsim.logic.Circuit.NetState;
 import de.m_marvin.logicsim.logic.Circuit;
+import de.m_marvin.logicsim.logic.Circuit.NetState;
 import de.m_marvin.logicsim.logic.Component;
 import de.m_marvin.logicsim.ui.widgets.InputDialog;
 import de.m_marvin.logicsim.ui.windows.Editor;

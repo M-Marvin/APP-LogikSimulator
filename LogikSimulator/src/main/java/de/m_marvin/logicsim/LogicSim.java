@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.jar.Attributes;
@@ -41,6 +42,8 @@ import de.m_marvin.logicsim.util.CircuitSerializer;
 import de.m_marvin.logicsim.util.ConfigFile;
 import de.m_marvin.logicsim.util.Registries;
 import de.m_marvin.logicsim.util.Registries.ComponentFolder;
+import de.m_marvin.simplelogging.printing.LogType;
+import de.m_marvin.simplelogging.printing.Logger;
 
 public class LogicSim {
 	
@@ -49,6 +52,7 @@ public class LogicSim {
 	// - Komponenten zur interaktion mit Dateien, Grphischer Darstellung, Tastatureingabe etc
 	// - Volatile switch for memory
 	
+	protected static final String LOG_LEVEL = "main";
 	public static final String LOGIC_SIM_ICON = "iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAA40lEQVRoge2YwQ2DMAxF3Yqhshy3LsIQrNFzJJbIBu0BoVZIUeLEIf7B78IFJH/5/9iEyDCqeGS+92laRZxkfc8rqmiJCejNVPhdbna4sLMWE9ArtGxua6EfrzW/W9t7fy6zmAXhOwAvoN5Chy06ERNw9qjaU6l0F7pqDtgupJ76EP/hnMvOSgiBiIi891V2hO8AvABRCx22ECR5KsF3QPscODNeB+AFwM8BUQENGH8X0j4HksB3QPscGD8D8AJEb+bsf6AAeAE2B3oTCxB7LxeCPQfgb+ZKM6BGEHwGTIBhgPMFj3A0g04XsBUAAAAASUVORK5CYII=";
 	public static final String CIRCUIT_FILE_EXTENSION = "lcf";
 	
@@ -72,9 +76,26 @@ public class LogicSim {
 		
 		CommandLineParser parser = new CommandLineParser();
 		parser.addOption("config-file", "");
+		parser.addOption("log-folder", "");
 		parser.addOption("sub-circuit-folder", "");
 		parser.addOption("open-files", "");
 		parser.parseInput(args);
+		
+		File logFolder = new File(parser.getOption("log-folder"));
+		if (logFolder.isDirectory() || logFolder.mkdir()) {
+			Calendar calendar = Calendar.getInstance();
+			String logFileName = "LogicSim_" + 
+					calendar.get(Calendar.YEAR) + "." + 
+					String.format("%02d", calendar.get(Calendar.MONTH) + 1) + "." + 
+					String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH)) + "_" + 
+					String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY)) + "." + 
+					String.format("%02d", calendar.get(Calendar.MINUTE)) + "." + 
+					String.format("%02d", calendar.get(Calendar.SECOND)) + ".log";
+			File logFile = new File(logFolder, logFileName);
+			File latestFile = new File(logFolder, "latest.log");
+			Logger.setDefaultLogger(new Logger(logFile, latestFile));
+		}
+		
 		logicSim.subCircuitFolder = new File(parser.getOption("sub-circuit-folder"));
 		logicSim.configFile = new File(parser.getOption("config-file"));
 		
@@ -143,7 +164,7 @@ public class LogicSim {
 	}
 		
 	private void start(File... filesToOpen) {
-
+		
 		registerIncludedParts();
 		updateSubCircuitCache();
 		
@@ -154,21 +175,21 @@ public class LogicSim {
 		this.simulationMonitor = new SimulationMonitor(processor);
 		
 		if (filesToOpen.length == 0) {
-			System.out.println("Open default editor window");
+			Logger.defaultLogger().logInfo(LOG_LEVEL, "Open default editor window");
 			openEditor(null);
 		} else {
-			System.out.println("Open editor windows for passed files");
+			Logger.defaultLogger().logInfo(LOG_LEVEL, "Open editor windows for passed files");
 			for (int i = 0; i < filesToOpen.length; i++) {
 				try {
 					openEditor(CircuitSerializer.loadCircuit(filesToOpen[i]));
 				} catch (IOException e) {
-					System.err.println("Failed to load file '" + filesToOpen[i] + "'!");
-					e.printStackTrace();
+					Logger.defaultLogger().logError(LOG_LEVEL,"Failed to load file '" + filesToOpen[i] + "'!");
+					Logger.defaultLogger().printException(LogType.ERROR, e);
 				}
 			}
 		}
 
-		System.out.println("Start ui-logic thread");
+		Logger.defaultLogger().logInfo(LOG_LEVEL, "Start ui-logic thread");
 		this.uiLogicThread = new Thread(() -> {
 			long lastTickTime = 0;
 			long tickTime = 0;
@@ -188,11 +209,11 @@ public class LogicSim {
 				} catch (InterruptedException e) {}
 			}
 			TextRenderer.cleanUpOpenGL();
-			System.out.println("ui-logic thread terminated!");
+			Logger.defaultLogger().logInfo(LOG_LEVEL, "ui-logic thread terminated!");
 		}, "ui-logic");
 		this.uiLogicThread.start();
 		
-		System.out.println("Enter ui main loop");
+		Logger.defaultLogger().logInfo(LOG_LEVEL, "Enter ui main loop");
 		long lastTickTime = 0;
 		long tickTime = 0;
 		float tickRateDelta = 0;
@@ -210,12 +231,12 @@ public class LogicSim {
 				}
 			} catch (InterruptedException e) {}
 		}
-		System.out.println("Exit ui main loop!");
+		Logger.defaultLogger().logInfo(LOG_LEVEL, "Exit ui main loop!");
 		
 		this.display.dispose();
 		this.processor.terminate();
 		
-		System.out.println("Main thread terminated!");
+		Logger.defaultLogger().logInfo(LOG_LEVEL, "Main thread terminated!");
 		
 	}
 	
@@ -285,8 +306,8 @@ public class LogicSim {
 				this.openEditorWindows.forEach(Editor::updateGraphics);
 			}
 		} catch (Exception e) {
-			System.err.println("Error while updateing graphics!");
-			e.printStackTrace();
+			Logger.defaultLogger().logError(LOG_LEVEL,"Error while updateing graphics!");
+			Logger.defaultLogger().printException(LogType.ERROR, e);
 		}
 		
 	}
@@ -302,7 +323,7 @@ public class LogicSim {
 	
 	public void registerIncludedParts() {
 		
-		System.out.println("Register components ...");
+		Logger.defaultLogger().logInfo(LOG_LEVEL, "Register components ...");
 		
 		ComponentFolder wireFolder = Registries.registerFolder("circuit.folders.wires", ICON_WIRE_GROUP);
 		ComponentFolder logicFolder = Registries.registerFolder("circuit.folders.logic", ICON_LOGIC_GROUP);
@@ -336,7 +357,7 @@ public class LogicSim {
 	
 	public void updateSubCircuitCache() {
 
-		System.out.println("Load integrated circuits from file ...");
+		Logger.defaultLogger().logInfo(LOG_LEVEL, "Load integrated circuits from file ...");
 		
 		Registries.clearSubCircuitCache();
 		scanForFiles(this.subCircuitFolder, file -> {

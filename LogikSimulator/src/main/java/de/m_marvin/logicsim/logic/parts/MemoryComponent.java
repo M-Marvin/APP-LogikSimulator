@@ -22,6 +22,8 @@ import de.m_marvin.logicsim.ui.TextRenderer;
 import de.m_marvin.logicsim.ui.widgets.EditorArea;
 import de.m_marvin.logicsim.ui.widgets.InputDialog;
 import de.m_marvin.logicsim.ui.windows.Editor;
+import de.m_marvin.simplelogging.printing.LogType;
+import de.m_marvin.simplelogging.printing.Logger;
 import de.m_marvin.univec.impl.Vec2i;
 
 public class MemoryComponent extends Component {
@@ -123,8 +125,8 @@ public class MemoryComponent extends Component {
 			}
 			is.close();
 		} catch (IOException e) {
-			System.err.println("Failed to load data from file!");
-			e.printStackTrace();
+			Logger.defaultLogger().logWarn("Failed to load data from file!");
+			Logger.defaultLogger().printException(LogType.WARN, e);
 			Editor.showErrorInfo(editor.getShell(), "editor.window.error.load_memory", e);
 		}
 	}
@@ -149,8 +151,8 @@ public class MemoryComponent extends Component {
 			}
 			os.close();
 		} catch (IOException e) {
-			System.err.println("Failed to save data from file!");
-			e.printStackTrace();
+			Logger.defaultLogger().logWarn("Failed to save data from file!");
+			Logger.defaultLogger().printException(LogType.WARN, e);
 			Editor.showErrorInfo(editor.getShell(), "editor.window.error.save_memory", e);
 		}
 	}

@@ -4,8 +4,8 @@ import java.util.Map;
 import java.util.Objects;
 
 import de.m_marvin.logicsim.logic.Circuit;
-import de.m_marvin.logicsim.logic.Component;
 import de.m_marvin.logicsim.logic.Circuit.NetState;
+import de.m_marvin.logicsim.logic.Component;
 import de.m_marvin.univec.impl.Vec2i;
 
 /**

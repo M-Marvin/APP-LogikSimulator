@@ -2,7 +2,6 @@ package de.m_marvin.logicsim.logic.simulator;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import com.sun.management.OperatingSystemMXBean;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
@@ -10,9 +9,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.sun.management.OperatingSystemMXBean;
+
 import de.m_marvin.logicsim.LogicSim;
 import de.m_marvin.logicsim.logic.Circuit;
 import de.m_marvin.logicsim.ui.windows.Editor;
+import de.m_marvin.simplelogging.printing.LogType;
+import de.m_marvin.simplelogging.printing.Logger;
 
 /**
  * This class handles the creation and load balancing of the multiple simulation threads.
@@ -22,6 +25,8 @@ import de.m_marvin.logicsim.ui.windows.Editor;
  * @author Marvin K.
  */
 public class CircuitProcessor {
+
+	protected static final String LOG_LEVEL = "processor";
 	
 	/**
 	 * Represents an circuit that is executed on an thread
@@ -55,7 +60,7 @@ public class CircuitProcessor {
 				// This catches exceptions that are thrown by interfering with the simulation while it is running
 				// When performing mass-selection or copy paste for example
 				// If this message appears while doing a normal simulation, it is definitely a bug!
-				System.out.println("Concurrent modification occured in simulation!");
+				Logger.defaultLogger().logInfo(LOG_LEVEL, "Concurrent modification occured in simulation!");
 			}
 		}
 		
@@ -136,7 +141,7 @@ public class CircuitProcessor {
 					}
 				}
 			} catch (Throwable e) {
-				e.printStackTrace();
+				Logger.defaultLogger().printException(LogType.ERROR, e);
 				LogicSim.getInstance().getDisplay().asyncExec(() -> {
 					if (!LogicSim.getInstance().getLastInteractedEditor().getShell().isDisposed()) Editor.showErrorInfo(LogicSim.getInstance().getLastInteractedEditor().getShell(), "editor.window.error.processor_crash", e);
 				});
@@ -161,23 +166,23 @@ public class CircuitProcessor {
 	
 	public CircuitProcessor() {
 		
-		System.out.println("Create new circuit processor ...");
+		Logger.defaultLogger().logInfo(LOG_LEVEL, "Create new circuit processor ...");
 		
 		try {
 			this.osBean = ManagementFactory.newPlatformMXBeanProxy(ManagementFactory.getPlatformMBeanServer(), ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);	
 		} catch (IOException e) {
-			System.err.println("Failed to create mx os bean");
+			Logger.defaultLogger().logError(LOG_LEVEL,"Failed to create mx os bean");
+			Logger.defaultLogger().printException(LogType.ERROR, e);
 			this.osBean = null;
-			e.printStackTrace();
 		}
 
-		System.out.println("Start processor threads for " + getAvailableCores() + " cores ...");
+		Logger.defaultLogger().logInfo(LOG_LEVEL, "Start processor threads for " + getAvailableCores() + " cores ...");
 		for (int i = 0; i < getAvailableCores(); i++) {
 			this.threads.add(new CircuitProcessorThread("processor-" + i));
 		}
 		this.threads.forEach(Thread::start);
 
-		System.out.println("Start processor master thread");
+		Logger.defaultLogger().logInfo(LOG_LEVEL, "Start processor master thread");
 		this.processorMasterThread = new Thread(() -> {
 			while (!requestShutdown) {
 				try {
@@ -185,7 +190,7 @@ public class CircuitProcessor {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {}
 			}
-			System.out.println("Processor master thread terminated!");
+			Logger.defaultLogger().logInfo(LOG_LEVEL, "Processor master thread terminated!");
 		}, "processor-master");
 		this.processorMasterThread.start();
 		
@@ -324,7 +329,7 @@ public class CircuitProcessor {
 	}
 	
 	public void terminate() {
-		System.out.println("Shutdown circuit processor ...");
+		Logger.defaultLogger().logInfo(LOG_LEVEL, "Shutdown circuit processor ...");
 		stop();
 		this.requestShutdown = true;
 	}

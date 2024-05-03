@@ -1,13 +1,5 @@
 import org.gradle.internal.os.OperatingSystem
 
-buildscript {
-    ext {
-        kotlin_version = '1.1.2-2'
-        osgi_platform = 'win32.win32.x86_64'
-        swt_version = '3.105.3'
-    }
-}
-
 plugins {
 	id "com.github.johnrengelman.shadow" version "7.1.0"
 }
@@ -17,20 +9,6 @@ apply plugin: 'java'
 project.ext.lwjglVersion = "3.3.3"
 
 switch (OperatingSystem.current()) {
-	case OperatingSystem.LINUX:
-		project.ext.lwjglNatives = "natives-linux"
-		def osArch = System.getProperty("os.arch")
-		if (osArch.startsWith("arm") || osArch.startsWith("aarch64")) {
-			project.ext.lwjglNatives += osArch.contains("64") || osArch.startsWith("armv8") ? "-arm64" : "-arm32"
-		} else if  (osArch.startsWith("ppc")) {
-			project.ext.lwjglNatives += "-ppc64le"
-		} else if  (osArch.startsWith("riscv")) {
-			project.ext.lwjglNatives += "-riscv64"
-		}
-		break
-	case OperatingSystem.MAC_OS:
-		project.ext.lwjglNatives = System.getProperty("os.arch").startsWith("aarch64") ? "natives-macos-arm64" : "natives-macos"
-		break
 	case OperatingSystem.WINDOWS:
 		def osArch = System.getProperty("os.arch")
 		project.ext.lwjglNatives = osArch.contains("64")
@@ -38,6 +16,19 @@ switch (OperatingSystem.current()) {
 			: "natives-windows-x86"
 		break
 }
+
+configurations.all {
+    resolutionStrategy {
+        dependencySubstitution {
+            def os = System.getProperty("os.name").toLowerCase()
+            if (os.contains("windows")) {
+                substitute module('org.eclipse.platform:org.eclipse.swt.${osgi.platform}') with module("org.eclipse.platform:org.eclipse.swt.win32.win32.x86_64:3.114.0")
+            }
+        }
+    }
+}
+
+version = '0.1.2-alpha'
 
 repositories {
 	mavenCentral()
@@ -49,45 +40,46 @@ configurations {
     implementation.extendsFrom shade
 }
 
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 dependencies {
 	
 	// LWJGL
-	implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
-	implementation "org.lwjgl:lwjgl"
-	implementation "org.lwjgl:lwjgl-opengl"
-	runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
-	runtimeOnly "org.lwjgl:lwjgl-opengl::$lwjglNatives"
+	shade platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
+
+	shade "org.lwjgl:lwjgl"
+	shade "org.lwjgl:lwjgl-glfw"
+	shade "org.lwjgl:lwjgl-openal"
+	shade "org.lwjgl:lwjgl-opengl"
+	shade "org.lwjgl:lwjgl::$lwjglNatives"
+	shade "org.lwjgl:lwjgl-glfw::$lwjglNatives"
+	shade "org.lwjgl:lwjgl-opengl::$lwjglNatives"
 	
 	// CommandLineParser
-	implementation 'com.github.M-Marvin:LIBRARY-CommandLineParser:d527412'
+	shade 'com.github.M-Marvin:LIBRARY-CommandLineParser:main-SNAPSHOT'
 	
-	// UniVec
-	implementation 'com.github.M-Marvin:LIBRARY-UnifiedVectors:0c5578b'
-	
-	// SWT Windows x64
-	implementation 'org.eclipse.platform:org.eclipse.swt.win32.win32.x86_64:3.123.0'
+	// SimpleLogging
+	shade 'com.github.M-Marvin:LIBRARY-SimpleLogging:main-SNAPSHOT'
 	
 	// GSON
-	implementation "com.google.code.gson:gson:2.9.1"
+	shade "com.google.code.gson:gson:2.9.1"
+	
+	// UniVec
+	shade 'com.github.M-Marvin:LIBRARY-UnifiedVectors:v1.3'
+	
+	// SWT
+	shade 'org.eclipse.platform:org.eclipse.swt.win32.win32.x86_64:3.123.0'
 	
 }
 
 jar {
     manifest {
         attributes 'Main-Class': 'de.m_marvin.logicsim.LogicSim'
-        attributes 'Implementation-Version': '0.1.2 - alpha'
-        attributes 'Implementation-Title': 'Multithreadding Logic Simulator'
+        attributes 'Implementation-Version': version
+        attributes 'Implementation-Title': project.name
         attributes 'Implementation-Vendor-Id': 'de.m_marvin'
-    }
-}
-
-configurations.all {
-    resolutionStrategy {
-        dependencySubstitution {
-            // The maven property ${osgi.platform} is not handled by Gradle
-            // so we replace the dependency, using the osgi platform from the project settings
-            substitute module('org.eclipse.platform:org.eclipse.swt.${osgi.platform}') with module("org.eclipse.platform:org.eclipse.swt.$osgi_platform:$swt_version")
-        }
     }
 }
 
@@ -95,7 +87,7 @@ task assembleBin() {
 	description "Copies all required files into the output installation folder"
 	
 	doLast {
-		ant.copy(file:'build/libs/LogikSimulator-all.jar', tofile:'../Runtime/logicsim.jar')
+		ant.copy(file:'build/libs/LogikSimulator-' + version + '-all.jar', tofile:'../Runtime/logicsim.jar')
 	}
 }
 

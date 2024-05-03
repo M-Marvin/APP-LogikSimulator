@@ -13,6 +13,9 @@ import org.eclipse.swt.internal.opengl.win32.WGL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL33;
 
+import de.m_marvin.simplelogging.printing.LogType;
+import de.m_marvin.simplelogging.printing.Logger;
+
 public class TextRenderer {
 	
 	public static final int CHARACTER_SIZE = 32;
@@ -33,8 +36,8 @@ public class TextRenderer {
 		try {
 			loadAsciiMap(ASCII_MAP_SIZED_CONSOLAS);
 		} catch (IOException e) {
-			System.err.println("Failed to initialise TextRenderer!");
-			e.printStackTrace();
+			Logger.defaultLogger().logError("Failed to initialise TextRenderer!");
+			Logger.defaultLogger().printException(LogType.ERROR, e);
 		}
 	}
 	
