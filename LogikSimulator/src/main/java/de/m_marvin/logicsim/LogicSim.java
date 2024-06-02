@@ -97,7 +97,8 @@ public class LogicSim {
 			URL url = LogicSim.class.getClassLoader().getResource("META-INF/MANIFEST.MF");
 			Manifest manifest = new Manifest(url.openStream());
 			Attributes attr = manifest.getMainAttributes();
-			return attr.getValue("Implementation-Version");
+			String version = attr.getValue("Implementation-Version");
+			return version == null ? "N/A" : version;
 		} catch (IOException e) {
 			return "N/A";
 		}
@@ -143,7 +144,7 @@ public class LogicSim {
 		ConfigFile.setValue(configFile, "language", lang);
 		Translator.changeLanguage(lang);
 	}
-		
+	
 	private void start(File... filesToOpen) {
 
 		registerIncludedParts();

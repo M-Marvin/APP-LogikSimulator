@@ -15,10 +15,12 @@ apply plugin: 'java'
 
 project.ext.lwjglVersion = "3.3.1"
 project.ext.lwjglNatives = "natives-windows"
+//project.ext.lwjglNatives = "natives-linux"
 
 repositories {
 	mavenCentral()
 	maven { url 'https://jitpack.io' }
+	flatDir { dir 'libs' }
 }
 
 configurations {
@@ -26,30 +28,37 @@ configurations {
     implementation.extendsFrom shade
 }
 
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
 dependencies {
 	
 	// LWJGL
-	implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
-	implementation "org.lwjgl:lwjgl"
-	implementation "org.lwjgl:lwjgl-opengl"
-	runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
-	runtimeOnly "org.lwjgl:lwjgl-opengl::$lwjglNatives"
+	shade platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
+	shade "org.lwjgl:lwjgl"
+	shade "org.lwjgl:lwjgl-opengl"
+	shade "org.lwjgl:lwjgl::$lwjglNatives"
+	shade "org.lwjgl:lwjgl-opengl::$lwjglNatives"
 	
 	// CommandLineParser
-	implementation 'com.github.M-Marvin:LIBRARY-CommandLineParser:d527412'
+	shade 'com.github.M-Marvin:LIBRARY-CommandLineParser:main-SNAPSHOT'
 	
 	// UniVec
-	implementation 'com.github.M-Marvin:LIBRARY-UnifiedVectors:0c5578b'
+	shade 'com.github.M-Marvin:LIBRARY-UnifiedVectors:main-SNAPSHOT'
 	
 	// SWT Windows x64
-	implementation 'org.eclipse.platform:org.eclipse.swt.win32.win32.x86_64:3.124.100'
+	shade 'org.eclipse.platform:org.eclipse.swt.win32.win32.x86_64:3.124.100'
+	//shade 'swt:swt-linux-amd64'
+	//shade 'swt:swt-win-amd64'
 	
 	// GSON
-	implementation "com.google.code.gson:gson:2.9.1"
+	shade "com.google.code.gson:gson:2.9.1"
 	
 }
 
 jar {
+    from { (configurations.runtime).collect { it.isDirectory() ? it : zipTree(it) } } {
+        exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
+    }
     manifest {
         attributes 'Main-Class': 'de.m_marvin.logicsim.LogicSim'
         attributes 'Implementation-Version': '0.1.3 - alpha'

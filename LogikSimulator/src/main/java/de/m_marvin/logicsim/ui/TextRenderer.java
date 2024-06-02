@@ -9,11 +9,28 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-import org.eclipse.swt.internal.opengl.win32.WGL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL33;
+import org.lwjgl.opengl.GLX;
+import org.lwjgl.opengl.WGL;
 
 public class TextRenderer {
+	
+	private static int getContextPlatform = 0;
+	
+	static {
+		try {
+			GLX.glXGetCurrentContext();
+			getContextPlatform = 1;
+		} catch (Throwable e1) {
+			try {
+				WGL.wglGetCurrentContext();
+				getContextPlatform = 2;
+			} catch (Throwable e2) {
+				getContextPlatform = 0;
+			}
+		}
+	}
 	
 	public static final int CHARACTER_SIZE = 32;
 	public static final int ASCII_MAP_SIZE = 16;
@@ -94,7 +111,11 @@ public class TextRenderer {
 	 * Returns an long value to identify the current gl context
 	 */
 	public static long getContextId() {
-		return WGL.wglGetCurrentContext();
+		switch (getContextPlatform) {
+		case 1: return GLX.glXGetCurrentContext();
+		case 2: return WGL.wglGetCurrentContext();
+		default: return 0;
+		}
 	}
 	
 	/*
