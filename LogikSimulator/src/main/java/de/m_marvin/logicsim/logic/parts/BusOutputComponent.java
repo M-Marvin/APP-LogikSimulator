@@ -148,7 +148,7 @@ public class BusOutputComponent extends Component implements ISubCircuitIO {
 	@Override
 	public void queryIO() {
 		if (this.subCircuitOutput.isPresent() && this.laneReferenceCache != null) {
-			// Write the current value onto the buss lanes of the parent circuit
+			// Write the current value onto the bus lanes of the parent circuit
 			// TODO Optimize
 			rewriteCache();
 			this.subCircuitOutput.get().writeLanes(writeLaneCache);
@@ -158,12 +158,8 @@ public class BusOutputComponent extends Component implements ISubCircuitIO {
 	@Override
 	public Node makeNode(Component subCircuitComponent, int id, Vec2i offset, boolean connectToCircuit) {
 		OutputNode outputNode = new OutputNode(subCircuitComponent, id, this.label, offset);
-		if (this.subCircuitOutput.isEmpty() || !isTransProcessNodeValid(this.subCircuitOutput.get())) {
-			if (connectToCircuit) {
-				this.subCircuitOutput = Optional.of(outputNode);
-			} else {
-				this.subCircuitOutput = Optional.empty();
-			}
+		if ((this.subCircuitOutput.isEmpty() || !isTransProcessNodeValid(this.subCircuitOutput.get())) && connectToCircuit) {
+			this.subCircuitOutput = Optional.of(outputNode);
 		}
 		return outputNode;
 	}

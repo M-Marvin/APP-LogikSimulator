@@ -107,12 +107,8 @@ public class BoolInputComponent extends Component implements ISubCircuitIO {
 	@Override
 	public Node makeNode(Component subCircuitComponent, int id, Vec2i offset, boolean connectToCircuit) {
 		InputNode overrideNode = new InputNode(subCircuitComponent, id, this.label, offset);
-		if (this.subCircuitInput.isEmpty() || !isTransProcessNodeValid(this.subCircuitInput.get())) {
-			if (connectToCircuit) {
-				this.subCircuitInput = Optional.of(overrideNode);
-			} else {
-				this.subCircuitInput = Optional.empty();
-			}
+		if ((this.subCircuitInput.isEmpty() || !isTransProcessNodeValid(this.subCircuitInput.get())) && connectToCircuit) {
+			this.subCircuitInput = Optional.of(overrideNode);
 		}
 		return overrideNode;
 	}

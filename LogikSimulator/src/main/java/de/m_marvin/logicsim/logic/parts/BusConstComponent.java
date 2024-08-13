@@ -113,7 +113,6 @@ public class BusConstComponent extends Component {
 	
 	@Override
 	public void reset() {
-		this.value = 0;
 		rewriteCache();
 	}
 	

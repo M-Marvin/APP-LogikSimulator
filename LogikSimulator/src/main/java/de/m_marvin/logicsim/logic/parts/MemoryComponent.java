@@ -190,7 +190,7 @@ public class MemoryComponent extends Component {
 	public void deserialize(JsonObject json) {
 		super.deserialize(json);
 		this.isVolatile = json.get("isVolatile").getAsBoolean();
-		this.minDataRowCount = json.get("minDataRowCount").getAsInt();
+		this.minDataRowCount = json.get("minDataRows").getAsInt();
 		this.dataRowWidth = json.get("dataRowWidth").getAsInt();
 		JsonArray arr = json.get("data").getAsJsonArray();
 		this.dataRowCount = arr.size() / this.dataRowWidth;
