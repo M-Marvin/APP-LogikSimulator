@@ -371,7 +371,7 @@
       "x": 710,
       "y": 280,
       "laneTags": {},
-      "subCircuitFile": "register.lcf"
+      "subCircuitFile": "latch.lcf"
     },
     {
       "id": "de.m_marvin.logicsim.logic.parts.SubCircuitComponent",
@@ -379,7 +379,7 @@
       "x": 610,
       "y": 380,
       "laneTags": {},
-      "subCircuitFile": "register.lcf"
+      "subCircuitFile": "latch.lcf"
     },
     {
       "id": "de.m_marvin.logicsim.logic.parts.SubCircuitComponent",

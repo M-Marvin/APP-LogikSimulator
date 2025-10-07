@@ -56,6 +56,8 @@
 "editor.config.memory.min_rows": "Min. rows to allocate:",
 "editor.config.memory.clear.description": "Clear memory:",
 "editor.config.memory.clear": "Clear",
+"editor.config.memory.ontime": "Ontime (ms)",
+"editor.config.memory.offtime": "Offtime (ms)",
 
 "editor_area.warning.floating": "FLOATING",
 "editor_area.warning.short_circuit": "SHORT CIRCUIT",
@@ -104,5 +106,6 @@
 "circuit.components.bool_output": "Bool Output",
 "circuit.components.bus_input": "Bus Input",
 "circuit.components.bus_output": "Bus Output",
-"circuit.components.memory": "Memory"
+"circuit.components.memory": "Memory",
+"circuit.components.clock": "Clock"
 }

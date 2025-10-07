@@ -101,6 +101,7 @@ public abstract class LogicGateComponent extends Component {
 	}
 	
 	protected final BiFunction<Boolean, Boolean, Boolean> logicalFuntion;
+	protected boolean lastState = false;
 	
 	public LogicGateComponent(Circuit circuit, BiFunction<Boolean, Boolean, Boolean> logicalFuntion) {
 		super(circuit);
@@ -126,8 +127,17 @@ public abstract class LogicGateComponent extends Component {
 	
 	@Override
 	public void updateIO() {
+		boolean rstate = this.logicalFuntion.apply(this.inputs.get(0).getState(), this.inputs.get(1).getState());
+		if (rstate) {
+			this.lastState = true;
+			this.outputs.get(0).setState(true);
+		} else if (this.lastState) {
+			this.lastState = false;
+			this.outputs.get(0).setState(true);
+		} else {
+			this.outputs.get(0).setState(false);
+		}
 		
-		this.outputs.get(0).setState(this.logicalFuntion.apply(this.inputs.get(0).getState(), this.inputs.get(1).getState()));
 		
 	}
 	

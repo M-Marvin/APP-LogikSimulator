@@ -96,7 +96,13 @@ public class BusOutputComponent extends Component implements ISubCircuitIO {
 	
 	@Override
 	public void updateIO() {
-		this.laneReferenceCache = this.inputs.get(0).getLaneReference();
+		if (this.subCircuitOutput.isPresent() && this.laneReferenceCache != null) {
+			// Write the current value onto the bus lanes of the parent circuit
+			// TODO Optimize
+			rewriteCache();
+			this.subCircuitOutput.get().writeLanes(writeLaneCache);
+		}
+		this.laneReferenceCache = this.inputs.get(0).getLaneReferencePri();
 	}
 	
 	@Override

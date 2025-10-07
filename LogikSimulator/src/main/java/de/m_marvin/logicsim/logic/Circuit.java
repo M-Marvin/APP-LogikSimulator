@@ -127,8 +127,8 @@ public class Circuit {
 	}
 	
 	protected final List<List<Node>> networks = new AsyncArrayList<>();
-	protected final List<Map<String, NetState>> valuesSec = new AsyncArrayList<>();
-	protected final List<Map<String, NetState>> valuesPri = new AsyncArrayList<>();
+	protected List<Map<String, NetState>> valuesSec = new AsyncArrayList<>();
+	protected List<Map<String, NetState>> valuesPri = new AsyncArrayList<>();
 	protected final List<Component> components = new AsyncArrayList<>();
 	protected File circuitFile;
 	protected final boolean virtual;
@@ -273,22 +273,26 @@ public class Circuit {
 		return this.valuesSec.size() > netId ? this.valuesSec.get(netId) : null;
 	}
 
+	protected Map<String, NetState> getNetLanesPri(int netId) {
+		return this.valuesSec.size() > netId ? this.valuesSec.get(netId) : null;
+	}
+
 	protected void applyNetValue(int netId, NetState state, String lane) {
 		if (netId >= this.valuesPri.size()) return;
 		NetState resultingState = combineStates(safeLaneRead(this.valuesPri.get(netId), lane), state, this.shortCircuitType);
 		this.valuesPri.get(netId).put(lane, resultingState);
-		this.valuesSec.get(netId).put(lane, resultingState);
+		//this.valuesSec.get(netId).put(lane, resultingState);
 	}
 	
 	protected void applyNetLanes(int netId, Map<String, NetState> laneStates) {
 		if (netId >= this.valuesPri.size()) return;
 		Map<String, NetState> laneStatesPri = this.valuesPri.get(netId);
-		Map<String, NetState> laneStatesSec = this.valuesSec.get(netId);
+		//Map<String, NetState> laneStatesSec = this.valuesSec.get(netId);
 		for (String lane : laneStates.keySet()) {
 			NetState resultingState = combineStates(safeLaneRead(laneStatesPri, lane), laneStates.get(lane), this.shortCircuitType);
 			if (lane != null && resultingState != null) {
 				laneStatesPri.put(lane, resultingState);
-				laneStatesSec.put(lane, resultingState);
+				//laneStatesSec.put(lane, resultingState);
 			}
 		}
 	}
@@ -307,6 +311,12 @@ public class Circuit {
 		OptionalInt netId = findNet(node);
 		if (netId.isEmpty()) return null;
 		return getNetLanes(netId.getAsInt());
+	}
+
+	public Map<String, NetState> getLaneMapReferencePri(Node node) {
+		OptionalInt netId = findNet(node);
+		if (netId.isEmpty()) return null;
+		return getNetLanesPri(netId.getAsInt());
 	}
 	
 	public void setNetState(Node node, NetState state) {
@@ -338,12 +348,27 @@ public class Circuit {
 		assert !this.virtual : "Can't simulate virtual circuit!";
 		this.valuesPri.forEach(holder -> holder.clear());
 		this.components.forEach(Component::updateIO);
+		
+		
+		
+//		List<Map<String, NetState>> temp = this.valuesSec;
+//		this.valuesSec = this.valuesPri;
+//		this.valuesPri = temp;
+//		this.valuesPri.forEach(m -> m.keySet().forEach(k -> m.put(k, NetState.FLOATING)));
+		
 		for (int i = 0; i < this.valuesPri.size(); i++) {
 			Map<String, NetState> laneDataSec = this.valuesSec.get(i);
 			Map<String, NetState> laneDataPri = this.valuesPri.get(i);
 			laneDataSec.putAll(laneDataPri);
 			laneDataSec.keySet().stream().filter(lane -> !laneDataPri.containsKey(lane)).toList().forEach(laneDataSec::remove);
 		}
+		
+//		for (int i = 0; i < this.valuesPri.size(); i++) {
+//			Map<String, NetState> laneDataSec = this.valuesSec.get(i);
+//			Map<String, NetState> laneDataPri = this.valuesPri.get(i);
+//			laneDataSec.putAll(laneDataPri);
+//			laneDataSec.keySet().stream().filter(lane -> !laneDataPri.containsKey(lane)).toList().forEach(laneDataSec::remove);
+//		}
 	}
 	
 	

@@ -20,6 +20,7 @@ import de.m_marvin.logicsim.logic.parts.BoolOutputComponent;
 import de.m_marvin.logicsim.logic.parts.BusConstComponent;
 import de.m_marvin.logicsim.logic.parts.BusInputComponent;
 import de.m_marvin.logicsim.logic.parts.BusOutputComponent;
+import de.m_marvin.logicsim.logic.parts.ClockComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.AndGateComponent;
 import de.m_marvin.logicsim.logic.parts.LogicGateComponent.NandGateComponent;
@@ -327,6 +328,7 @@ public class LogicSim {
 		Registries.registerPart(ioFolder, BusConstComponent.class, Component::placeClick, BusConstComponent::coursorMove, Component::abbortPlacement, "circuit.components.bus_const", BusConstComponent.ICON_B64);
 		Registries.registerPart(ioFolder, BoolConstComponent.class, Component::placeClick, BoolConstComponent::coursorMove, Component::abbortPlacement, "circuit.components.bool_const", BoolConstComponent.ICON_B64);
 		Registries.registerPart(utilityFolder, MemoryComponent.class, Component::placeClick, MemoryComponent::coursorMove, Component::abbortPlacement, "circuit.components.memory", MemoryComponent.ICON_B64);
+		Registries.registerPart(utilityFolder, ClockComponent.class, Component::placeClick, ClockComponent::coursorMove, Component::abbortPlacement, "circuit.components.clock", ClockComponent.ICON_B64);
 		
 		Registries.registerPart(wireFolder, ConnectorWire.class, ConnectorWire::placeClick, ConnectorWire::coursorMove, ConnectorWire::abbortPlacement, "circuit.components.wire", ConnectorWire.ICON_B64);
 		

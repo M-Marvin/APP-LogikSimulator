@@ -50,7 +50,7 @@ public class BoolOutputComponent extends Component implements ISubCircuitIO {
 	@Override
 	public void updateIO() {
 		this.state = this.inputs.get(0).getState();
-		if (this.subCircuitOutput.isPresent()) this.laneReferenceCache = this.inputs.get(0).getLaneReference();
+		if (this.subCircuitOutput.isPresent()) this.laneReferenceCache = this.inputs.get(0).getLaneReferencePri();
 	}
 	
 	@Override

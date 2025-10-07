@@ -72,6 +72,10 @@ public abstract class Node {
 	public Map<String, NetState> getLaneReference() {
 		return this.getCircuit().getLaneMapReference(this);
 	}
+
+	public Map<String, NetState> getLaneReferencePri() {
+		return this.getCircuit().getLaneMapReferencePri(this);
+	}
 	
 	/**
 	 * Gets called when the user clicks on the node in the editor.

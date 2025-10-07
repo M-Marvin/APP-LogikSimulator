@@ -145,7 +145,7 @@ public class BusInputComponent extends Component implements ISubCircuitIO {
 	@Override
 	public void queryIO() {
 		if (this.subCircuitInput.isPresent()) {
-			this.laneReferenceCache = this.subCircuitInput.get().getLaneReference();
+			this.laneReferenceCache = this.subCircuitInput.get().getLaneReferencePri();
 		}
 	}
 	

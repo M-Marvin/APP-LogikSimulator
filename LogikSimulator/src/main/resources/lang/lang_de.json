@@ -56,6 +56,8 @@
 "editor.config.memory.min_rows": "Min. Zeilen zuordnen:",
 "editor.config.memory.clear.description": "Speicher löschen:",
 "editor.config.memory.clear": "Löschen",
+"editor.config.memory.ontime": "Einschalt-Dauer (ms)",
+"editor.config.memory.offtime": "Ausschalt-Dauer (ms)",
 
 "editor_area.warning.floating": "FLOATING",
 "editor_area.warning.short_circuit": "KURZSCHLUSS",
@@ -107,5 +109,6 @@
 "circuit.components.bus_output": "Bus-Ausgang",
 "circuit.components.bus_const": "Bus-Konstante",
 "circuit.components.bool_const": "Bool-Konstante",
-"circuit.components.memory": "Speicher"
+"circuit.components.memory": "Speicher",
+"circuit.components.clock": "Taktgeber"
 }
