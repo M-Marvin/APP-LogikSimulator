@@ -127,7 +127,7 @@ public class CircuitSerializer {
 			} catch (Exception e) {
 				System.err.println("Failed to load component '" + componentJson.toString() + "'");
 				Editor parentWindow = LogicSim.getInstance().getLastInteractedEditor();
-				if (parentWindow != null) Editor.showErrorInfo(parentWindow.getShell(), "editor.window.error.parese_file", e);
+				if (parentWindow != null) Editor.showErrorInfo(parentWindow.getShell(), "editor.window.error.parse_file", e);
 				e.printStackTrace();
 			}
 		});
